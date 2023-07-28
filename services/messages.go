@@ -74,7 +74,7 @@ func (s *MessageService) DeleteMessage(ctx context.Context, req *protos.DeleteMe
 // Finds and retrieves messages matching the particular criteria.
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
 	results := s.EntityStore.List(func(s1, s2 *protos.Message) bool {
-		return s1.CreatedAt.AsTime() < s2.CreatedAt.AsTime()
+		return s1.CreatedAt.AsTime().Before(s2.CreatedAt.AsTime())
 	},
 		func(m *protos.Message) bool {
 			return m.TopicId == req.TopicId
