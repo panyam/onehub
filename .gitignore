@@ -1,0 +1,15 @@
+node_modules
+.DS_Store
+__debug_bin
+main
+build
+.coverage
+*.egg-info
+__pycache__
+dist
+*.swo
+.pgdata
+.pgdata_test
+*.swp
+env
+

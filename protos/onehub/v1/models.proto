@@ -1,0 +1,69 @@
+syntax = "proto3";
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/struct.proto";
+
+option go_package = "github.com/onehub/protos";
+package onehub.v1;
+
+// Artists perform/play/sing songs
+message Topic {
+  google.protobuf.Timestamp created_at = 1;
+  google.protobuf.Timestamp updated_at = 2;
+
+  // ID of the topic
+  string id = 3;
+
+  // ID of the user that created this topic
+  string creator_id = 4;
+  
+  // A unique name of the topic that users can use to connect to
+  string name = 5;
+
+  // IDs of users in this topic.   Right now no information about
+  // their participation is kept.
+  repeated string users = 6;
+}
+
+/**
+ * An individual message in a topic
+ */
+message Message {
+  /**
+   * When the message was created on the server.
+   */
+  google.protobuf.Timestamp created_at = 1;
+
+  /**
+   * When the message or its body were last modified (if modifications are
+   * possible).
+   */
+  google.protobuf.Timestamp updated_at = 2;
+
+  /**
+   * ID of the message guaranteed to be unique within a topic.
+   * Set only by the server and cannot be modified.
+   */
+  string id = 3;
+
+  /**
+   * User sending this message.
+   */
+  string user_id = 4;
+
+  /**
+   * Topic the message is part of.  This is only set by the server
+   * and cannot be modified.
+   */
+  string topic_id = 5;
+
+  /**
+   * Content type of the message. Can be like a ContentType http
+   * header or something custom like shell/command
+   */
+  string content_type = 6;
+
+  /**
+   * A simple way to just send text.
+   */
+  string content_text = 7;
+}

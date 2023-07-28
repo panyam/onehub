@@ -1,0 +1,177 @@
+syntax = "proto3";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/onehub/protos";
+package onehub.v1;
+
+import "onehub/v1/models.proto";
+
+/**
+ * Service for operating on messages
+ */
+service MessageService {
+  /**
+   * Create a new sesssion
+   */
+  rpc CreateMessage(CreateMessageRequest) returns (CreateMessageResponse) {
+  }
+
+  /**
+   * List all messages in a topic
+   */
+  rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) { 
+  }
+
+  /**
+   * Get a particular message
+   */
+  rpc GetMessage(GetMessageRequest) returns (GetMessageResponse) { 
+  }
+
+  /**
+   * Batch get multiple messages by IDs
+   */
+  rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse) { 
+  }
+
+  /**
+   * Delete a particular message
+   */
+  rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) { 
+  }
+
+  /**
+   * Update a message within a topic.
+   */
+  rpc UpdateMessage(UpdateMessageRequest) returns (UpdateMessageResponse) {
+  }
+}
+
+/**
+ * Message creation request object
+ */
+message CreateMessageRequest {
+  /**
+   * Message being updated
+   */
+  Message message = 1;
+}
+
+/**
+ * Response of an message creation.
+ */
+message CreateMessageResponse {
+  /**
+   * Message being created
+   */
+  Message message = 1;
+}
+
+/**
+ * A message listing request.  For now only paginations params are provided.
+ */
+message ListMessagesRequest {
+  /**
+   * Instead of an offset an abstract  "page" key is provided that offers
+   * an opaque "pointer" into some offset in a result set.
+   */
+  string page_key = 1;
+
+  /**
+   * Number of results to return.
+   */
+  int32 page_size = 2;
+
+  /**
+   * Topic in which messages are to be listed.  Required.
+   */
+  string topic_id = 3;
+}
+
+/**
+ * Response of a topic search/listing.
+ */
+message ListMessagesResponse {
+  /**
+   * The list of topics found as part of this response.
+   */
+  repeated Message messages = 1;
+
+  /**
+   * The key/pointer string that subsequent List requests should pass to
+   * continue the pagination.
+   */
+  string next_page_key = 2;
+}
+
+/**
+ * Request to get a single message.
+ */
+message GetMessageRequest {
+  /**
+   * ID of the topic to be fetched
+   */
+  string id = 1;
+}
+
+/**
+ * Message get response
+ */
+message GetMessageResponse {
+  Message message = 1;
+}
+
+/**
+ * Request to batch get messages
+ */
+message GetMessagesRequest {
+  /**
+   * IDs of the messages to be fetched
+   */
+  repeated string ids = 1;
+}
+
+/**
+ * Message batch-get response
+ */
+message GetMessagesResponse {
+  map<string, Message> messages = 1;
+}
+
+/**
+ * Request to delete an message
+ */
+message DeleteMessageRequest {
+  /**
+   * ID of the message to be deleted.
+   */
+  string id = 1;
+}
+
+/**
+ * Message deletion response
+ */
+message DeleteMessageResponse {
+}
+
+message UpdateMessageRequest {
+  // The message being updated.  The topic ID AND message ID fields *must*
+  // be specified in this message object.  How other fields are used is
+  // determined by the update_mask parameter enabling partial updates
+  Message message = 1;
+
+  // Indicates which fields are being updated
+  // If the field_mask is *not* provided then we reject
+  // a replace (as required by the standard convention) to prevent
+  // full replace in error.  Instead an update_mask of "*" must be passed.
+  google.protobuf.FieldMask update_mask = 3;
+
+  // Any fields specified here will be "appended" to instead of being
+  // replaced
+  google.protobuf.FieldMask append_mask = 4;
+}
+
+message UpdateMessageResponse {
+  // The updated message
+  Message message = 1;
+}

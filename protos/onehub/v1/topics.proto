@@ -1,0 +1,185 @@
+syntax = "proto3";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/onehub/protos";
+package onehub.v1;
+
+import "onehub/v1/models.proto";
+
+/**
+ * Service for operating on topics
+ */
+service TopicService {
+  /**
+   * Create a new sesssion
+   */
+  rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse) {
+  }
+
+  /**
+   * List all topics from a user.
+   */
+  rpc ListTopics(ListTopicsRequest) returns (ListTopicsResponse) { 
+  }
+
+  /**
+   * Get a particular topic
+   */
+  rpc GetTopic(GetTopicRequest) returns (GetTopicResponse) { 
+  }
+
+  /**
+   * Batch get multiple topics by ID
+   */
+  rpc GetTopics(GetTopicsRequest) returns (GetTopicsResponse) { 
+  }
+
+  /**
+   * Delete a particular topic
+   */
+  rpc DeleteTopic(DeleteTopicRequest) returns (DeleteTopicResponse) { 
+  }
+
+  /**
+   * Updates specific fields of a topic
+   */
+  rpc UpdateTopic(UpdateTopicRequest) returns (UpdateTopicResponse) {
+  }
+}
+
+/**
+ * Topic creation request object
+ */
+message CreateTopicRequest {
+  /**
+   * Topic being updated
+   */
+  Topic topic = 1;
+}
+
+/**
+ * Response of an topic creation.
+ */
+message CreateTopicResponse {
+  /**
+   * Topic being created
+   */
+  Topic topic = 1;
+}
+
+/**
+ * An topic search request.  For now only paginations params are provided.
+ */
+message ListTopicsRequest {
+  /**
+   * Instead of an offset an abstract  "page" key is provided that offers
+   * an opaque "pointer" into some offset in a result set.
+   */
+  string page_key = 1;
+
+  /**
+   * Number of results to return.
+   */
+  int32 page_size = 2;
+}
+
+/**
+ * Response of a topic search/listing.
+ */
+message ListTopicsResponse {
+  /**
+   * The list of topics found as part of this response.
+   */
+  repeated Topic topics = 1;
+
+  /**
+   * The key/pointer string that subsequent List requests should pass to
+   * continue the pagination.
+   */
+  string next_page_key = 2;
+}
+
+/**
+ * Request to get an topic.
+ */
+message GetTopicRequest {
+  /**
+   * ID of the topic to be fetched
+   */
+  string id = 1;
+}
+
+/**
+ * Topic get response
+ */
+message GetTopicResponse {
+  Topic topic = 1;
+}
+
+/**
+ * Request to batch get topics
+ */
+message GetTopicsRequest {
+  /**
+   * IDs of the topic to be fetched
+   */
+  repeated string ids = 1;
+}
+
+/**
+ * Topic batch-get response
+ */
+message GetTopicsResponse {
+  map<string, Topic> topics = 1;
+}
+
+/**
+ * Request to delete an topic.
+ */
+message DeleteTopicRequest {
+  /**
+   * ID of the topic to be deleted.
+   */
+  string id = 1;
+}
+
+/**
+ * Topic deletion response
+ */
+message DeleteTopicResponse {
+}
+
+/**
+ * The request for (partially) updating an Topic.
+ */
+message UpdateTopicRequest {
+  /**
+   * Topic being updated
+   */
+  Topic topic = 1;
+
+  /**
+   * Mask of fields being updated in this Topic to make partial changes.
+   */
+  google.protobuf.FieldMask update_mask = 2;
+
+  /**
+   * IDs of users to be added to this topic.
+   */
+  repeated string add_users = 3;
+
+  /**
+   * IDs of users to be removed from this topic.
+   */
+  repeated string remove_users = 4;
+}
+
+/**
+ * The request for (partially) updating an Topic.
+ */
+message UpdateTopicResponse {
+  /**
+   * Topic being updated
+   */
+  Topic topic = 1;
+}
