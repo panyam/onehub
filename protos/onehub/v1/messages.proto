@@ -5,6 +5,7 @@ option go_package = "github.com/onehub/protos";
 package onehub.v1;
 
 import "onehub/v1/models.proto";
+import "google/api/annotations.proto";
 
 /**
  * Service for operating on messages
@@ -14,36 +15,56 @@ service MessageService {
    * Create a new sesssion
    */
   rpc CreateMessage(CreateMessageRequest) returns (CreateMessageResponse) {
+    option (google.api.http) = {
+      post: "/v1/topics/{message.topic_id=*}/messages",
+      body: "*",
+    };
   }
 
   /**
    * List all messages in a topic
    */
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) { 
+    option (google.api.http) = {
+      get: "/v1/topics/{topic_id=*}/messages"
+    };
   }
 
   /**
    * Get a particular message
    */
   rpc GetMessage(GetMessageRequest) returns (GetMessageResponse) { 
+    option (google.api.http) = {
+      get: "/v1/messages/{id=*}"
+    };
   }
 
   /**
    * Batch get multiple messages by IDs
    */
   rpc GetMessages(GetMessagesRequest) returns (GetMessagesResponse) { 
+    option (google.api.http) = {
+      get: "/v1/messages:batchGet"
+    };
   }
 
   /**
    * Delete a particular message
    */
   rpc DeleteMessage(DeleteMessageRequest) returns (DeleteMessageResponse) { 
+    option (google.api.http) = {
+      delete: "/v1/messages/{id=*}"
+    };
   }
 
   /**
    * Update a message within a topic.
    */
   rpc UpdateMessage(UpdateMessageRequest) returns (UpdateMessageResponse) {
+      option (google.api.http) = {
+          patch: "/v1/messages/{message.id=*}"
+          body: "*"
+      };
   }
 }
 

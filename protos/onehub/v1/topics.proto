@@ -5,6 +5,7 @@ option go_package = "github.com/onehub/protos";
 package onehub.v1;
 
 import "onehub/v1/models.proto";
+import "google/api/annotations.proto";
 
 /**
  * Service for operating on topics
@@ -14,36 +15,56 @@ service TopicService {
    * Create a new sesssion
    */
   rpc CreateTopic(CreateTopicRequest) returns (CreateTopicResponse) {
+    option (google.api.http) = {
+      post: "/v1/topics",
+      body: "*",
+    };
   }
 
   /**
    * List all topics from a user.
    */
   rpc ListTopics(ListTopicsRequest) returns (ListTopicsResponse) { 
+    option (google.api.http) = {
+      get: "/v1/topics"
+    };
   }
 
   /**
    * Get a particular topic
    */
   rpc GetTopic(GetTopicRequest) returns (GetTopicResponse) { 
+    option (google.api.http) = {
+      get: "/v1/topics/{id=*}"
+    };
   }
 
   /**
    * Batch get multiple topics by ID
    */
   rpc GetTopics(GetTopicsRequest) returns (GetTopicsResponse) { 
+    option (google.api.http) = {
+      get: "/v1/topics:batchGet"
+    };
   }
 
   /**
    * Delete a particular topic
    */
   rpc DeleteTopic(DeleteTopicRequest) returns (DeleteTopicResponse) { 
+    option (google.api.http) = {
+      delete: "/v1/topics/{id=*}"
+    };
   }
 
   /**
    * Updates specific fields of a topic
    */
   rpc UpdateTopic(UpdateTopicRequest) returns (UpdateTopicResponse) {
+    option (google.api.http) = {
+      patch: "/v1/topics/{topic.id=*}"
+      body: "*"
+    };
   }
 }
 
