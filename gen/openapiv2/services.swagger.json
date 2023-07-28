@@ -1,0 +1,846 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "onehub/v1/models.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "MessageService"
+    },
+    {
+      "name": "TopicService"
+    }
+  ],
+  "consumes": [
+    "application/json"
+  ],
+  "produces": [
+    "application/json"
+  ],
+  "paths": {
+    "/v1/messages/{id}": {
+      "get": {
+        "summary": "*\nGet a particular message",
+        "operationId": "MessageService_GetMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "*\nID of the topic to be fetched",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      },
+      "delete": {
+        "summary": "*\nDelete a particular message",
+        "operationId": "MessageService_DeleteMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "*\nID of the message to be deleted.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
+    "/v1/messages/{message.id}": {
+      "patch": {
+        "summary": "*\nUpdate a message within a topic.",
+        "operationId": "MessageService_UpdateMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "message.id",
+            "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "*\nWhen the message was created on the server."
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
+                    },
+                    "userId": {
+                      "type": "string",
+                      "description": "*\nUser sending this message."
+                    },
+                    "topicId": {
+                      "type": "string",
+                      "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified."
+                    },
+                    "contentType": {
+                      "type": "string",
+                      "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
+                    },
+                    "contentText": {
+                      "type": "string",
+                      "description": "*\nA simple way to just send text."
+                    },
+                    "contentData": {
+                      "type": "object",
+                      "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
+                    }
+                  },
+                  "title": "The message being updated.  The topic ID AND message ID fields *must*\nbe specified in this message object.  How other fields are used is\ndetermined by the update_mask parameter enabling partial updates"
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "Indicates which fields are being updated\nIf the field_mask is *not* provided then we reject\na replace (as required by the standard convention) to prevent\nfull replace in error.  Instead an update_mask of \"*\" must be passed."
+                },
+                "appendMask": {
+                  "type": "string",
+                  "title": "Any fields specified here will be \"appended\" to instead of being\nreplaced"
+                }
+              }
+            }
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
+    "/v1/messages:batchGet": {
+      "get": {
+        "summary": "*\nBatch get multiple messages by IDs",
+        "operationId": "MessageService_GetMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "*\nIDs of the messages to be fetched",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
+    "/v1/topics": {
+      "get": {
+        "summary": "*\nList all topics from a user.",
+        "operationId": "TopicService_ListTopics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListTopicsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageKey",
+            "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageSize",
+            "description": "*\nNumber of results to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "TopicService"
+        ]
+      },
+      "post": {
+        "summary": "*\nCreate a new sesssion",
+        "operationId": "TopicService_CreateTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateTopicRequest"
+            }
+          }
+        ],
+        "tags": [
+          "TopicService"
+        ]
+      }
+    },
+    "/v1/topics/{id}": {
+      "get": {
+        "summary": "*\nGet a particular topic",
+        "operationId": "TopicService_GetTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "*\nID of the topic to be fetched",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          }
+        ],
+        "tags": [
+          "TopicService"
+        ]
+      },
+      "delete": {
+        "summary": "*\nDelete a particular topic",
+        "operationId": "TopicService_DeleteTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "*\nID of the topic to be deleted.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          }
+        ],
+        "tags": [
+          "TopicService"
+        ]
+      }
+    },
+    "/v1/topics/{message.topicId}/messages": {
+      "post": {
+        "summary": "*\nCreate a new sesssion",
+        "operationId": "MessageService_CreateMessage",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateMessageResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "message.topicId",
+            "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "message": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "*\nWhen the message was created on the server."
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time",
+                      "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
+                    },
+                    "id": {
+                      "type": "string",
+                      "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified."
+                    },
+                    "userId": {
+                      "type": "string",
+                      "description": "*\nUser sending this message."
+                    },
+                    "contentType": {
+                      "type": "string",
+                      "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
+                    },
+                    "contentText": {
+                      "type": "string",
+                      "description": "*\nA simple way to just send text."
+                    },
+                    "contentData": {
+                      "type": "object",
+                      "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
+                    }
+                  },
+                  "title": "*\nMessage being updated"
+                }
+              },
+              "title": "*\nMessage creation request object"
+            }
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
+    "/v1/topics/{topic.id}": {
+      "patch": {
+        "summary": "*\nUpdates specific fields of a topic",
+        "operationId": "TopicService_UpdateTopic",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateTopicResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topic.id",
+            "description": "ID of the topic",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "topic": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "creatorId": {
+                      "type": "string",
+                      "title": "ID of the user that created this topic"
+                    },
+                    "name": {
+                      "type": "string",
+                      "title": "A unique name of the topic that users can use to connect to"
+                    },
+                    "users": {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      },
+                      "description": "IDs of users in this topic.   Right now no information about\ntheir participation is kept."
+                    }
+                  },
+                  "title": "*\nTopic being updated"
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "*\nMask of fields being updated in this Topic to make partial changes."
+                },
+                "addUsers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "*\nIDs of users to be added to this topic."
+                },
+                "removeUsers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "*\nIDs of users to be removed from this topic."
+                }
+              },
+              "description": "*\nThe request for (partially) updating an Topic."
+            }
+          }
+        ],
+        "tags": [
+          "TopicService"
+        ]
+      }
+    },
+    "/v1/topics/{topicId}/messages": {
+      "get": {
+        "summary": "*\nList all messages in a topic",
+        "operationId": "MessageService_ListMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topicId",
+            "description": "*\nTopic in which messages are to be listed.  Required.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "pageKey",
+            "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageSize",
+            "description": "*\nNumber of results to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
+    "/v1/topics:batchGet": {
+      "get": {
+        "summary": "*\nBatch get multiple topics by ID",
+        "operationId": "TopicService_GetTopics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetTopicsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "*\nIDs of the topic to be fetched",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "TopicService"
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "protobufAny": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "protobufNullValue": {
+      "type": "string",
+      "enum": [
+        "NULL_VALUE"
+      ],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "rpcStatus": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/protobufAny"
+          }
+        }
+      }
+    },
+    "v1CreateMessageResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/v1Message",
+          "title": "*\nMessage being created"
+        }
+      },
+      "description": "*\nResponse of an message creation."
+    },
+    "v1CreateTopicRequest": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1Topic",
+          "title": "*\nTopic being updated"
+        }
+      },
+      "title": "*\nTopic creation request object"
+    },
+    "v1CreateTopicResponse": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1Topic",
+          "title": "*\nTopic being created"
+        }
+      },
+      "description": "*\nResponse of an topic creation."
+    },
+    "v1DeleteMessageResponse": {
+      "type": "object",
+      "title": "*\nMessage deletion response"
+    },
+    "v1DeleteTopicResponse": {
+      "type": "object",
+      "title": "*\nTopic deletion response"
+    },
+    "v1GetMessageResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/v1Message"
+        }
+      },
+      "title": "*\nMessage get response"
+    },
+    "v1GetMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Message"
+          }
+        }
+      },
+      "title": "*\nMessage batch-get response"
+    },
+    "v1GetTopicResponse": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1Topic"
+        }
+      },
+      "title": "*\nTopic get response"
+    },
+    "v1GetTopicsResponse": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1Topic"
+          }
+        }
+      },
+      "title": "*\nTopic batch-get response"
+    },
+    "v1ListMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
+          "description": "*\nThe list of topics found as part of this response."
+        },
+        "nextPageKey": {
+          "type": "string",
+          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        }
+      },
+      "description": "*\nResponse of a topic search/listing."
+    },
+    "v1ListTopicsResponse": {
+      "type": "object",
+      "properties": {
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Topic"
+          },
+          "description": "*\nThe list of topics found as part of this response."
+        },
+        "nextPageKey": {
+          "type": "string",
+          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        }
+      },
+      "description": "*\nResponse of a topic search/listing."
+    },
+    "v1Message": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "*\nWhen the message was created on the server."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
+        },
+        "id": {
+          "type": "string",
+          "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified."
+        },
+        "userId": {
+          "type": "string",
+          "description": "*\nUser sending this message."
+        },
+        "topicId": {
+          "type": "string",
+          "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified."
+        },
+        "contentType": {
+          "type": "string",
+          "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
+        },
+        "contentText": {
+          "type": "string",
+          "description": "*\nA simple way to just send text."
+        },
+        "contentData": {
+          "type": "object",
+          "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
+        }
+      },
+      "title": "*\nAn individual message in a topic"
+    },
+    "v1Topic": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "title": "ID of the topic"
+        },
+        "creatorId": {
+          "type": "string",
+          "title": "ID of the user that created this topic"
+        },
+        "name": {
+          "type": "string",
+          "title": "A unique name of the topic that users can use to connect to"
+        },
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          },
+          "description": "IDs of users in this topic.   Right now no information about\ntheir participation is kept."
+        }
+      },
+      "title": "Artists perform/play/sing songs"
+    },
+    "v1UpdateMessageResponse": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "$ref": "#/definitions/v1Message",
+          "title": "The updated message"
+        }
+      }
+    },
+    "v1UpdateTopicResponse": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "$ref": "#/definitions/v1Topic",
+          "title": "*\nTopic being updated"
+        }
+      },
+      "description": "*\nThe request for (partially) updating an Topic."
+    }
+  }
+}
