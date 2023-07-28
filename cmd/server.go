@@ -22,7 +22,7 @@ func startGRPCServer(addr string) {
 	// create new gRPC server
 	server := grpc.NewServer()
 	v1.RegisterTopicServiceServer(server, svc.NewTopicService(nil))
-	// v1.RegisterMessageServiceServer(server, svc.NewMessageService(nil))
+	v1.RegisterMessageServiceServer(server, svc.NewMessageService(nil))
 	if l, err := net.Listen("tcp", addr); err != nil {
 		log.Fatalf("error in listening on port %s: %v", addr, err)
 	} else {
