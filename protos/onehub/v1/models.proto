@@ -66,4 +66,9 @@ message Message {
    * A simple way to just send text.
    */
   string content_text = 7;
+
+  // Raw contents for data stored locally as JSON
+  // Note we can have a combination of text, url and data
+  // to show different things in the View/UI
+  google.protobuf.Struct content_data = 8;
 }
