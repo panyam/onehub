@@ -65,7 +65,7 @@ func (s *EntityStore[T]) Update(entity *T) *T {
 	return entity
 }
 
-// Deletes an song from our system.
+// Deletes an entity from our system.
 func (s *EntityStore[T]) Delete(id string) bool {
 	_, ok := s.Entities[id]
 	if ok {
@@ -74,11 +74,13 @@ func (s *EntityStore[T]) Delete(id string) bool {
 	return ok
 }
 
-// Finds and retrieves songs matching the particular criteria.
-func (s *EntityStore[T]) List(ltfunc func(t1, t2 *T) bool) (out []*T) {
+// Finds and retrieves entity matching the particular criteria.
+func (s *EntityStore[T]) List(ltfunc func(t1, t2 *T) bool, filterfunc func(t *T) bool) (out []*T) {
 	log.Println("E: ", s.Entities)
 	for _, ent := range s.Entities {
-		out = append(out, ent)
+		if filterfunc == nil || filterfunc(ent) {
+			out = append(out, ent)
+		}
 	}
 	// Sort in reverse order of name
 	sort.Slice(out, func(idx1, idx2 int) bool {
