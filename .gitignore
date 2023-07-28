@@ -9,6 +9,7 @@ __pycache__
 dist
 *.swo
 .pgdata
+.pgadmin
 .pgdata_test
 *.swp
 env
