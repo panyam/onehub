@@ -1,8 +1,7 @@
 version: '3.9'
 services:
   postgres:
-    image: postgres:15.2
-    profiles: ["all", "debug"]
+    image: postgres:15.3
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
