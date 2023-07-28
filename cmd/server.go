@@ -3,9 +3,11 @@ package main
 import (
 	"context"
 	"flag"
+	"fmt"
 	"log"
 	"net"
 	"net/http"
+	"strings"
 
 	"google.golang.org/grpc"
 
@@ -14,7 +16,10 @@ import (
 	svc "github.com/panyam/onehub/services"
 
 	// This is needed to enable the use of the grpc_cli tool
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
+	"google.golang.org/grpc/status"
 )
 
 var (
@@ -24,7 +29,9 @@ var (
 
 func startGRPCServer(addr string) {
 	// create new gRPC server
-	server := grpc.NewServer()
+	server := grpc.NewServer(
+		grpc.UnaryInterceptor(EnsureAuthIsValid),
+	)
 	v1.RegisterTopicServiceServer(server, svc.NewTopicService(nil))
 	v1.RegisterMessageServiceServer(server, svc.NewMessageService(nil))
 	if l, err := net.Listen("tcp", addr); err != nil {
@@ -41,7 +48,26 @@ func startGRPCServer(addr string) {
 
 func startGatewayServer(gw_addr, grpc_addr string) {
 	ctx := context.Background()
-	mux := runtime.NewServeMux()
+	mux := runtime.NewServeMux(
+		runtime.WithMetadata(func(ctx context.Context, request *http.Request) metadata.MD {
+
+			//
+			// Step 2 - Extend the context
+			//
+			ctx = metadata.AppendToOutgoingContext(ctx)
+
+			//
+			// Step 3 - get the basic auth params
+			//
+			username, password, ok := request.BasicAuth()
+			if !ok {
+				return nil
+			}
+			md := metadata.Pairs()
+			md.Append("OneHubUsername", username)
+			md.Append("OneHubPassword", password)
+			return md
+		}))
 
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 	err := v1.RegisterTopicServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts)
@@ -54,6 +80,54 @@ func startGatewayServer(gw_addr, grpc_addr string) {
 
 	log.Println("Starting grpc gateway server on: ", gw_addr)
 	http.ListenAndServe(gw_addr, mux)
+}
+
+func EnsureAuthExists(ctx context.Context,
+	method string, // Method to be invoked on the service (eg GetAlbums)
+	req, // Request payload  (eg GetAlbumsRequest)
+	reply interface{}, // Response payload (eg GetAlbumsResponse)
+	cc *grpc.ClientConn, // the underlying connection to the service
+	invoker grpc.UnaryInvoker, // The next handler
+	opts ...grpc.CallOption) error {
+
+	md, ok := metadata.FromOutgoingContext(ctx)
+	if ok {
+		usernames := md.Get("OneHubUsername")
+		passwords := md.Get("OneHubPassword")
+		log.Println("UP: ", usernames, passwords)
+		if len(usernames) > 0 && len(passwords) > 0 {
+			username := strings.TrimSpace(usernames[0])
+			password := strings.TrimSpace(passwords[0])
+			if len(username) > 0 && len(password) > 0 {
+				// All fine - just call the invoker
+				return invoker(ctx, method, req, reply, cc, opts...)
+			}
+		}
+	}
+	return status.Error(codes.NotFound, "BasicAuth params not found")
+}
+
+func EnsureAuthIsValid(ctx context.Context,
+	req interface{},
+	info *grpc.UnaryServerInfo,
+	handler grpc.UnaryHandler) (resp interface{}, err error) {
+	md, ok := metadata.FromIncomingContext(ctx)
+	if ok {
+		usernames := md.Get("OneHubUsername")
+		passwords := md.Get("OneHubPassword")
+		log.Println("UP: ", usernames, passwords)
+		if len(usernames) > 0 && len(passwords) > 0 {
+			username := strings.TrimSpace(usernames[0])
+			password := strings.TrimSpace(passwords[0])
+
+			// Make sure you use better passwords than this!
+			if len(username) > 0 && password == fmt.Sprintf("%s123", username) {
+				// All fine - just call the invoker
+				return handler(ctx, req)
+			}
+		}
+	}
+	return nil, status.Error(codes.NotFound, "Invalid username/password")
 }
 
 func main() {
