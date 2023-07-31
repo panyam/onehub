@@ -5,6 +5,23 @@ import "google/protobuf/struct.proto";
 option go_package = "github.com/onehub/protos";
 package onehub.v1;
 
+message User {
+  google.protobuf.Timestamp created_at = 1;
+  google.protobuf.Timestamp updated_at = 2;
+
+  // ID of this user
+  string id = 3;
+
+  // Name of this user
+  string name = 4;
+
+  // An avatar object for the user
+  string avatar = 5;
+
+  // General Profile Data
+  optional google.protobuf.Struct profile_data = 6;
+}
+
 // Artists perform/play/sing songs
 message Topic {
   google.protobuf.Timestamp created_at = 1;

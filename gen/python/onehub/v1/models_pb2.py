@@ -15,7 +15,7 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16onehub/v1/models.proto\x12\tonehub.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\xd6\x01\n\x05Topic\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x1d\n\ncreator_id\x18\x04 \x01(\tR\tcreatorId\x12\x12\n\x04name\x18\x05 \x01(\tR\x04name\x12\x14\n\x05users\x18\x06 \x03(\tR\x05users\"\xc5\x02\n\x07Message\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x17\n\x07user_id\x18\x04 \x01(\tR\x06userId\x12\x19\n\x08topic_id\x18\x05 \x01(\tR\x07topicId\x12!\n\x0c\x63ontent_type\x18\x06 \x01(\tR\x0b\x63ontentType\x12!\n\x0c\x63ontent_text\x18\x07 \x01(\tR\x0b\x63ontentText\x12:\n\x0c\x63ontent_data\x18\x08 \x01(\x0b\x32\x17.google.protobuf.StructR\x0b\x63ontentDataB{\n\rcom.onehub.v1B\x0bModelsProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16onehub/v1/models.proto\x12\tonehub.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x8a\x02\n\x04User\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\x12\x16\n\x06\x61vatar\x18\x05 \x01(\tR\x06\x61vatar\x12?\n\x0cprofile_data\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructH\x00R\x0bprofileData\x88\x01\x01\x42\x0f\n\r_profile_data\"\xd6\x01\n\x05Topic\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x1d\n\ncreator_id\x18\x04 \x01(\tR\tcreatorId\x12\x12\n\x04name\x18\x05 \x01(\tR\x04name\x12\x14\n\x05users\x18\x06 \x03(\tR\x05users\"\xc5\x02\n\x07Message\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x17\n\x07user_id\x18\x04 \x01(\tR\x06userId\x12\x19\n\x08topic_id\x18\x05 \x01(\tR\x07topicId\x12!\n\x0c\x63ontent_type\x18\x06 \x01(\tR\x0b\x63ontentType\x12!\n\x0c\x63ontent_text\x18\x07 \x01(\tR\x0b\x63ontentText\x12:\n\x0c\x63ontent_data\x18\x08 \x01(\x0b\x32\x17.google.protobuf.StructR\x0b\x63ontentDataB{\n\rcom.onehub.v1B\x0bModelsProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -24,8 +24,10 @@ if _descriptor._USE_C_DESCRIPTORS == False:
 
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\rcom.onehub.v1B\013ModelsProtoP\001Z\030github.com/onehub/protos\242\002\003OXX\252\002\tOnehub.V1\312\002\tOnehub\\V1\342\002\025Onehub\\V1\\GPBMetadata\352\002\nOnehub::V1'
-  _globals['_TOPIC']._serialized_start=101
-  _globals['_TOPIC']._serialized_end=315
-  _globals['_MESSAGE']._serialized_start=318
-  _globals['_MESSAGE']._serialized_end=643
+  _globals['_USER']._serialized_start=101
+  _globals['_USER']._serialized_end=367
+  _globals['_TOPIC']._serialized_start=370
+  _globals['_TOPIC']._serialized_end=584
+  _globals['_MESSAGE']._serialized_start=587
+  _globals['_MESSAGE']._serialized_end=912
 # @@protoc_insertion_point(module_scope)

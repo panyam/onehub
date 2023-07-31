@@ -7,6 +7,63 @@ import type { BinaryReadOptions, FieldList, JsonReadOptions, JsonValue, PartialM
 import { Message as Message$1, proto3 } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message onehub.v1.User
+ */
+export declare class User extends Message$1<User> {
+  /**
+   * @generated from field: google.protobuf.Timestamp created_at = 1;
+   */
+  createdAt?: Timestamp;
+
+  /**
+   * @generated from field: google.protobuf.Timestamp updated_at = 2;
+   */
+  updatedAt?: Timestamp;
+
+  /**
+   * ID of this user
+   *
+   * @generated from field: string id = 3;
+   */
+  id: string;
+
+  /**
+   * Name of this user
+   *
+   * @generated from field: string name = 4;
+   */
+  name: string;
+
+  /**
+   * An avatar object for the user
+   *
+   * @generated from field: string avatar = 5;
+   */
+  avatar: string;
+
+  /**
+   * General Profile Data
+   *
+   * @generated from field: optional google.protobuf.Struct profile_data = 6;
+   */
+  profileData?: Struct;
+
+  constructor(data?: PartialMessage<User>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.User";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): User;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): User;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): User;
+
+  static equals(a: User | PlainMessage<User> | undefined, b: User | PlainMessage<User> | undefined): boolean;
+}
+
+/**
  * Artists perform/play/sing songs
  *
  * @generated from message onehub.v1.Topic

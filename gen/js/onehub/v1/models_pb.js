@@ -6,6 +6,21 @@
 import { proto3, Struct, Timestamp } from "@bufbuild/protobuf";
 
 /**
+ * @generated from message onehub.v1.User
+ */
+export const User = proto3.makeMessageType(
+  "onehub.v1.User",
+  () => [
+    { no: 1, name: "created_at", kind: "message", T: Timestamp },
+    { no: 2, name: "updated_at", kind: "message", T: Timestamp },
+    { no: 3, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 5, name: "avatar", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 6, name: "profile_data", kind: "message", T: Struct, opt: true },
+  ],
+);
+
+/**
  * Artists perform/play/sing songs
  *
  * @generated from message onehub.v1.Topic
