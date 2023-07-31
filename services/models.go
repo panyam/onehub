@@ -13,6 +13,13 @@ type BaseModel struct {
 	Version   int    // used for optimistic locking
 }
 
+type User struct {
+	BaseModel
+	Name        string
+	Avatar      string
+	ProfileData map[string]interface{} `gorm:"type:json"`
+}
+
 type Topic struct {
 	BaseModel
 	CreatorId string
