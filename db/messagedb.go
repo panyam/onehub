@@ -36,7 +36,7 @@ func (tdb *OneHubDB) GetMessages(topic_id string, user_id string, pageKey string
 
 // Get messages in a topic paginated and ordered by creation time stamp
 func (tdb *OneHubDB) ListMessagesInTopic(topic_id string, pageKey string, pageSize int) (out []*Topic, err error) {
-	err = tdb.storage.Where("topi_ic = ?", topic_id).Find(&out).Error
+	err = tdb.storage.Where("topic_id= ?", topic_id).Find(&out).Error
 	return
 }
 
