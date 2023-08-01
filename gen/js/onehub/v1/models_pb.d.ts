@@ -104,9 +104,9 @@ export declare class Topic extends Message$1<Topic> {
    * IDs of users in this topic.   Right now no information about
    * their participation is kept.
    *
-   * @generated from field: repeated string users = 6;
+   * @generated from field: map<string, bool> users = 6;
    */
-  users: string[];
+  users: { [key: string]: boolean };
 
   constructor(data?: PartialMessage<Topic>);
 

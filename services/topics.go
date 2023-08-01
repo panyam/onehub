@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 
+	gut "github.com/panyam/goutils/utils"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
 	"google.golang.org/grpc/codes"
@@ -16,7 +17,7 @@ type TopicService struct {
 	DB *ds.OneHubDB
 }
 
-func NewTopicService(db *ds.OneHubDB) {
+func NewTopicService(db *ds.OneHubDB) *TopicService {
 	return &TopicService{
 		DB: db,
 	}

@@ -475,9 +475,9 @@
                       "title": "A unique name of the topic that users can use to connect to"
                     },
                     "users": {
-                      "type": "array",
-                      "items": {
-                        "type": "string"
+                      "type": "object",
+                      "additionalProperties": {
+                        "type": "boolean"
                       },
                       "description": "IDs of users in this topic.   Right now no information about\ntheir participation is kept."
                     }
@@ -814,9 +814,9 @@
           "title": "A unique name of the topic that users can use to connect to"
         },
         "users": {
-          "type": "array",
-          "items": {
-            "type": "string"
+          "type": "object",
+          "additionalProperties": {
+            "type": "boolean"
           },
           "description": "IDs of users in this topic.   Right now no information about\ntheir participation is kept."
         }

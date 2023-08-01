@@ -33,7 +33,7 @@ export const Topic = proto3.makeMessageType(
     { no: 3, name: "id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 4, name: "creator_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
     { no: 5, name: "name", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 6, name: "users", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+    { no: 6, name: "users", kind: "map", K: 9 /* ScalarType.STRING */, V: {kind: "scalar", T: 8 /* ScalarType.BOOL */} },
   ],
 );
 

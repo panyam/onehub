@@ -12,9 +12,9 @@ import (
 )
 
 func TopicToProto(input *ds.Topic) (out *protos.Topic) {
-	var userIds []string
+	var userIds map[string]bool = make(map[string]bool)
 	for _, userId := range input.Users {
-		userIds = append(userIds, userId)
+		userIds[userId] = true
 	}
 
 	out = &protos.Topic{
@@ -40,7 +40,7 @@ func TopicFromProto(input *protos.Topic) (out *ds.Topic) {
 	}
 	if input.Users != nil {
 		var userIds []string
-		for _, userId := range input.Users {
+		for userId := range input.Users {
 			userIds = append(userIds, userId)
 		}
 

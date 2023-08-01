@@ -38,7 +38,7 @@ message Topic {
 
   // IDs of users in this topic.   Right now no information about
   // their participation is kept.
-  repeated string users = 6;
+  map<string, bool> users = 6;
 }
 
 /**

@@ -10,6 +10,7 @@ require (
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.1
 	github.com/lib/pq v1.10.8
+	github.com/panyam/goutils v0.0.37
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20230724170836-66ad5b6ff146
 	gorm.io/gorm v1.25.2
