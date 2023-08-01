@@ -1,4 +1,4 @@
-package db
+package datastore
 
 import (
 	"errors"
@@ -9,7 +9,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func (tdb *OneHubDB) SaveUser(topic *User) (err error) {
+/////////////////////// Topic DB
+
+func (tdb *OneHubDB) SaveTopic(topic *Topic) (err error) {
 	db := tdb.storage
 	topic.UpdatedAt = time.Now()
 	if strings.Trim(topic.Id, " ") == "" {
@@ -26,19 +28,19 @@ func (tdb *OneHubDB) SaveUser(topic *User) (err error) {
 	return
 }
 
-func (tdb *OneHubDB) DeleteUser(topicId string) (err error) {
+func (tdb *OneHubDB) DeleteTopic(topicId string) (err error) {
 	err = tdb.storage.Where("topic_id = ?", topicId).Delete(&Message{}).Error
 	if err == nil {
-		err = tdb.storage.Where("id = ?", topicId).Delete(&User{}).Error
+		err = tdb.storage.Where("id = ?", topicId).Delete(&Topic{}).Error
 	}
 	return
 }
 
-func (tdb *OneHubDB) GetUser(id string) (*User, error) {
-	var out User
+func (tdb *OneHubDB) GetTopic(id string) (*Topic, error) {
+	var out Topic
 	err := tdb.storage.First(&out, "id = ?", id).Error
 	if err != nil {
-		log.Println("GetUser Error: ", id, err)
+		log.Println("GetTopic Error: ", id, err)
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		} else {
@@ -49,8 +51,8 @@ func (tdb *OneHubDB) GetUser(id string) (*User, error) {
 	return &out, err
 }
 
-func (tdb *OneHubDB) ListUsers(pageKey string, pageSize int) (out []*User, err error) {
-	query := tdb.storage.Model(&User{}).Order("name asc")
+func (tdb *OneHubDB) ListTopics(pageKey string, pageSize int) (out []*Topic, err error) {
+	query := tdb.storage.Model(&Topic{}).Order("name asc")
 	if pageKey != "" {
 		count := 0
 		query = query.Offset(count)
