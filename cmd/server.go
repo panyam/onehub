@@ -7,6 +7,7 @@ import (
 	"log"
 	"net"
 	"net/http"
+	"runtime/debug"
 	"strings"
 
 	"google.golang.org/grpc"
@@ -36,7 +37,10 @@ var (
 func startGRPCServer(addr string, db *ds.OneHubDB) {
 	// create new gRPC server
 	server := grpc.NewServer(
-		grpc.UnaryInterceptor(EnsureAuthIsValid),
+		grpc.ChainUnaryInterceptor(
+			ErrorLogger(),
+			EnsureAuthIsValid,
+		),
 	)
 	v1.RegisterTopicServiceServer(server, svc.NewTopicService(db))
 	v1.RegisterMessageServiceServer(server, svc.NewMessageService(db))
@@ -134,6 +138,31 @@ func EnsureAuthIsValid(ctx context.Context,
 		}
 	}
 	return nil, status.Error(codes.NotFound, "Invalid username/password")
+}
+
+func ErrorLogger( /* Add configs here */ ) grpc.UnaryServerInterceptor {
+	return func(ctx context.Context,
+		req interface{},
+		info *grpc.UnaryServerInfo,
+		handler grpc.UnaryHandler) (resp interface{}, err error) {
+
+		onPanic := func() {
+			if r := recover(); r != nil {
+				err = status.Errorf(codes.Internal, "panic: %s", r)
+				errmsg := fmt.Sprintf("[PANIC] %s\n\n%s", r, string(debug.Stack()))
+				log.Println(errmsg)
+			}
+		}
+		defer onPanic()
+
+		resp, err = handler(ctx, req)
+		errCode := status.Code(err)
+		if errCode == codes.Unknown || errCode == codes.Internal {
+			log.Println("Request handler returned an internal error - reporting it")
+			return
+		}
+		return
+	}
 }
 
 func main() {
