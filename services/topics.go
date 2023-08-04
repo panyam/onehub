@@ -25,6 +25,10 @@ func NewTopicService(db *ds.OneHubDB) *TopicService {
 
 // Create a new Topic
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
+	req.Topic.CreatorId = GetAuthedUser(ctx)
+	if req.Topic.CreatorId == "" {
+		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic")
+	}
 	topic := req.Topic
 	if topic.Id != "" {
 		// see if it already exists
@@ -34,9 +38,6 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 		}
 	} else {
 		topic.Id = s.DB.NextId("Topic")
-	}
-	if topic.CreatorId == "" {
-		return nil, status.Error(codes.InvalidArgument, "Creator not found")
 	}
 	if topic.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "Name not found")
