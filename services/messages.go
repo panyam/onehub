@@ -2,64 +2,70 @@ package services
 
 import (
 	"context"
-	"log"
+	"fmt"
+	"time"
 
+	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
-	tspb "google.golang.org/protobuf/types/known/timestamppb"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type MessageService struct {
 	protos.UnimplementedMessageServiceServer
-	*EntityStore[protos.Message]
+	DB *ds.OneHubDB
 }
 
-func NewMessageService(estore *EntityStore[protos.Message]) *MessageService {
-	if estore == nil {
-		estore = NewEntityStore[protos.Message]()
-	}
-	estore.IDSetter = func(message *protos.Message, id string) { message.Id = id }
-	estore.IDGetter = func(message *protos.Message) string { return message.Id }
-
-	estore.CreatedAtSetter = func(message *protos.Message, val *tspb.Timestamp) { message.CreatedAt = val }
-	estore.CreatedAtGetter = func(message *protos.Message) *tspb.Timestamp { return message.CreatedAt }
-
-	estore.UpdatedAtSetter = func(message *protos.Message, val *tspb.Timestamp) { message.UpdatedAt = val }
-	estore.UpdatedAtGetter = func(message *protos.Message) *tspb.Timestamp { return message.UpdatedAt }
-
+func NewMessageService(db *ds.OneHubDB) *MessageService {
 	return &MessageService{
-		EntityStore: estore,
+		DB: db,
 	}
 }
 
 // Create a new Message
 func (s *MessageService) CreateMessage(ctx context.Context, req *protos.CreateMessageRequest) (resp *protos.CreateMessageResponse, err error) {
-	resp = &protos.CreateMessageResponse{}
-	resp.Message = s.EntityStore.Create(req.Message)
-	return
-}
+	topic, err := s.DB.GetTopic(req.Message.TopicId)
+	if topic == nil {
+		return nil, fmt.Errorf("Topic not found: %s", req.Message.TopicId)
+	}
+	if err != nil {
+		return nil, err
+	}
+	// Add a new message entity here
+	message := req.Message
+	message.Id = fmt.Sprintf("%s:%d", req.Message.TopicId, time.Now().UnixMilli())
+	dbmsg := MessageFromProto(message)
+	if err := s.DB.CreateMessage(dbmsg); err != nil {
+		return nil, err
+	}
 
-// Get a single topic by id
-func (s *MessageService) GetMessage(ctx context.Context, req *protos.GetMessageRequest) (resp *protos.GetMessageResponse, err error) {
-	log.Println("Getting Message by ID: ", req.Id)
-	resp = &protos.GetMessageResponse{
-		Message: s.EntityStore.Get(req.Id),
+	resp = &protos.CreateMessageResponse{
+		Message: MessageToProto(dbmsg),
 	}
 	return
 }
 
-// Batch gets multiple messages.
-func (s *MessageService) GetMessages(ctx context.Context, req *protos.GetMessagesRequest) (resp *protos.GetMessagesResponse, err error) {
-	log.Println("BatchGet for IDs: ", req.Ids)
-	resp = &protos.GetMessagesResponse{
-		Messages: s.EntityStore.BatchGet(req.Ids),
-	}
-	return
-}
-
-// Updates specific fields of an Message
 func (s *MessageService) UpdateMessage(ctx context.Context, req *protos.UpdateMessageRequest) (resp *protos.UpdateMessageResponse, err error) {
+	msg, err := s.DB.GetMessage(req.Message.Id)
+	if msg == nil {
+		return nil, fmt.Errorf("message not found: %s", req.Message.Id)
+	}
+	dbmsg := MessageFromProto(req.Message)
+	if err := s.DB.SaveMessage(dbmsg); err != nil {
+		return nil, err
+	}
 	resp = &protos.UpdateMessageResponse{
-		Message: s.EntityStore.Update(req.Message),
+		Message: MessageToProto(dbmsg),
+	}
+	return
+}
+
+func (s *MessageService) GetMessage(ctx context.Context, req *protos.GetMessageRequest) (resp *protos.GetMessageResponse, err error) {
+	curr, _ := s.DB.GetMessage(req.Id)
+	if curr == nil {
+		err = status.Error(codes.NotFound, fmt.Sprintf("Message with id '%s' not found", req.Id))
+	} else {
+		resp = &protos.GetMessageResponse{Message: MessageToProto(curr)}
 	}
 	return
 }
@@ -67,19 +73,6 @@ func (s *MessageService) UpdateMessage(ctx context.Context, req *protos.UpdateMe
 // Deletes an message from our system.
 func (s *MessageService) DeleteMessage(ctx context.Context, req *protos.DeleteMessageRequest) (resp *protos.DeleteMessageResponse, err error) {
 	resp = &protos.DeleteMessageResponse{}
-	s.EntityStore.Delete(req.Id)
-	return
-}
-
-// Finds and retrieves messages matching the particular criteria.
-func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
-	results := s.EntityStore.List(func(s1, s2 *protos.Message) bool {
-		return s1.CreatedAt.AsTime().Before(s2.CreatedAt.AsTime())
-	},
-		func(m *protos.Message) bool {
-			return m.TopicId == req.TopicId
-		})
-	log.Println("Found Messages: ", results)
-	resp = &protos.ListMessagesResponse{Messages: results}
+	s.DB.DeleteMessage(req.Id)
 	return
 }

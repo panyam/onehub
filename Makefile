@@ -15,6 +15,10 @@ OUT_DIR:=$(SRC_DIR)/gen/go
 
 all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
+up:
+	docker compose down
+	docker compose up
+
 goprotos:
 	echo "Generating GO bindings"
 	protoc --go_out=$(OUT_DIR) --go_opt=paths=source_relative          	\

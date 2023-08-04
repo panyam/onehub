@@ -12,6 +12,8 @@ import (
 	"google.golang.org/grpc"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
+	cmdutils "github.com/panyam/onehub/cmd/utils"
+	ds "github.com/panyam/onehub/datastore"
 	v1 "github.com/panyam/onehub/gen/go/onehub/v1"
 	svc "github.com/panyam/onehub/services"
 
@@ -22,18 +24,22 @@ import (
 	"google.golang.org/grpc/status"
 )
 
+const DEFAULT_DB_ENDPOINT = "postgres://postgres:docker@localhost:5432/onehubdb"
+
 var (
 	addr    = flag.String("addr", ":9000", "Address to start the onehub grpc server on.")
 	gw_addr = flag.String("gw_addr", ":8080", "Address to start the grpc gateway server on.")
+
+	db_endpoint = flag.String("db_endpoint", "", fmt.Sprintf("Endpoint of DB where all topics/messages state are persisted.  Default value: ONEHUB_DB_ENDPOINT environment variable or %s", DEFAULT_DB_ENDPOINT))
 )
 
-func startGRPCServer(addr string) {
+func startGRPCServer(addr string, db *ds.OneHubDB) {
 	// create new gRPC server
 	server := grpc.NewServer(
 		grpc.UnaryInterceptor(EnsureAuthIsValid),
 	)
-	v1.RegisterTopicServiceServer(server, svc.NewTopicService(nil))
-	v1.RegisterMessageServiceServer(server, svc.NewMessageService(nil))
+	v1.RegisterTopicServiceServer(server, svc.NewTopicService(db))
+	v1.RegisterMessageServiceServer(server, svc.NewMessageService(db))
 	if l, err := net.Listen("tcp", addr); err != nil {
 		log.Fatalf("error in listening on port %s: %v", addr, err)
 	} else {
@@ -132,6 +138,19 @@ func EnsureAuthIsValid(ctx context.Context,
 
 func main() {
 	flag.Parse()
-	go startGRPCServer(*addr)
+	ohdb := OpenOHDB()
+	go startGRPCServer(*addr, ohdb)
 	startGatewayServer(*gw_addr, *addr)
+}
+
+func OpenOHDB() *ds.OneHubDB {
+	if *db_endpoint == "" {
+		*db_endpoint = cmdutils.GetEnvOrDefault("ONEHUB_DB_ENDPOINT", DEFAULT_DB_ENDPOINT)
+	}
+	db, err := cmdutils.OpenDB(*db_endpoint)
+	if err != nil {
+		log.Fatal(err)
+		panic(err)
+	}
+	return ds.NewOneHubDB(db)
 }

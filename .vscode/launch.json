@@ -9,7 +9,7 @@
           "type": "go",
           "request": "launch",
           "mode": "debug",
-          "program": "cmd/svc/main.go",
+          "program": "cmd/server.go",
           "cwd": "${workspaceFolder}",
           "dlvFlags": ["--check-go-version=false"]
       }
