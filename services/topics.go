@@ -6,6 +6,8 @@ import (
 	"strings"
 
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	tspb "google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -35,6 +37,10 @@ func NewTopicService(estore *EntityStore[protos.Topic]) *TopicService {
 // Create a new Topic
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
 	resp = &protos.CreateTopicResponse{}
+	req.Topic.CreatorId = GetAuthedUser(ctx)
+	if req.Topic.CreatorId == "" {
+		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic")
+	}
 	resp.Topic = s.EntityStore.Create(req.Topic)
 	return
 }
