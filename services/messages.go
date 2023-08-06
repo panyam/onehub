@@ -26,7 +26,7 @@ func NewMessageService(db *ds.OneHubDB) *MessageService {
 func (s *MessageService) CreateMessage(ctx context.Context, req *protos.CreateMessageRequest) (resp *protos.CreateMessageResponse, err error) {
 	topic, err := s.DB.GetTopic(req.Message.TopicId)
 	if topic == nil {
-		return nil, fmt.Errorf("Topic not found: %s", req.Message.TopicId)
+		return nil, fmt.Errorf("topic not found: %s", req.Message.TopicId)
 	}
 	if err != nil {
 		return nil, err

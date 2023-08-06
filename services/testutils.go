@@ -2,11 +2,12 @@ package services
 
 import (
 	"context"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/test/bufconn"
 	"log"
 	"net"
 	"testing"
+
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/test/bufconn"
 )
 
 type DialerFunc = func(context.Context, string) (net.Conn, error)

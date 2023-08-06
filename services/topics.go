@@ -127,9 +127,7 @@ func (s *TopicService) UpdateTopic(ctx context.Context, req *protos.UpdateTopicR
 		currtopic.Topic.Users[userid] = true
 	}
 	for _, userid := range req.RemoveUsers {
-		if _, ok := currtopic.Topic.Users[userid]; ok {
-			delete(currtopic.Topic.Users, userid)
-		}
+		delete(currtopic.Topic.Users, userid)
 	}
 	err = s.DB.SaveTopic(TopicFromProto(currtopic.Topic))
 	if err == nil {

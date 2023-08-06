@@ -1,5 +1,6 @@
 syntax = "proto3";
 import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
 
 option go_package = "github.com/onehub/protos";
 package onehub.v1;
@@ -174,6 +175,12 @@ message DeleteTopicResponse {
  * The request for (partially) updating an Topic.
  */
 message UpdateTopicRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "UpdateTopicRequest"
+    }
+  };
+
   /**
    * Topic being updated
    */
@@ -199,6 +206,12 @@ message UpdateTopicRequest {
  * The request for (partially) updating an Topic.
  */
 message UpdateTopicResponse {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "UpdateTopicResponse"
+    }
+  };
+
   /**
    * Topic being updated
    */
