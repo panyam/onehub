@@ -3,8 +3,8 @@ package services
 import (
 	"context"
 	"fmt"
-	"time"
 
+	gut "github.com/panyam/goutils/utils"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
 	"google.golang.org/grpc/codes"
@@ -22,6 +22,16 @@ func NewMessageService(db *ds.OneHubDB) *MessageService {
 	}
 }
 
+func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
+	results, err := s.DB.GetMessages(req.TopicId, "", req.PageKey, int(req.PageSize))
+	if err != nil {
+		return nil, err
+	}
+
+	resp = &protos.ListMessagesResponse{Messages: gut.Map(results, MessageToProto)}
+	return
+}
+
 // Create a new Message
 func (s *MessageService) CreateMessage(ctx context.Context, req *protos.CreateMessageRequest) (resp *protos.CreateMessageResponse, err error) {
 	topic, err := s.DB.GetTopic(req.Message.TopicId)
@@ -33,7 +43,16 @@ func (s *MessageService) CreateMessage(ctx context.Context, req *protos.CreateMe
 	}
 	// Add a new message entity here
 	message := req.Message
-	message.Id = fmt.Sprintf("%s:%d", req.Message.TopicId, time.Now().UnixMilli())
+	if message.Id != "" {
+		// see if it already exists
+		curr, _ := s.DB.GetMessage(message.Id)
+		if curr != nil {
+			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Id))
+		}
+	} else {
+		message.Id = s.DB.NextId("Message")
+	}
+	message.UserId = GetAuthedUser(ctx)
 	dbmsg := MessageFromProto(message)
 	if err := s.DB.CreateMessage(dbmsg); err != nil {
 		return nil, err
