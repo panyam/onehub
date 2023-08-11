@@ -17,6 +17,8 @@ func topicsCommand() *cobra.Command {
 	out.AddCommand(getCommand())
 	out.AddCommand(listCommand())
 	out.AddCommand(deleteCommand())
+	out.AddCommand(createCommand())
+	out.AddCommand(updateCommand())
 	return out
 }
 
@@ -65,16 +67,28 @@ func deleteCommand() *cobra.Command {
 }
 
 func createCommand() *cobra.Command {
-	return &cobra.Command{
-		Use:   "new",
-		Short: "Create a new",
-		Long:  `Delete one or more topics by ID (or list of IDs`,
+	out := &cobra.Command{
+		Use:       "new",
+		ValidArgs: []string{"TOPIC_NAME"},
+		Short:     "Create a new topic",
 		Run: func(cmd *cobra.Command, args []string) {
-			for _, topicid := range args {
-				fmt.Println("Deleting topic by ID: ", topicid)
-			}
+			fmt.Println("Creating a new topic: ", args)
 		},
 	}
+	out.Flags().StringP("id", "i", "", "A custom ID to use instead of auto generating one")
+	return out
+}
+func updateCommand() *cobra.Command {
+	out := &cobra.Command{
+		Use:        "update",
+		ArgAliases: []string{"TOPIC_ID"},
+		Short:      "Update a topic",
+		Run: func(cmd *cobra.Command, args []string) {
+			fmt.Println("Updating a topic: ", args)
+		},
+	}
+	out.Flags().StringP("name", "n", "", "New name to set for the topic")
+	return out
 }
 
 func init() {
