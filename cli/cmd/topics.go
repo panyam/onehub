@@ -78,6 +78,7 @@ func createCommand() *cobra.Command {
 	out.Flags().StringP("id", "i", "", "A custom ID to use instead of auto generating one")
 	return out
 }
+
 func updateCommand() *cobra.Command {
 	out := &cobra.Command{
 		Use:        "update",
