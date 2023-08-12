@@ -43,6 +43,7 @@ func startGRPCServer(addr string, db *ds.OneHubDB) {
 		),
 	)
 	v1.RegisterTopicServiceServer(server, svc.NewTopicService(db))
+	v1.RegisterUserServiceServer(server, svc.NewUserService(db))
 	v1.RegisterMessageServiceServer(server, svc.NewMessageService(db))
 	if l, err := net.Listen("tcp", addr); err != nil {
 		log.Fatalf("error in listening on port %s: %v", addr, err)
@@ -85,6 +86,9 @@ func startGatewayServer(gw_addr, grpc_addr string) {
 		log.Fatal(err)
 	}
 	if err := v1.RegisterMessageServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts); err != nil {
+		log.Fatal(err)
+	}
+	if err := v1.RegisterUserServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts); err != nil {
 		log.Fatal(err)
 	}
 
