@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -30,9 +31,9 @@ func listCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			name, _ := cmd.Flags().GetString("name")
 			if name != "" {
-				fmt.Println("Listing topics by name: ", name)
+				CTX.Client.Call("GET", fmt.Sprintf("/v1/topics?name=%s", name), nil, nil, nil)
 			} else {
-				fmt.Println("Listing all topics")
+				CTX.Client.Call("GET", "/v1/topics", nil, nil, nil)
 			}
 		},
 	}
@@ -47,7 +48,7 @@ func getCommand() *cobra.Command {
 		Long:  `Get one or more topics by ID (or list of IDs`,
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, topicid := range args {
-				fmt.Println("Getting topic by ID: ", topicid)
+				CTX.Client.Call("GET", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
 			}
 		},
 	}
@@ -60,7 +61,7 @@ func deleteCommand() *cobra.Command {
 		Long:  `Delete one or more topics by ID (or list of IDs`,
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, topicid := range args {
-				fmt.Println("Deleting topic by ID: ", topicid)
+				CTX.Client.Call("DELETE", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
 			}
 		},
 	}
@@ -68,11 +69,25 @@ func deleteCommand() *cobra.Command {
 
 func createCommand() *cobra.Command {
 	out := &cobra.Command{
-		Use:       "new",
-		ValidArgs: []string{"TOPIC_NAME"},
-		Short:     "Create a new topic",
+		Use:        "new topic_name",
+		ValidArgs:  []string{"TOPIC_NAME"},
+		Args:       cobra.MinimumNArgs(1),
+		ArgAliases: []string{"TOPIC_NAME"},
+		Short:      "Create a new topic",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if args[0] == "" {
+				return errors.New("Invalid Topic")
+			}
+			return nil
+		},
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Creating a new topic: ", args)
+			id, _ := cmd.Flags().GetString("id")
+			name := args[0]
+			params := StringMap{
+				"id":   id,
+				"name": name,
+			}
+			CTX.Client.Call("POST", "/v1/topics", nil, nil, StringMap{"topic": params})
 		},
 	}
 	out.Flags().StringP("id", "i", "", "A custom ID to use instead of auto generating one")
