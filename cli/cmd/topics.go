@@ -102,11 +102,26 @@ func createCommand() *cobra.Command {
 
 func updateCommand() *cobra.Command {
 	out := &cobra.Command{
-		Use:        "update",
+		Use:        "update TOPIC_ID [flags]",
 		ArgAliases: []string{"TOPIC_ID"},
 		Short:      "Update a topic",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return errors.New("TopicID must be specified for an update")
+			}
+			return nil
+		},
 		Run: func(cmd *cobra.Command, args []string) {
-			fmt.Println("Updating a topic: ", args)
+			name, _ := cmd.Flags().GetString("name")
+			id := args[0]
+			params := StringMap{
+				"name": name,
+			}
+			payload := StringMap{
+				"topic":       params,
+				"update_mask": "name",
+			}
+			Client.Call("PATCH", fmt.Sprintf("/v1/topics/%s", id), nil, nil, payload)
 		},
 	}
 	out.Flags().StringP("name", "n", "", "New name to set for the topic")

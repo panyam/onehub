@@ -112,7 +112,7 @@ func (s *TopicService) UpdateTopic(ctx context.Context, req *protos.UpdateTopicR
 	if req.UpdateMask != nil {
 		for _, path := range req.UpdateMask.Paths {
 			switch path {
-			case "title":
+			case "name":
 				currtopic.Topic.Name = req.Topic.Name
 			default:
 				return nil, status.Errorf(codes.InvalidArgument, "UpdateTopic - update_mask contains invalid path: %s", path)
