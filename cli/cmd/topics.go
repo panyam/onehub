@@ -46,6 +46,12 @@ func getCommand() *cobra.Command {
 		Use:   "get",
 		Short: "Get topics",
 		Long:  `Get one or more topics by ID (or list of IDs`,
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return errors.New("Atleast one topic ID must be specified")
+			}
+			return nil
+		},
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, topicid := range args {
 				CTX.Client.Call("GET", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
