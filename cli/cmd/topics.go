@@ -31,9 +31,9 @@ func listCommand() *cobra.Command {
 		Run: func(cmd *cobra.Command, args []string) {
 			name, _ := cmd.Flags().GetString("name")
 			if name != "" {
-				CTX.Client.Call("GET", fmt.Sprintf("/v1/topics?name=%s", name), nil, nil, nil)
+				Client.Call("GET", fmt.Sprintf("/v1/topics?name=%s", name), nil, nil, nil)
 			} else {
-				CTX.Client.Call("GET", "/v1/topics", nil, nil, nil)
+				Client.Call("GET", "/v1/topics", nil, nil, nil)
 			}
 		},
 	}
@@ -54,7 +54,7 @@ func getCommand() *cobra.Command {
 		},
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, topicid := range args {
-				CTX.Client.Call("GET", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
+				Client.Call("GET", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
 			}
 		},
 	}
@@ -67,7 +67,7 @@ func deleteCommand() *cobra.Command {
 		Long:  `Delete one or more topics by ID (or list of IDs`,
 		Run: func(cmd *cobra.Command, args []string) {
 			for _, topicid := range args {
-				CTX.Client.Call("DELETE", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
+				Client.Call("DELETE", fmt.Sprintf("/v1/topics/%s", topicid), nil, nil, nil)
 			}
 		},
 	}
@@ -93,7 +93,7 @@ func createCommand() *cobra.Command {
 				"id":   id,
 				"name": name,
 			}
-			CTX.Client.Call("POST", "/v1/topics", nil, nil, StringMap{"topic": params})
+			Client.Call("POST", "/v1/topics", nil, nil, StringMap{"topic": params})
 		},
 	}
 	out.Flags().StringP("id", "i", "", "A custom ID to use instead of auto generating one")
