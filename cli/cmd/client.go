@@ -7,18 +7,20 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"log"
 	"net/http"
 	"strings"
 	"time"
 )
+
+type StringMap = map[string]interface{}
 
 type OHClient struct {
 	Host     string
 	Username string
 	Password string
 
-	transport *http.Transport
+	PrettyPrintResponse bool
+	transport           *http.Transport
 }
 
 func NewOHClient(host string) *OHClient {
@@ -28,7 +30,8 @@ func NewOHClient(host string) *OHClient {
 	}
 
 	return &OHClient{
-		Host: host,
+		Host:                host,
+		PrettyPrintResponse: true,
 		transport: &http.Transport{
 			TLSClientConfig: &tls.Config{
 				InsecureSkipVerify: true,
@@ -38,30 +41,22 @@ func NewOHClient(host string) *OHClient {
 }
 
 // Make a JSON POST request to the OHClient
-func (c *OHClient) Call(method string, path string, args map[string][]string, body map[string]interface{}, headers map[string]interface{}) (response map[string]interface{}, err error) {
-	// make a post reuqest
+func (c *OHClient) Call(method string, path string, args map[string][]string, headers StringMap, body StringMap) (response StringMap, err error) {
 	url := fmt.Sprintf("%s%s", c.Host, path)
-	req, err := http.NewRequest(method, url, nil)
+	var req *http.Request
+
+	if body == nil {
+		req, err = http.NewRequest(method, url, nil)
+	} else {
+		reqBody, err := json.Marshal(body)
+		if err == nil {
+			bodyReader := bytes.NewBuffer(reqBody)
+			req, err = http.NewRequest(method, url, bodyReader)
+		}
+	}
 	if err != nil {
 		return nil, err
 	}
-
-	// Set the body
-	if body != nil {
-		reqBody, err := json.Marshal(body)
-		if err != nil {
-			return nil, err
-		}
-		bodyReader := bytes.NewBuffer(reqBody)
-		req, err = http.NewRequest(method, url, bodyReader)
-		if err != nil {
-			return nil, err
-		}
-		log.Printf("BODY: %s", reqBody)
-	} else {
-	}
-
-	log.Printf("Sending request: '%s %s", method, url)
 
 	// Set any custom headers needed
 	if headers == nil {
@@ -95,5 +90,11 @@ func (c *OHClient) Call(method string, path string, args map[string][]string, bo
 	}
 
 	err = json.Unmarshal(respbody, &response)
+	if err != nil {
+		fmt.Println(err)
+	} else if c.PrettyPrintResponse {
+		indented, _ := json.MarshalIndent(response, "", "  ")
+		fmt.Println(string(indented))
+	}
 	return
 }

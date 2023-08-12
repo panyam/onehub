@@ -7,11 +7,13 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const DEFAULT_ONEHUB_HOST = "localhost:8080"
+const DEFAULT_ONEHUB_HOST = "http://localhost:8080"
 
 type CmdContext struct {
-	Client OHClient
+	Client *OHClient
 }
+
+var CTX = CmdContext{Client: NewOHClient("")}
 
 // rootCmd represents the base command when called without any subcommands
 func rootCommand() *cobra.Command {
@@ -36,9 +38,10 @@ func rootCommand() *cobra.Command {
 
 			if CTX.Client.Host == "" {
 				CTX.Client.Host = os.Getenv("OneHubHost")
-				CTX.Client.Host = DEFAULT_ONEHUB_HOST
+				if CTX.Client.Host == "" {
+					CTX.Client.Host = DEFAULT_ONEHUB_HOST
+				}
 			}
-
 			return nil
 		},
 	}
@@ -49,7 +52,6 @@ func rootCommand() *cobra.Command {
 }
 
 var rootCmd = rootCommand()
-var CTX CmdContext
 
 // Execute adds all child commands to the root command and sets flags appropriately.
 // This is called by main.main(). It only needs to happen once to the rootCmd.
