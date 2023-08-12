@@ -1,0 +1,219 @@
+syntax = "proto3";
+import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/onehub/protos";
+package onehub.v1;
+
+import "onehub/v1/models.proto";
+import "google/api/annotations.proto";
+
+/**
+ * Service for operating on users
+ */
+service UserService {
+  /**
+   * Create a new sesssion
+   */
+  rpc CreateUser(CreateUserRequest) returns (CreateUserResponse) {
+    option (google.api.http) = {
+      post: "/v1/users",
+      body: "*",
+    };
+  }
+
+  /**
+   * List all users from a user.
+   */
+  rpc ListUsers(ListUsersRequest) returns (ListUsersResponse) { 
+    option (google.api.http) = {
+      get: "/v1/users"
+    };
+  }
+
+  /**
+   * Get a particular user
+   */
+  rpc GetUser(GetUserRequest) returns (GetUserResponse) { 
+    option (google.api.http) = {
+      get: "/v1/users/{id=*}"
+    };
+  }
+
+  /**
+   * Batch get multiple users by ID
+   */
+  rpc GetUsers(GetUsersRequest) returns (GetUsersResponse) { 
+    option (google.api.http) = {
+      get: "/v1/users:batchGet"
+    };
+  }
+
+  /**
+   * Delete a particular user
+   */
+  rpc DeleteUser(DeleteUserRequest) returns (DeleteUserResponse) { 
+    option (google.api.http) = {
+      delete: "/v1/users/{id=*}"
+    };
+  }
+
+  /**
+   * Updates specific fields of a user
+   */
+  rpc UpdateUser(UpdateUserRequest) returns (UpdateUserResponse) {
+    option (google.api.http) = {
+      patch: "/v1/users/{user.id=*}"
+      body: "*"
+    };
+  }
+}
+
+/**
+ * User creation request object
+ */
+message CreateUserRequest {
+  /**
+   * User being updated
+   */
+  User user = 1;
+}
+
+/**
+ * Response of an user creation.
+ */
+message CreateUserResponse {
+  /**
+   * User being created
+   */
+  User user = 1;
+}
+
+/**
+ * An user search request.  For now only paginations params are provided.
+ */
+message ListUsersRequest {
+  /**
+   * Instead of an offset an abstract  "page" key is provided that offers
+   * an opaque "pointer" into some offset in a result set.
+   */
+  string page_key = 1;
+
+  /**
+   * Number of results to return.
+   */
+  int32 page_size = 2;
+}
+
+/**
+ * Response of a user search/listing.
+ */
+message ListUsersResponse {
+  /**
+   * The list of users found as part of this response.
+   */
+  repeated User users = 1;
+
+  /**
+   * The key/pointer string that subsequent List requests should pass to
+   * continue the pagination.
+   */
+  string next_page_key = 2;
+}
+
+/**
+ * Request to get an user.
+ */
+message GetUserRequest {
+  /**
+   * ID of the user to be fetched
+   */
+  string id = 1;
+}
+
+/**
+ * User get response
+ */
+message GetUserResponse {
+  User user = 1;
+}
+
+/**
+ * Request to batch get users
+ */
+message GetUsersRequest {
+  /**
+   * IDs of the user to be fetched
+   */
+  repeated string ids = 1;
+}
+
+/**
+ * User batch-get response
+ */
+message GetUsersResponse {
+  map<string, User> users = 1;
+}
+
+/**
+ * Request to delete an user.
+ */
+message DeleteUserRequest {
+  /**
+   * ID of the user to be deleted.
+   */
+  string id = 1;
+}
+
+/**
+ * User deletion response
+ */
+message DeleteUserResponse {
+}
+
+/**
+ * The request for (partially) updating an User.
+ */
+message UpdateUserRequest {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "UpdateUserRequest"
+    }
+  };
+
+  /**
+   * User being updated
+   */
+  User user = 1;
+
+  /**
+   * Mask of fields being updated in this User to make partial changes.
+   */
+  google.protobuf.FieldMask update_mask = 2;
+
+  /**
+   * IDs of users to be added to this user.
+   */
+  repeated string add_users = 3;
+
+  /**
+   * IDs of users to be removed from this user.
+   */
+  repeated string remove_users = 4;
+}
+
+/**
+ * The request for (partially) updating an User.
+ */
+message UpdateUserResponse {
+  option (grpc.gateway.protoc_gen_openapiv2.options.openapiv2_schema) = {
+    json_schema: {
+      title: "UpdateUserResponse"
+    }
+  };
+
+  /**
+   * User being updated
+   */
+  User user = 1;
+}
