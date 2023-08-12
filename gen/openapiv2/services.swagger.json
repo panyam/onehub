@@ -10,6 +10,9 @@
     },
     {
       "name": "TopicService"
+    },
+    {
+      "name": "UserService"
     }
   ],
   "consumes": [
@@ -503,7 +506,8 @@
                   "description": "*\nIDs of users to be removed from this topic."
                 }
               },
-              "description": "*\nThe request for (partially) updating an Topic."
+              "description": "*\nThe request for (partially) updating an Topic.",
+              "title": "UpdateTopicRequest"
             }
           }
         ],
@@ -595,6 +599,266 @@
           "TopicService"
         ]
       }
+    },
+    "/v1/users": {
+      "get": {
+        "summary": "*\nList all users from a user.",
+        "operationId": "UserService_ListUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageKey",
+            "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "pageSize",
+            "description": "*\nNumber of results to return.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "post": {
+        "summary": "*\nCreate a new sesssion",
+        "operationId": "UserService_CreateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1CreateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/users/{id}": {
+      "get": {
+        "summary": "*\nGet a particular user",
+        "operationId": "UserService_GetUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "*\nID of the user to be fetched",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      },
+      "delete": {
+        "summary": "*\nDelete a particular user",
+        "operationId": "UserService_DeleteUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1DeleteUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "id",
+            "description": "*\nID of the user to be deleted.",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/users/{user.id}": {
+      "patch": {
+        "summary": "*\nUpdates specific fields of a user",
+        "operationId": "UserService_UpdateUser",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1UpdateUserResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "user.id",
+            "description": "ID of this user",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "type": "object",
+                  "properties": {
+                    "createdAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "updatedAt": {
+                      "type": "string",
+                      "format": "date-time"
+                    },
+                    "name": {
+                      "type": "string",
+                      "title": "Name of this user"
+                    },
+                    "avatar": {
+                      "type": "string",
+                      "title": "An avatar object for the user"
+                    },
+                    "profileData": {
+                      "type": "object",
+                      "title": "General Profile Data"
+                    }
+                  },
+                  "title": "*\nUser being updated"
+                },
+                "updateMask": {
+                  "type": "string",
+                  "description": "*\nMask of fields being updated in this User to make partial changes."
+                },
+                "addUsers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "*\nIDs of users to be added to this user."
+                },
+                "removeUsers": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  },
+                  "description": "*\nIDs of users to be removed from this user."
+                }
+              },
+              "description": "*\nThe request for (partially) updating an User.",
+              "title": "UpdateUserRequest"
+            }
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
+    },
+    "/v1/users:batchGet": {
+      "get": {
+        "summary": "*\nBatch get multiple users by ID",
+        "operationId": "UserService_GetUsers",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1GetUsersResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "ids",
+            "description": "*\nIDs of the user to be fetched",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "UserService"
+        ]
+      }
     }
   },
   "definitions": {
@@ -664,6 +928,26 @@
       },
       "description": "*\nResponse of an topic creation."
     },
+    "v1CreateUserRequest": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User",
+          "title": "*\nUser being updated"
+        }
+      },
+      "title": "*\nUser creation request object"
+    },
+    "v1CreateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User",
+          "title": "*\nUser being created"
+        }
+      },
+      "description": "*\nResponse of an user creation."
+    },
     "v1DeleteMessageResponse": {
       "type": "object",
       "title": "*\nMessage deletion response"
@@ -671,6 +955,10 @@
     "v1DeleteTopicResponse": {
       "type": "object",
       "title": "*\nTopic deletion response"
+    },
+    "v1DeleteUserResponse": {
+      "type": "object",
+      "title": "*\nUser deletion response"
     },
     "v1GetMessageResponse": {
       "type": "object",
@@ -714,6 +1002,27 @@
       },
       "title": "*\nTopic batch-get response"
     },
+    "v1GetUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User"
+        }
+      },
+      "title": "*\nUser get response"
+    },
+    "v1GetUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/v1User"
+          }
+        }
+      },
+      "title": "*\nUser batch-get response"
+    },
     "v1ListMessagesResponse": {
       "type": "object",
       "properties": {
@@ -749,6 +1058,24 @@
         }
       },
       "description": "*\nResponse of a topic search/listing."
+    },
+    "v1ListUsersResponse": {
+      "type": "object",
+      "properties": {
+        "users": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1User"
+          },
+          "description": "*\nThe list of users found as part of this response."
+        },
+        "nextPageKey": {
+          "type": "string",
+          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        }
+      },
+      "description": "*\nResponse of a user search/listing."
     },
     "v1Message": {
       "type": "object",
@@ -840,7 +1167,48 @@
           "title": "*\nTopic being updated"
         }
       },
-      "description": "*\nThe request for (partially) updating an Topic."
+      "description": "*\nThe request for (partially) updating an Topic.",
+      "title": "UpdateTopicResponse"
+    },
+    "v1UpdateUserResponse": {
+      "type": "object",
+      "properties": {
+        "user": {
+          "$ref": "#/definitions/v1User",
+          "title": "*\nUser being updated"
+        }
+      },
+      "description": "*\nThe request for (partially) updating an User.",
+      "title": "UpdateUserResponse"
+    },
+    "v1User": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "title": "ID of this user"
+        },
+        "name": {
+          "type": "string",
+          "title": "Name of this user"
+        },
+        "avatar": {
+          "type": "string",
+          "title": "An avatar object for the user"
+        },
+        "profileData": {
+          "type": "object",
+          "title": "General Profile Data"
+        }
+      }
     }
   }
 }
