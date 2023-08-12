@@ -9,11 +9,7 @@ import (
 
 const DEFAULT_ONEHUB_HOST = "http://localhost:8080"
 
-type CmdContext struct {
-	Client *OHClient
-}
-
-var CTX = CmdContext{Client: NewOHClient("")}
+var Client = NewOHClient("")
 
 // rootCmd represents the base command when called without any subcommands
 func rootCommand() *cobra.Command {
@@ -22,32 +18,32 @@ func rootCommand() *cobra.Command {
 		Short: "The OneHub CLI",
 		Long:  `The CLI for interacting with OneHub in a simpler but more flexible way`,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
-			if CTX.Client.Username == "" {
-				CTX.Client.Username = os.Getenv("OneHubUsername")
-				if CTX.Client.Username == "" {
+			if Client.Username == "" {
+				Client.Username = os.Getenv("OneHubUsername")
+				if Client.Username == "" {
 					return errors.New("Username not found.  Set the --username flag or the OneHubUsername environment variable")
 				}
 			}
 
-			if CTX.Client.Password == "" {
-				CTX.Client.Password = os.Getenv("OneHubPassword")
-				if CTX.Client.Password == "" {
+			if Client.Password == "" {
+				Client.Password = os.Getenv("OneHubPassword")
+				if Client.Password == "" {
 					return errors.New("Password not found.  Set the --password flag or the OneHubPassword environment variable")
 				}
 			}
 
-			if CTX.Client.Host == "" {
-				CTX.Client.Host = os.Getenv("OneHubHost")
-				if CTX.Client.Host == "" {
-					CTX.Client.Host = DEFAULT_ONEHUB_HOST
+			if Client.Host == "" {
+				Client.Host = os.Getenv("OneHubHost")
+				if Client.Host == "" {
+					Client.Host = DEFAULT_ONEHUB_HOST
 				}
 			}
 			return nil
 		},
 	}
-	out.PersistentFlags().StringVar(&CTX.Client.Host, "host", DEFAULT_ONEHUB_HOST, "Host name to call the client against.  Envvar: OneHubHost")
-	out.PersistentFlags().StringVar(&CTX.Client.Username, "username", "", "Username to use for basic auth for all commands.  Envvar: OneHubUsername")
-	out.PersistentFlags().StringVar(&CTX.Client.Password, "password", "", "Password to use for basic auth for all commands.  Envvar: OneHubPassword")
+	out.PersistentFlags().StringVar(&Client.Host, "host", DEFAULT_ONEHUB_HOST, "Host name to call the client against.  Envvar: OneHubHost")
+	out.PersistentFlags().StringVar(&Client.Username, "username", "", "Username to use for basic auth for all commands.  Envvar: OneHubUsername")
+	out.PersistentFlags().StringVar(&Client.Password, "password", "", "Password to use for basic auth for all commands.  Envvar: OneHubPassword")
 	return out
 }
 
