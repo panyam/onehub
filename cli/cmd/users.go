@@ -22,6 +22,38 @@ func usersCommand() *cobra.Command {
 	return out
 }
 
+func listUsersCommand() *cobra.Command {
+	out := &cobra.Command{
+		Use:   "list",
+		Short: "List users",
+		Run: func(cmd *cobra.Command, args []string) {
+			path := "/v1/users"
+			Client.Call("GET", path, nil, nil, nil)
+		},
+	}
+	return out
+}
+
+func getUsersCommand() *cobra.Command {
+	out := &cobra.Command{
+		Use:   "get USER_ID [...USER_IDs]",
+		Short: "Get a user for one or more user IDs",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 1 {
+				return errors.New("At least one user ID must be provided")
+			}
+			return nil
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			for _, mid := range args {
+				path := fmt.Sprintf("/v1/users/%s", mid)
+				Client.Call("GET", path, nil, nil, nil)
+			}
+		},
+	}
+	return out
+}
+
 func newUserCommand() *cobra.Command {
 	out := &cobra.Command{
 		Use:   "new",
@@ -49,48 +81,9 @@ func newUserCommand() *cobra.Command {
 		},
 	}
 	out.Flags().StringP("id", "i", "", "A custom ID to use instead of auto generating one")
-	out.Flags().StringP("type", "t", "text", "Content type to assign to the content")
-	out.Flags().StringP("file", "f", "", "Load user content from the given file if user not passed as a command line arg")
-	out.Flags().StringP("data", "d", "", "Extra JSON data to save as part of the content")
-	return out
-}
-
-func listUsersCommand() *cobra.Command {
-	out := &cobra.Command{
-		Use:   "list TOPIC_ID",
-		Short: "List users",
-		Long:  `List users in a topic`,
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) != 1 {
-				return errors.New("A TOPIC_ID must be provided")
-			}
-			return nil
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			path := fmt.Sprintf("/v1/topics/%s/users", args[0])
-			Client.Call("GET", path, nil, nil, nil)
-		},
-	}
-	return out
-}
-
-func getUsersCommand() *cobra.Command {
-	out := &cobra.Command{
-		Use:   "get MSG_ID [...MSG_IDS]",
-		Short: "Get a user for one or more user IDs",
-		PreRunE: func(cmd *cobra.Command, args []string) error {
-			if len(args) < 1 {
-				return errors.New("At least one user ID must be provided")
-			}
-			return nil
-		},
-		Run: func(cmd *cobra.Command, args []string) {
-			for _, mid := range args {
-				path := fmt.Sprintf("/v1/users/%s", mid)
-				Client.Call("GET", path, nil, nil, nil)
-			}
-		},
-	}
+	out.Flags().StringP("name", "n", "", "Name of the user to create")
+	out.Flags().StringP("avatar", "a", "", "Avatar for the user")
+	out.Flags().StringP("data", "d", "", "Extra JSON data to save as part of the user profile")
 	return out
 }
 
