@@ -10,7 +10,7 @@ import (
 // topicsCmd represents the entire topics command hierarchy
 func topicsCommand() *cobra.Command {
 	out := &cobra.Command{
-		Use:   "topics",
+		Use:   "topics A B C",
 		Short: "Manage topics",
 		Long:  `Group of commands to manage and interact with topic`,
 	}
@@ -20,6 +20,8 @@ func topicsCommand() *cobra.Command {
 	out.AddCommand(deleteCommand())
 	out.AddCommand(createCommand())
 	out.AddCommand(updateCommand())
+	out.AddCommand(addUsersCommand())
+	out.AddCommand(removeUsersCommand())
 	return out
 }
 
@@ -125,6 +127,52 @@ func updateCommand() *cobra.Command {
 		},
 	}
 	out.Flags().StringP("name", "n", "", "New name to set for the topic")
+	return out
+}
+
+func addUsersCommand() *cobra.Command {
+	out := &cobra.Command{
+		Use:   "addusers TOPIC_ID USER_ID [...USER_IDs]",
+		Short: "Add users to a topic",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 2 {
+				return errors.New("A topic id and atleast one user ID must be specified")
+			}
+			return nil
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			topicid := args[0]
+			userids := args[1:]
+			payload := StringMap{
+				"add_users": userids,
+			}
+			path := fmt.Sprintf("/v1/topics/%s", topicid)
+			Client.Call("PATCH", path, nil, nil, payload)
+		},
+	}
+	return out
+}
+
+func removeUsersCommand() *cobra.Command {
+	out := &cobra.Command{
+		Use:   "removeusers TOPIC_ID USER_ID [...USER_IDs]",
+		Short: "Remove users from a topic",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) < 2 {
+				return errors.New("A topic id and atleast one user ID must be specified")
+			}
+			return nil
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			topicid := args[0]
+			userids := args[1:]
+			payload := StringMap{
+				"remove_users": userids,
+			}
+			path := fmt.Sprintf("/v1/topics/%s", topicid)
+			Client.Call("PATCH", path, nil, nil, payload)
+		},
+	}
 	return out
 }
 
