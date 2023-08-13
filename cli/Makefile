@@ -1,3 +1,4 @@
 
 bin:
-	go build -o $(GOBIN)/oh
+	go build
+	go install
