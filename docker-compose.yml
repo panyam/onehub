@@ -26,3 +26,26 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
+
+  service:
+    build:
+      context: .
+      dockerfile: ./Dockerfile
+    depends_on:
+      postgres:
+          condition: service_healthy
+            # webapp: condition: service_healthy
+    volumes:
+      - ./cmd:/app/cmd
+      - ./gen:/app/gen
+      - ./datastore:/app/datastore
+      - ./services:/app/services
+      - ./protos:/app/protos
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
+    ports:
+      - 8080:8080
+      - 9000:9000

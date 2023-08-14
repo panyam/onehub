@@ -5,6 +5,7 @@ WORKDIR /app
 RUN go install github.com/cosmtrek/air@latest
 RUN go install github.com/go-delve/delve/cmd/dlv@latest
 
+COPY .air.* ./
 COPY go.mod go.sum ./
 RUN go mod download
 
