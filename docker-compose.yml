@@ -27,7 +27,7 @@ services:
       timeout: 5s
       retries: 5
 
-  service:
+  onehub:
     build:
       context: .
       dockerfile: ./Dockerfile
@@ -49,3 +49,4 @@ services:
     ports:
       - 8080:8080
       - 9000:9000
+      - 9091:9091

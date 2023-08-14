@@ -15,7 +15,7 @@
       }
         ,
        {
-            "name": "Remote Docker for OneHub",
+            "name": "Remote Debugger for OneHub",
             "type": "go",
             "request": "attach",
             "mode": "remote",
