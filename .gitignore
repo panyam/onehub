@@ -1,4 +1,5 @@
 node_modules
+ohserve
 .DS_Store
 __debug_bin*
 main

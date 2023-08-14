@@ -27,7 +27,7 @@ func NewTopicService(db *ds.OneHubDB) *TopicService {
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
 	req.Topic.CreatorId = GetAuthedUser(ctx)
 	if req.Topic.CreatorId == "" {
-		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic")
+		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic.")
 	}
 	topic := req.Topic
 	if topic.Id != "" {

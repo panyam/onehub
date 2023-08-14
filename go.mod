@@ -10,13 +10,16 @@ require (
 require (
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.1
 	github.com/lib/pq v1.10.8
-	github.com/panyam/goutils v0.0.37
+	github.com/panyam/goutils v0.0.38
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20230724170836-66ad5b6ff146
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/driver/sqlite v1.5.2
 	gorm.io/gorm v1.25.2
 )
+
+// replace github.com/panyam/goutils v0.0.37 => ../goutils/
+// replace github.com/panyam/slicer v0.0.1 => ../slicer/
 
 require (
 	github.com/davecgh/go-spew v1.1.1 // indirect
@@ -38,7 +41,3 @@ require (
 	google.golang.org/genproto/googleapis/rpc v0.0.0-20230724170836-66ad5b6ff146 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
-
-replace github.com/panyam/goutils v0.0.37 => ../goutils/
-
-replace github.com/panyam/slicer v0.0.1 => ../slicer/
