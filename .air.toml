@@ -4,8 +4,8 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  cmd = "go build -o ./ohserve cmd/server.go"
-  bin = "./ohserve"
+  cmd = "go build -o ./tmp/main cmd/server.go"
+  bin = "./tmp/main"
 
   delay = 1000
   exclude_dir = ["assets", "testdata", "tmp", "cli", "vendors", "ohfe"]
