@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -19,6 +20,7 @@ type OHClient struct {
 	Username string
 	Password string
 
+	LogRequests         bool
 	PrettyPrintResponse bool
 	transport           *http.Transport
 }
@@ -56,6 +58,10 @@ func (c *OHClient) Call(method string, path string, args map[string][]string, he
 	}
 	if err != nil {
 		return nil, err
+	}
+	log.Println("LoG req: ", c.LogRequests)
+	if c.LogRequests {
+		log.Println("Request: ", url)
 	}
 
 	// Set any custom headers needed

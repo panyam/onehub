@@ -17,6 +17,9 @@ import styles from '@/components/styles/TopicListPanel.module.css'
 import TopicDetail from "./TopicDetail"
 import Auth from '@/core/Auth'
 
+import { Api } from '@/core/Api'
+const api = new Api()
+
 class ResultList<T> {
   hasNext = false
   hasPrev = false
@@ -40,9 +43,9 @@ export default function Container(props: any) {
 
 
   useEffect(() => {
-    axios.get("/v1/topics").then(response => {
-      const out = new ResultList<any>(response.data.topics)
-      out.hasNext = response.data.nextPageKey.trim() != ""
+    api.getTopics().then(response => {
+      const out = new ResultList<any>(response.topics)
+      out.hasNext = response.nextPageKey.trim() != ""
       setTopicList(out)
     });
   }, [])
@@ -50,7 +53,7 @@ export default function Container(props: any) {
   const newButtonRef = React.createRef<HTMLButtonElement>()
 
   const onTopicDeleted = (topic: any) => {
-    axios.delete(`/v1/topics/${topic.id}`).then(resp => {
+    api.deleteTopic(topic.id).then(resp => {
       const newTopics = topicList.items.filter(t => t.id != topic.id)
       setTopicList(new ResultList(newTopics))
     })
@@ -67,13 +70,13 @@ export default function Container(props: any) {
         newButtonRef.current.disabled = false
       }
 
-      axios.post("/v1/topics", {
+      api.createTopic({
         "topic": {
         "name": result,
         "creator_id": user.id,
         },
       }).then(response => {
-        const newTopics = [...topicList.items, response.data.topic]
+        const newTopics = [...topicList.items, response.topic]
         const newResults = new ResultList<any>(newTopics )
         setTopicList(newResults)
       });

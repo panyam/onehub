@@ -41,7 +41,8 @@ func rootCommand() *cobra.Command {
 			return nil
 		},
 	}
-	out.PersistentFlags().StringVar(&Client.Host, "host", DEFAULT_ONEHUB_HOST, "Host name to call the client against.  Envvar: OneHubHost")
+	out.PersistentFlags().BoolVar(&Client.LogRequests, "log-requests", false, "Whether to log requests sent to the api server or not")
+	out.PersistentFlags().StringVar(&Client.Host, "host", "", "Host name to call the client against.  Envvar: OneHubHost")
 	out.PersistentFlags().StringVar(&Client.Username, "username", "", "Username to use for basic auth for all commands.  Envvar: OneHubUsername")
 	out.PersistentFlags().StringVar(&Client.Password, "password", "", "Password to use for basic auth for all commands.  Envvar: OneHubPassword")
 	return out

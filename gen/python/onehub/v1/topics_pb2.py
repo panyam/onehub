@@ -23,7 +23,6 @@ _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
 _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'onehub.v1.topics_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
-
   DESCRIPTOR._options = None
   DESCRIPTOR._serialized_options = b'\n\rcom.onehub.v1B\013TopicsProtoP\001Z\030github.com/onehub/protos\242\002\003OXX\252\002\tOnehub.V1\312\002\tOnehub\\V1\342\002\025Onehub\\V1\\GPBMetadata\352\002\nOnehub::V1'
   _GETTOPICSRESPONSE_TOPICSENTRY._options = None

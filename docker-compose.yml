@@ -62,4 +62,15 @@ services:
       - 7080:80
     depends_on:
       - onehub
-        # - frontend
+      - frontend
+
+  frontend:
+    build: ./frontend
+    volumes:
+       - ./frontend:/app
+       - /app/node_modules
+       - /app/.next
+    restart: always
+    ports:
+      - 4000:4000
+    stdin_open: true

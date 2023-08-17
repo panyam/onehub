@@ -3,6 +3,9 @@ import { createRef, useState, useEffect } from "react";
 import styles from '@/components/styles/MessageList.module.css'
 import MessageView from '@/components/MessageView'
 
+import { Api } from '@/core/Api'
+const api = new Api()
+
 class ResultList<T> {
   hasNext = false
   hasPrev = false
@@ -24,9 +27,9 @@ export default function Container(props: any) {
     console.log("TopicId: ", props.topicId)
     if (props.topicId == null) return
     document.scrollingElement?.scroll(0, 1)
-    axios.get(`/v1/topics/${props.topicId}/messages`).then(resp => {
-      console.log("Bingo: ", resp.data)
-      setMessageList(new ResultList<any>(resp.data.messages))
+    api.getMessages(props.topicId).then(resp => {
+      console.log("Bingo: ", resp)
+      setMessageList(new ResultList<any>(resp.messages))
     });
   }, [props.topicId])
 

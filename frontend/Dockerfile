@@ -7,7 +7,5 @@ COPY package*.json /app
 
 RUN npm install
 
-COPY . /app
-
 # Finally, we run the NextJS app
 CMD ["npm", "run", "dev"]

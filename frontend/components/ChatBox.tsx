@@ -3,6 +3,8 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import styles from '@/components/styles/ChatBox.module.css'
 import Auth from '@/core/Auth'
+import { Api } from '@/core/Api'
+const api = new Api()
 
 export default function Container(props: any) {
   const textAreaRef = React.createRef<HTMLTextAreaElement>()
@@ -16,7 +18,7 @@ export default function Container(props: any) {
           alert("You need to be logged in")
         } else {
           console.log(evt, evt.target)
-          axios.post(`/v1/topics/${props.topicId}/messages`, {
+          api.createMessage(props.topicId, {
             "message": {
               "topic_id": props.topicId,
               "content_text": contenttext,
@@ -25,7 +27,7 @@ export default function Container(props: any) {
             },
           }).then(resp => {
             if (props.onNewMessage != null) {
-              props.onNewMessage(resp.data)
+              props.onNewMessage(resp)
             }
             if (textAreaRef.current != null) {
               textAreaRef.current.value = ""
