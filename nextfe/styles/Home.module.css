@@ -13,6 +13,10 @@
   min-height: 100vh;
 }
 
+.headerLoggedInUser {
+  padding: 5px;
+}
+
 .headerRightToolbar {
   float: right;
 }

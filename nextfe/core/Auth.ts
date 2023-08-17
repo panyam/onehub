@@ -22,7 +22,14 @@ export default class Auth {
     return user
   }
 
+  logout() {
+    localStorage.setItem("loggedInUser", JSON.stringify({}))
+  }
+
   get loggedInUser() {
+    if (typeof (localStorage) === "undefined") {
+      return {'id': null}
+    }
     let out = localStorage.getItem("loggedInUser")
     if (out == null) {
       const val = {

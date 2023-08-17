@@ -12,6 +12,7 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const [currTopicId, setCurrTopicId] = React.useState(null)
+  const [ isLoggedIn, setIsLoggedIn ] = React.useState(api.auth.isLoggedIn)
   const onTopicSelected = (topic: any) => {
     console.log("Selected: ", topic)
     setCurrTopicId(topic.id)
@@ -19,6 +20,14 @@ export default function Home() {
 
   const signInButtonLabel = "Sign In"
   const onSigninButtonClicked = () => {
+    if (isLoggedIn) {
+      api.auth.logout()
+      setIsLoggedIn(false)
+    } else {
+      const user = api.auth.ensureLoggedIn()
+      if (user != null) {
+      }
+    }
   }
 
   return (
@@ -33,7 +42,8 @@ export default function Home() {
       <div className={styles.header}>
         <h2>OneHub Playground</h2>
         <div className={styles.headerRightToolbar}>
-            <button onClick={onSigninButtonClicked}>{signInButtonLabel}</button>
+            <span className={styles.headerLoggedInuser}>{isLoggedIn ? api.auth.loggedInUser.name : ""}</span>
+            <button onClick={onSigninButtonClicked}>{isLoggedIn ? "Signout" : "Signin"}</button>
         </div>
       </div>
       <div className={styles.left}>

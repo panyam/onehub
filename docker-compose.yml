@@ -1,5 +1,10 @@
 version: '3.9'
 services:
+  basegoimage:
+    build:
+      dockerfile: Dockerfile.base
+    image: basegoimage
+
   pgadmin:
     image: dpage/pgadmin4
     ports:
@@ -27,15 +32,31 @@ services:
       timeout: 5s
       retries: 5
 
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs/server.key:/root/ssl/server.key
+      - ./configs/server.crt:/root/ssl/server.crt
+    ports:
+      - 7443:443
+      - 7080:80
+    depends_on:
+      - onehub
+      - nextfe 
+      - ohfe
+
   onehub:
+    depends_on:
+      - basegoimage
+      - postgres
     build:
       context: .
       dockerfile: ./Dockerfile
-    depends_on:
-      postgres:
-          condition: service_healthy
-            # webapp: condition: service_healthy
     volumes:
+      # - ./.air.toml:/app/.air.toml:ro
+      # - ./go.mod:/app/go.mod:ro
+      # - ./go.sum:/app/go.sum:ro
       - ./cmd:/app/cmd
       - ./gen:/app/gen
       - ./datastore:/app/datastore
@@ -51,26 +72,30 @@ services:
       - 9000:9000
       - 9091:9091
 
-  nginx:
-    image: nginx:latest
+  nextfe:
+    build: ./nextfe
     volumes:
-      - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./configs/server.key:/root/ssl/server.key
-      - ./configs/server.crt:/root/ssl/server.crt
-    ports:
-      - 7443:443
-      - 7080:80
-    depends_on:
-      - onehub
-      - frontend
-
-  frontend:
-    build: ./frontend
-    volumes:
-       - ./frontend:/app
+       - ./nextfe:/app
        - /app/node_modules
        - /app/.next
     restart: always
     ports:
       - 4000:4000
     stdin_open: true
+
+  ohfe:
+    depends_on:
+      - basegoimage
+    build:
+      context: ./ohfe
+    volumes:
+      # - ./ohfe/.air.toml:/app/.air.toml:ro
+      # - ./ohfe/go.mod:/app/go.mod:ro
+      # - ./ohfe/go.sum:/app/go.sum:ro
+      - ./ohfe/cmd:/app/cmd
+    environment:
+      ONEHUB_ENDPOINT: http://onehub:8080/api
+      ONEHUB_GRPC_ENDPOINT: onehub:9090
+    ports:
+      - 5080:5000
+      - 9092:9091
