@@ -1,0 +1,42 @@
+
+.container {
+}
+
+.header {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  height: 30px;
+}
+
+.topiclist {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 50px;
+  top: 50px;
+  overflow: scroll;
+  /* border: solid 2px red; */
+}
+
+.footer {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  height: 50px;
+}
+
+.button {
+  padding:5px;
+  margin: 5px;
+}
+
+.TopicCellDiv {
+  display: flex;
+  flex-direction: column;
+}

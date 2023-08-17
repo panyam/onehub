@@ -1,0 +1,45 @@
+
+
+.container {
+  border: solid 1px red;
+  max-height: 300px;
+  /*
+  position: absolute;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  */
+}
+
+.bottomanchor {
+  overflow-anchor: auto;
+  height: 1px;
+}
+
+.contentarea {
+  margin-left: 20px;
+  margin-bottom: 10px;
+}
+
+.userinfoarea {
+  border-top: solid 2px white;
+  display: flex;
+  padding-bottom: 10px;
+  padding-top: 10px;
+  padding-left: 5px;
+  align-items: center;
+}
+
+.header_avatar {
+}
+
+.header_username {
+  padding-left: 10px;
+  padding-right: 10px;
+}
+
+.header_createdat {
+  padding-left: 10px;
+  padding-right: 10px;
+}

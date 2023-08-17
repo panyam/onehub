@@ -1,0 +1,13 @@
+
+.container {
+  overflow: scroll;
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 0px;
+  /* background-color: white; */
+  overflow-anchor: none;
+}
+

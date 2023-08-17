@@ -50,3 +50,16 @@ services:
       - 8080:8080
       - 9000:9000
       - 9091:9091
+
+  nginx:
+    image: nginx:latest
+    volumes:
+      - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./configs/server.key:/root/ssl/server.key
+      - ./configs/server.crt:/root/ssl/server.crt
+    ports:
+      - 7443:443
+      - 7080:80
+    depends_on:
+      - onehub
+        # - frontend

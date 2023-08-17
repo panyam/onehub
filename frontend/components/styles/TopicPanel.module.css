@@ -1,0 +1,67 @@
+
+.container {
+}
+
+.header {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  height: 50px;
+  border-bottom: solid 2px white;
+}
+
+.messagelist {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 50px;
+  bottom: 150px;
+  margin: 10px;
+  border-right: solid 2px white;
+}
+
+.integrations {
+  margin: 10px;
+  position: absolute;
+  width: 0px;
+  right: 0px;
+  top: 50px;
+  bottom: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  overflow: scroll;
+  padding: 1rem;
+}
+
+.chatbox {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  height: 150px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  overflow: scroll;
+  padding: 1rem;
+}
+
+.footer {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  height: 50px;
+}
+
+.button {
+  padding:5px;
+  margin: 5px;
+}
+

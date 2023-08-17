@@ -1,0 +1,73 @@
+user  nginx;
+events {
+    worker_connections   1000000;
+}
+http {
+  server {              
+    server_name localhost;
+    listen  80;
+
+    # listen  443 default_server ssl;              # server_name demo.dagknows.com;
+    # ssl_certificate     /root/ssl/server.crt;
+    # ssl_certificate_key /root/ssl/server.key;
+    # ssl_protocols       TLSv1.2;
+    # ssl_ciphers         HIGH:!aNULL:!MD5;    
+
+    # API requests for in-req-router tasks endpoint (deprecated)
+    location ~ /api/ {
+      if ($request_method = OPTIONS ) {
+        return 200;
+      }
+      proxy_pass http://onehub:8080;
+      proxy_pass_request_headers on;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_set_header Host $host;
+      proxy_set_header Host-With-Port $http_host;
+      proxy_set_header Connection '';
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-HTTPS    on;
+      proxy_set_header Authorization $http_authorization;
+      proxy_pass_header Authorization;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Prefix /;
+
+      proxy_http_version 1.1;
+      chunked_transfer_encoding off;                
+      proxy_buffering off;
+      proxy_cache off;
+    }
+
+    # Everything else to the frontend
+    location / {
+      if ($request_method = OPTIONS ) { return 200; }
+      proxy_pass http://frontend:4000;
+      proxy_pass_request_headers on;
+      proxy_set_header Upgrade $http_upgrade;
+      proxy_set_header Connection "upgrade";
+      proxy_set_header Host $host;
+      proxy_set_header Host-With-Port $http_host;
+      proxy_set_header Connection '';
+      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+      proxy_set_header X-Forwarded-HTTPS    on;
+      proxy_set_header Authorization $http_authorization;
+      proxy_pass_header Authorization;
+      proxy_set_header X-Forwarded-Proto $scheme;
+      proxy_set_header X-Forwarded-Host $host;
+      proxy_set_header X-Forwarded-Prefix /;
+      proxy_http_version 1.1;
+      chunked_transfer_encoding off;                
+    }
+  }
+
+  # server {
+  # listen 80;
+  # server_name localhost;
+  # location / {
+  # return 301 https://$host$request_uri;
+  # }
+  # }
+}
