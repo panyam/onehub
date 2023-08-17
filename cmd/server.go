@@ -141,7 +141,7 @@ func EnsureAuthIsValid(ctx context.Context,
 			}
 		}
 	}
-	return nil, status.Error(codes.NotFound, "Invalid username/password")
+	return nil, status.Error(codes.Unauthenticated, "Invalid username/password")
 }
 
 func ErrorLogger( /* Add configs here */ ) grpc.UnaryServerInterceptor {
