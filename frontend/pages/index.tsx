@@ -5,6 +5,8 @@ import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import TopicListPanel from '@/components/TopicListPanel'
 import TopicPanel from '@/components/TopicPanel'
+import { Api } from '@/core/Api'
+const api = new Api()
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -13,6 +15,10 @@ export default function Home() {
   const onTopicSelected = (topic: any) => {
     console.log("Selected: ", topic)
     setCurrTopicId(topic.id)
+  }
+
+  const signInButtonLabel = "Sign In"
+  const onSigninButtonClicked = () => {
   }
 
   return (
@@ -26,6 +32,9 @@ export default function Home() {
     <main className={styles.main}>
       <div className={styles.header}>
         <h2>OneHub Playground</h2>
+        <div className={styles.headerRightToolbar}>
+            <button onClick={onSigninButtonClicked}>{signInButtonLabel}</button>
+        </div>
       </div>
       <div className={styles.left}>
         <TopicListPanel onTopicSelected={onTopicSelected}/>

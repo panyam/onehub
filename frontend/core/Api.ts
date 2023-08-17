@@ -1,6 +1,17 @@
 import axios from "axios";
 
+import Auth from './Auth'
+
 export class Api {
+  auth = new Auth()
+
+  get basicAuthParams(): any {
+    const username = (this.auth.loggedInUser || {}).id || ""
+    return {
+      username: username,
+      password: username + "123",
+    }
+  }
   getApiPath(path: string): string {
     if (path.startsWith("/")) {
       return `/api/v1{path}`
@@ -15,7 +26,7 @@ export class Api {
   }
 
   async getTopicInfo(topicid: string): Promise<any> {
-    const resp = await axios.get(this.getApiPath(`topics/${topicid}`))
+    const resp = await axios.get(this.getApiPath(`topics/${topicid}`), {auth: this.basicAuthParams})
     return resp.data
   }
 

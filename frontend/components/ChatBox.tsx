@@ -43,7 +43,7 @@ export default function Container(props: any) {
   }, [props.topicId])
 
   return (<div className={styles.container}>
-    <div className={styles.header}>header</div>
+    <div className={styles.header}></div>
     <div className={styles.inputarea}>
       <textarea ref={textAreaRef} className={styles.textarea}
                 placeholder="Enter your message and press Ctrl-Enter"

@@ -15,8 +15,6 @@ import axios from "axios";
 import React, { useState, useEffect } from "react";
 import styles from '@/components/styles/TopicListPanel.module.css'
 import TopicDetail from "./TopicDetail"
-import Auth from '@/core/Auth'
-
 import { Api } from '@/core/Api'
 const api = new Api()
 
@@ -60,7 +58,7 @@ export default function Container(props: any) {
   }
 
   const onNewTopic = () => {
-    const user = new Auth().ensureLoggedIn()
+    const user = api.auth.ensureLoggedIn()
     if (user == null) {
       alert("You need to be logged in")
     }

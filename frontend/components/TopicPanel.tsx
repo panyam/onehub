@@ -16,7 +16,7 @@ class ResultList<T> {
 }
 
 export default function Container(props: any) {
-  const [ topicName, setTopicName ] = useState("Unnamed Topic")
+  const [ topicName, setTopicName ] = useState("")
   const [ topicEvents, setTopicEvents ] = useState([] as any[])
   useEffect(() => {
     if (props.topicId) {
