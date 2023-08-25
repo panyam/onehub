@@ -13,6 +13,16 @@
   min-height: 100vh;
 }
 
+.loginFormInput {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+.loginFormLabel {
+}
+
 .headerLoggedInUser {
   padding: 5px;
 }
@@ -28,7 +38,7 @@
   right: 0px;
   height: 60px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   /* align-items: center; */
   overflow: scroll;

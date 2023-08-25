@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from '@/styles/Home.module.css'
 import TopicListPanel from '@/components/TopicListPanel'
+import DialogModal from '@/components/DialogModal'
 import TopicPanel from '@/components/TopicPanel'
 import { Api } from '@/core/Api'
 const api = new Api()
@@ -11,8 +12,11 @@ const api = new Api()
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
+  const signinDialogRef = React.createRef<HTMLDialogElement>()
   const [currTopicId, setCurrTopicId] = React.useState(null)
   const [ isLoggedIn, setIsLoggedIn ] = React.useState(api.auth.isLoggedIn)
+  const [isDialogOpened, setIsDialogOpened] = useState(false);
+
   const onTopicSelected = (topic: any) => {
     console.log("Selected: ", topic)
     setCurrTopicId(topic.id)
@@ -24,11 +28,18 @@ export default function Home() {
       api.auth.logout()
       setIsLoggedIn(false)
     } else {
+      setIsDialogOpened(true)
+      /*
       const user = api.auth.ensureLoggedIn()
       if (user != null) {
       }
+      */
     }
   }
+
+  const onProceed = () => {
+    console.log("Proceed clicked");
+  };
 
   return (
   <>
@@ -38,6 +49,23 @@ export default function Home() {
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <link rel="icon" href="/favicon.ico" />
     </Head>
+    <DialogModal
+      title="Signin to Onehub"
+      isOpened={isDialogOpened}
+      onProceed={onProceed}
+      onClose={() => setIsDialogOpened(false)}
+      proceedButtonLabel = "Signin"
+    >
+      <hr/>
+      <form>
+        <label className={styles.loginFormLabel}>Full name</label>
+        <input className={styles.loginFormInput}
+               placeholder="Enter your display name" />
+        <label className={styles.loginFormLabel}>Username</label>
+        <input className={styles.loginFormInput}
+               placeholder="Enter your userid/username" />
+      </form>
+    </DialogModal>
     <main className={styles.main}>
       <div className={styles.header}>
         <h2>OneHub Playground</h2>
