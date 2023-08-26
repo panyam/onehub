@@ -66,7 +66,7 @@ export class Api {
   }
 
   async createTopic(topic: any): Promise<any> {
-    const resp = await axios.post("/v1/topics", topic, {auth: this.basicAuthParams})
+    const resp = await axios.post(this.getApiPath("topics"), topic, {auth: this.basicAuthParams})
     return resp.data
   }
 
