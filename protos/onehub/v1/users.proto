@@ -190,16 +190,6 @@ message UpdateUserRequest {
    * Mask of fields being updated in this User to make partial changes.
    */
   google.protobuf.FieldMask update_mask = 2;
-
-  /**
-   * IDs of users to be added to this user.
-   */
-  repeated string add_users = 3;
-
-  /**
-   * IDs of users to be removed from this user.
-   */
-  repeated string remove_users = 4;
 }
 
 /**

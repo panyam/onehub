@@ -5,13 +5,18 @@ import Auth from './Auth'
 export class Api {
   auth = new Auth()
 
-  get basicAuthParams(): any {
-    const username = (this.auth.loggedInUser || {}).id || ""
+  basicAuthParamsFor(username) {
     return {
       username: username,
       password: username + "123",
     }
   }
+
+  get basicAuthParams(): any {
+    const username = (this.auth.loggedInUser || {}).id || ""
+    return this.basicAuthParamsFor(username)
+  }
+
   getApiPath(path: string): string {
     if (path.startsWith("/")) {
       return `/api/v1{path}`
@@ -20,8 +25,28 @@ export class Api {
     }
   }
 
+  async createUser(userid: string, fullname: string): Promise<any> {
+    const resp = await axios.post(this.getApiPath(`users`), {
+      "user": {
+        "id": userid,
+        "name": fullname,
+      }
+    }, {auth: this.basicAuthParamsFor(userid)})
+    return resp.data
+  }
+
+  async updateUser(userid: string, fullname: string): Promise<any> {
+    const resp = await axios.patch(this.getApiPath(`users/${userid}`), {
+      "user": {
+        "name": fullname,
+      },
+      "update_mask": "name"
+    }, {auth: this.basicAuthParamsFor(userid)})
+    return resp.data
+  }
+
   async getUserInfo(userid: string): Promise<any> {
-    const resp = await axios.get(this.getApiPath(`users/${userid}`))
+    const resp = await axios.get(this.getApiPath(`users/${userid}`), {auth: this.basicAuthParamsFor(userid)})
     return resp.data
   }
 
@@ -31,27 +56,27 @@ export class Api {
   }
 
   async getTopics(): Promise<any> {
-    const resp = await axios.get(this.getApiPath(`topics`))
+    const resp = await axios.get(this.getApiPath(`topics`), {auth: this.basicAuthParams})
     return resp.data
   }
 
   async deleteTopic(topicid: string): Promise<any> {
-    const resp = await axios.delete(this.getApiPath(`topics/${topicid}`))
+    const resp = await axios.delete(this.getApiPath(`topics/${topicid}`), {auth: this.basicAuthParams})
     return resp.data
   }
 
   async createTopic(topic: any): Promise<any> {
-    const resp = await axios.post("/v1/topics", topic)
+    const resp = await axios.post("/v1/topics", topic, {auth: this.basicAuthParams})
     return resp.data
   }
 
   async getMessages(topicId: string): Promise<any> {
-    const resp = await axios.get(this.getApiPath(`topics/${topicId}/messages`))
+    const resp = await axios.get(this.getApiPath(`topics/${topicId}/messages`), {auth: this.basicAuthParams})
     return resp.data
   }
 
   async createMessage(topicId: string, message: any): Promise<any> {
-    const resp = await axios.post(this.getApiPath(`topics/${topicId}/messages`), message)
+    const resp = await axios.post(this.getApiPath(`topics/${topicId}/messages`), message, {auth: this.basicAuthParams})
     return resp.data
   }
 }
