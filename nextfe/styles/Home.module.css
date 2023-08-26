@@ -13,6 +13,17 @@
   min-height: 100vh;
 }
 
+.loginForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.loginFormErrorSpan {
+  width: 100%;
+  box-sizing: border-box;
+  color: red;
+}
+
 .loginFormInput {
   width: 100%;
   padding: 12px 20px;
@@ -21,6 +32,9 @@
 }
 
 .loginFormLabel {
+  font-weight: bolder;
+  width: 100%;
+  box-sizing: border-box;
 }
 
 .headerLoggedInUser {

@@ -20,21 +20,21 @@ const isClickInsideRectangle = (e: MouseEvent, element: HTMLElement) => {
 
 type Props = {
   title: string;
-  isOpened: boolean;
-  onProceed: () => void;
-  onClose: () => void;
   children: React.ReactNode;
-  proceedButtonLabel?: string;
+  isOpened: boolean;
+  onClose?: (label: String) => boolean;
+  buttons?: string[];
+  onCancel?: () => boolean;
   cancelButtonLabel?: string;
 };
 
 const DialogModal = ({
   title,
   isOpened,
-  onProceed,
+  onCancel,
   onClose,
+  buttons,
   children,
-  proceedButtonLabel,
   cancelButtonLabel,
 }: Props) => {
   const ref = useRef<HTMLDialogElement>(null);
@@ -49,18 +49,22 @@ const DialogModal = ({
     }
   }, [isOpened]);
 
-  const proceedAndClose = () => {
-    onProceed();
-    onClose();
-  };
+  buttons = buttons || ["Ok"]
+  cancelButtonLabel = cancelButtonLabel || "Cancel"
+  if (!onCancel || onCancel == null) {
+    onCancel = () => true
+  }
+  if (!onClose || onClose == null) {
+    onClose = (label) => true
+  }
 
   return (
   <div className = {styles.dialog_container}>
     <dialog className = {styles.dialog}
       ref={ref}
-      onCancel={onClose}
+      onCancel={onCancel}
       onClick={(e) =>
-        ref.current && !isClickInsideRectangle(e, ref.current) && onClose()
+        ref.current && !isClickInsideRectangle(e, ref.current) && onCancel!()
       }
     >
       <h3>{title}</h3>
@@ -69,8 +73,16 @@ const DialogModal = ({
 
       <Buttons>
         <center>
-          <button className={styles.dialog_button} onClick={proceedAndClose}>{proceedButtonLabel || "Ok"}</button>
-          <button className={styles.dialog_button} onClick={onClose}>{cancelButtonLabel || "Cancel"}</button>
+          {
+            buttons.map((label, index) => 
+              <button key={index}
+                      className={styles.dialog_button}
+                      onClick={() => onClose!(label)}>{label}
+                  </button>
+            )
+          }
+          <button key="cancel" className={styles.dialog_button}
+                  onClick={() => onCancel!()}>{cancelButtonLabel}</button>
         </center>
       </Buttons>
     </dialog>

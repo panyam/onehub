@@ -13,6 +13,10 @@ const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
   const signinDialogRef = React.createRef<HTMLDialogElement>()
+  const usernameInputRef = React.createRef<HTMLInputElement>()
+  const fullnameInputRef = React.createRef<HTMLInputElement>()
+  const usernameInputErrorRef = React.createRef<HTMLSpanElement>()
+  const fullnameInputErrorRef = React.createRef<HTMLSpanElement>()
   const [currTopicId, setCurrTopicId] = React.useState(null)
   const [ isLoggedIn, setIsLoggedIn ] = React.useState(api.auth.isLoggedIn)
   const [isDialogOpened, setIsDialogOpened] = useState(false);
@@ -22,24 +26,38 @@ export default function Home() {
     setCurrTopicId(topic.id)
   }
 
-  const signInButtonLabel = "Sign In"
   const onSigninButtonClicked = () => {
     if (isLoggedIn) {
       api.auth.logout()
       setIsLoggedIn(false)
     } else {
       setIsDialogOpened(true)
-      /*
-      const user = api.auth.ensureLoggedIn()
-      if (user != null) {
-      }
-      */
     }
   }
 
-  const onProceed = () => {
-    console.log("Proceed clicked");
-  };
+  const onClose = (label: string): boolean => {
+    let result = true
+    if (!fullnameInputRef.current) return false
+    if (!usernameInputRef.current) return false
+    usernameInputErrorRef.current!.innerHTML = ""
+    fullnameInputErrorRef.current!.innerHTML = ""
+    const userid = usernameInputRef.current.value.trim() || ""
+    const fullname = fullnameInputRef.current.value.trim() || ""
+    if (userid == "") {
+      result = false
+      usernameInputErrorRef.current!.innerHTML = "Invalid username"
+    }
+    if (fullname == "") {
+      result = false
+      fullnameInputErrorRef.current!.innerHTML = "Invalid fullname"
+    }
+    if (result) {
+      api.auth.setLoggedInUser(userid, {"name": fullname})
+      setIsLoggedIn(true)
+      setIsDialogOpened(false)
+    }
+    return result
+  }
 
   return (
   <>
@@ -52,25 +70,30 @@ export default function Home() {
     <DialogModal
       title="Signin to Onehub"
       isOpened={isDialogOpened}
-      onProceed={onProceed}
-      onClose={() => setIsDialogOpened(false)}
-      proceedButtonLabel = "Signin"
+      buttons={["Signin"]}
+      onClose={onClose}
     >
       <hr/>
-      <form>
+      <form className={styles.loginForm}>
         <label className={styles.loginFormLabel}>Full name</label>
-        <input className={styles.loginFormInput}
+        <input ref={fullnameInputRef}
+               className={styles.loginFormInput}
                placeholder="Enter your display name" />
+        <span className={styles.loginFormErrorSpan}
+              ref={fullnameInputErrorRef}></span>
         <label className={styles.loginFormLabel}>Username</label>
-        <input className={styles.loginFormInput}
+        <input ref={usernameInputRef}
+               className={styles.loginFormInput}
                placeholder="Enter your userid/username" />
+        <span className={styles.loginFormErrorSpan}
+              ref={usernameInputErrorRef}></span>
       </form>
     </DialogModal>
     <main className={styles.main}>
       <div className={styles.header}>
         <h2>OneHub Playground</h2>
         <div className={styles.headerRightToolbar}>
-            <span className={styles.headerLoggedInuser}>{isLoggedIn ? api.auth.loggedInUser.name : ""}</span>
+            <span className={styles.headerLoggedInUser}>{isLoggedIn ? api.auth.loggedInUser.name : ""}</span>
             <button onClick={onSigninButtonClicked}>{isLoggedIn ? "Signout" : "Signin"}</button>
         </div>
       </div>

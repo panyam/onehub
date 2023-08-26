@@ -45,6 +45,11 @@ export default function Container(props: any) {
       const out = new ResultList<any>(response.topics)
       out.hasNext = response.nextPageKey.trim() != ""
       setTopicList(out)
+    }).catch(error => {
+      const out = new ResultList<any>([])
+      out.hasNext = false
+      setTopicList(out)
+      console.log("Error: ", error)
     });
   }, [])
 
