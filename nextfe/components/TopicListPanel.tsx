@@ -62,6 +62,8 @@ export default function Container(props: any) {
     })
   }
 
+  const onSearchTopics = () => {}
+
   const onNewTopic = () => {
     const user = api.auth.ensureLoggedIn()
     if (user == null) {
@@ -90,7 +92,13 @@ export default function Container(props: any) {
   }
 
   return (<>
-  <div className={styles.header}><h3>Topics</h3></div>
+  <div className={styles.header}>
+    <h3>Topics</h3>
+    <div className={styles.TopicsHeaderPanel}>
+      <button onClick={onSearchTopics} className={styles.headerButton}>Search</button>
+      <button onClick={onNewTopic} ref={newButtonRef} className={styles.headerButton}>New</button>
+    </div>
+  </div>
   <div className={styles.topiclist}>
     <List sx={{ width: '100%', maxWidth: 360}}>{
         topicList.items.map((topic, index) => {
@@ -105,9 +113,6 @@ export default function Container(props: any) {
     }</List>
   </div>
   <div className={styles.footer}>
-    <center>
-      <button onClick={onNewTopic} ref={newButtonRef} className={styles.button}>New</button>
-    </center>
   </div>
 </>)
 }
