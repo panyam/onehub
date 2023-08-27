@@ -79,7 +79,7 @@ export default function Container(props: any) {
         "creator_id": user.id,
         },
       }).then(response => {
-        const newTopics = [...topicList.items, response.topic]
+        const newTopics = [response.topic, ...topicList.items]
         const newResults = new ResultList<any>(newTopics )
         setTopicList(newResults)
       });
