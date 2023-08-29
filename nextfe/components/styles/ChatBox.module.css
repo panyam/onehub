@@ -5,18 +5,11 @@
   left: 0px;
   right: 0px;
   bottom: 0px;
-}
-
-.inputarea {
-  position: absolute;
-  bottom: 0px;
-  left: 0px;
-  right: 0px;
-  top: 30px;
+  padding-top: 5px;
 }
 
 .header {
-  border-top: solid 2px white;
+  background-color: gray;
   position: absolute;
   top: 0px;
   left: 0px;
@@ -24,11 +17,47 @@
   height: 30px;
 }
 
-.textarea {
+.inputarea {
+  position: absolute;
+  bottom: 35px;
+  left: 0px;
+  right: 0px;
+  top: 35px;
+  overflow: scroll;
+}
+
+.footer {
+  background-color: gray;
+  padding-left: 10px;
+  padding-top: 5px;
   position: absolute;
   bottom: 0px;
   left: 0px;
   right: 0px;
+  height: 30px;
+}
+
+
+.editable {
+  position: absolute !important;
+  bottom: 0px;
+  left: 0px;
+  right: 0px;
   top: 0px;
-  padding: 5px;
+  padding-left: 10px;
+  padding-right: 10px;
+  overflow: scroll;
+  border-radius: 5px;
+  border: solid 1px;
+}
+
+.header_toolbar {
+  padding-bottom: 10px !important;
+  border: solid 0px !important;
+}
+
+.footer_toolbar {
+  border-bottom: none;
+  padding-bottom: 5px !important;
+  border: solid 0px !important;
 }

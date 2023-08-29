@@ -37,14 +37,13 @@ export default function Container(props: any) {
 
   return (<>
   <div className={styles.header}>{topicName}</div>
+  <div className={styles.footer}></div>
+  <div className={styles.integrations}></div>
   <div className={styles.messagelist}>
     <MessageList topicId = {props.topicId} topicEvents={topicEvents} />
   </div>
   <div className={styles.chatbox}>
     <ChatBox topicId = {props.topicId} onNewMessage = {onNewMessage}/>
-  </div>
-  <div className={styles.integrations}></div>
-  <div className={styles.footer}>
   </div>
 </>)
 }

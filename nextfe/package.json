@@ -21,6 +21,7 @@
     "axios": "^1.4.0",
     "eslint": "8.40.0",
     "eslint-config-next": "13.4.4",
+    "is-hotkey": "^0.2.0",
     "moment": "^2.29.4",
     "moment-timezone": "^0.5.43",
     "next": "13.4.4",

@@ -1,7 +1,4 @@
 
-.container {
-}
-
 .header {
   position:absolute;
   padding: 10px;
@@ -19,7 +16,6 @@
   top: 50px;
   bottom: 150px;
   margin: 10px;
-  border-right: solid 2px white;
 }
 
 .integrations {
