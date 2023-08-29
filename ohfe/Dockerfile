@@ -1,0 +1,3 @@
+FROM basegoimage
+
+WORKDIR /app

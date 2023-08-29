@@ -15,7 +15,25 @@ import {
 } from 'slate'
 import { ReactEditor, Editable, withReact, useSlate, Slate } from 'slate-react'
 import { withHistory } from 'slate-history'
-import { Button, Icon, Toolbar } from '@/components/slate/components'
+
+
+type CustomElement = { type: 'paragraph'; children: CustomText[] }
+type CustomText = { text: string }
+const CodeElement = (props: any) => {
+  return (
+    <pre {...props.attributes}>
+      <code>{props.children}</code>
+    </pre>
+  )
+}
+
+declare module 'slate' {
+  interface CustomTypes {
+    Editor: BaseEditor & ReactEditor
+    Element: CustomElement
+    Text: CustomText
+  }
+}
 
 import { Api } from '@/core/Api'
 const api = new Api()
@@ -96,7 +114,7 @@ export default function Container(props: any) {
       </Toolbar>
           <Editable         // Define a new handler which prints the key that was pressed.
           className={styles.inputarea} 
-          onKeyDown={(event: any) => { console.log(event.key) }}
+          onKeyDown={event => { console.log(event.key) }}
           />
         </Slate>
     </div>
@@ -187,7 +205,7 @@ const BlockButton = (props: any) => {
         format,
         TEXT_ALIGN_TYPES.includes(format) ? 'align' : 'type'
       )}
-      onMouseDown={(event: any) => {
+      onMouseDown={event => {
         event.preventDefault()
         toggleBlock(editor, format)
       }}
@@ -197,13 +215,12 @@ const BlockButton = (props: any) => {
   )
 }
 
-const MarkButton = (props: any) => {
-  const { format, icon } = props
+const MarkButton = ({ format, icon }) => {
   const editor = useSlate()
   return (
     <Button
       active={isMarkActive(editor, format)}
-      onMouseDown={(event: any) => {
+      onMouseDown={event => {
         event.preventDefault()
         toggleMark(editor, format)
       }}
@@ -213,7 +230,7 @@ const MarkButton = (props: any) => {
   )
 }
 
-const toggleBlock = (editor: any, format: any) => {
+const toggleBlock = (editor, format) => {
   const isActive = isBlockActive(
     editor,
     format,
@@ -247,7 +264,7 @@ const toggleBlock = (editor: any, format: any) => {
   }
 }
 
-const toggleMark = (editor: any, format: any) => {
+const toggleMark = (editor, format) => {
   const isActive = isMarkActive(editor, format)
 
   if (isActive) {
@@ -257,7 +274,7 @@ const toggleMark = (editor: any, format: any) => {
   }
 }
 
-const isBlockActive = (editor: any, format: string, blockType = 'type') => {
+const isBlockActive = (editor, format, blockType = 'type') => {
   const { selection } = editor
   if (!selection) return false
 
@@ -274,7 +291,7 @@ const isBlockActive = (editor: any, format: string, blockType = 'type') => {
   return !!match
 }
 
-const isMarkActive = (editor: any, format: string) => {
+const isMarkActive = (editor, format) => {
   const marks = Editor.marks(editor)
   return marks ? marks[format] === true : false
 }
