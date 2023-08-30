@@ -1,4 +1,8 @@
 import React, { useState, useEffect, useContext } from "react";
+
+import { createRoot } from "react-dom/client";
+import * as FlexLayout from "flexlayout-react";
+
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
@@ -107,6 +111,46 @@ export default function Home() {
     }
   }, [])
 
+  const flexFactory = (node: any) => {
+    var component = node.getComponent();
+    if (component === "button") {
+      return <button>{node.getName()}</button>;
+    }
+  }
+
+  const flexModel = {model: FlexLayout.Model.fromJson({
+    global: {},
+    borders: [],
+    layout: {
+        type: "row",
+        weight: 100,
+        children: [
+            {
+                type: "tabset",
+                weight: 50,
+                children: [
+                    {
+                        type: "tab",
+                        name: "One",
+                        component: "button",
+                    }
+                ]
+            },
+            {
+                type: "tabset",
+                weight: 50,
+                children: [
+                    {
+                        type: "tab",
+                        name: "Two",
+                        component: "button",
+                    }
+                ]
+            }
+        ]
+    }
+  })};
+
   return (
   <>
     <Head>
@@ -147,14 +191,18 @@ export default function Home() {
             <button onClick={onSigninButtonClicked}>{signinButtonLabel}</button>
         </div>
       </div>
+      {/*
+      <div className={styles.mainpanel}>
+	      <FlexLayout.Layout model={flexModel} factory={flexFactory}/>
+      </div>
+      */}
       <div className={styles.left}>
         <TopicListPanel onTopicSelected={onTopicSelected}/>
       </div>
       <div className={styles.centerpanel}>
         <TopicPanel topicId = {currTopicId} />
       </div>
-      <div className={styles.footer}>
-      </div>
+      <div className={styles.footer}></div>
     </main>
   </>
   )
