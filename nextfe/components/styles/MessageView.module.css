@@ -1,7 +1,6 @@
 
 
 .container {
-  border: solid 1px red;
   max-height: 300px;
   /*
   position: absolute;
@@ -23,7 +22,7 @@
 }
 
 .userinfoarea {
-  border-top: solid 2px white;
+  border-top: dashed 1px #444444;
   display: flex;
   padding-bottom: 10px;
   padding-top: 10px;
