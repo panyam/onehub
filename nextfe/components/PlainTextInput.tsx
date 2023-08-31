@@ -14,7 +14,7 @@ export default function Container(props: any) {
         console.log(evt, evt.target)
         if (await props.onNewMessage({
             "content_text": contenttext,
-            "content_type": "chat/text",
+            "content_type": "text/plain",
         })) {
           if (textAreaRef.current != null) {
             textAreaRef.current.value = ""

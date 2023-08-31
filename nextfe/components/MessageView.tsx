@@ -95,7 +95,8 @@ export default function MessageView(props: {
 }
 
 export function createContentView(message: any): React.ReactNode {
-    if (message.contentType == "chat/text") {
+    if (message.contentType == "text/plain" ||
+        message.contentType == "chat/text") {
       return <>
         <div style={{wordWrap: "break-word"}}><p>{message.contentText}</p></div>
       </>

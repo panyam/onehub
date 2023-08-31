@@ -78,6 +78,7 @@ func MessageFromProto(input *protos.Message) (out *ds.Message) {
 		},
 		UserId:      input.UserId,
 		TopicId:     input.TopicId,
+		CreatedAt:   input.CreatedAt.AsTime(),
 		ContentType: input.ContentType,
 		ContentText: input.ContentText,
 	}
@@ -89,7 +90,7 @@ func MessageFromProto(input *protos.Message) (out *ds.Message) {
 
 func UserToProto(input *ds.User) (out *protos.User) {
 	out = &protos.User{
-		CreatedAt: tspb.New(input.BaseModel.CreatedAt),
+		CreatedAt: tspb.New(input.CreatedAt),
 		UpdatedAt: tspb.New(input.BaseModel.UpdatedAt),
 		Name:      input.Name,
 		Avatar:    input.Avatar,

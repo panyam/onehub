@@ -5,7 +5,7 @@ export default function Document() {
     <Html lang="en">
       <Head>
         <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
-        <link rel="stylesheet" href="node_modules/flexlayout-react/style/dark.css" />
+        {/*<link rel="stylesheet" href="node_modules/flexlayout-react/style/dark.css" />*/}
       </Head>
       <body>
         <Main />
