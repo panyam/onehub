@@ -1,8 +1,8 @@
 
 import axios from "axios";
+import isHotkey from 'is-hotkey'
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import styles from '@/components/styles/ChatBox.module.css'
-import Auth from '@/core/Auth'
+import styles from './Editor.module.css'
 
 // Slate editor
 import {
@@ -15,6 +15,7 @@ import {
 } from 'slate'
 import { ReactEditor, Editable, withReact, useSlate, Slate } from 'slate-react'
 import { withHistory } from 'slate-history'
+import { Button, Icon, Toolbar } from './components'
 
 
 type CustomElement = { type: 'paragraph'; children: CustomText[] }
@@ -35,42 +36,14 @@ declare module 'slate' {
   }
 }
 
-import { Api } from '@/core/Api'
-const api = new Api()
+const HOTKEYS = {
+  'mod+b': 'bold',
+  'mod+i': 'italic',
+  'mod+u': 'underline',
+  'mod+`': 'code',
+}
 
 export default function Container(props: any) {
-  /*
-  const textAreaRef = React.createRef<HTMLTextAreaElement>()
-  const onKeyUp = (evt: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (props.topicId != null && evt.code == "Enter" && evt.ctrlKey) {
-      const tarea = evt.target as HTMLTextAreaElement
-      const contenttext = tarea.value.trim();
-      if (contenttext.length > 0) {
-        const user = new Auth().ensureLoggedIn()
-        if (user == null) {
-          alert("You need to be logged in")
-        } else {
-          console.log(evt, evt.target)
-          api.createMessage(props.topicId, {
-            "message": {
-              "topic_id": props.topicId,
-              "content_text": contenttext,
-              "content_type": "chat/text",
-              "user_id": user.id,
-            },
-          }).then(resp => {
-            if (props.onNewMessage != null) {
-              props.onNewMessage(resp)
-            }
-            if (textAreaRef.current != null) {
-              textAreaRef.current.value = ""
-            }
-          });
-        }
-      }
-    }
-  }*/
-
   useEffect(() => {
     if (props.topicId == null) return
   }, [props.topicId])
@@ -84,40 +57,60 @@ export default function Container(props: any) {
   const renderElement = useCallback((props: any) => <Element {...props} />, [])
   const renderLeaf = useCallback((props: any) => <Leaf {...props} />, [])
   const editor = useMemo(() => withHistory(withReact(createEditor())), [])
+  editor.onChange = (event => {
+    console.log("On Change: ", event)
+  })
 
   return (
-    <div className={styles.container}>
-      <div className={styles.header}></div>
-        {/*
-      <div className={styles.inputarea}>
-        <textarea ref={textAreaRef} className={styles.textarea}
-                  placeholder="Enter your message and press Ctrl-Enter"
-                  onKeyPress = {onKeyUp}>
-        </textarea>
-      </div>
-        */}
-        <Slate editor={editor} initialValue={initialValue} >
-      <Toolbar>
-        <MarkButton format="bold" icon="format_bold" />
-        <MarkButton format="italic" icon="format_italic" />
-        <MarkButton format="underline" icon="format_underlined" />
-        <MarkButton format="code" icon="code" />
-        <BlockButton format="heading-one" icon="looks_one" />
-        <BlockButton format="heading-two" icon="looks_two" />
-        <BlockButton format="block-quote" icon="format_quote" />
-        <BlockButton format="numbered-list" icon="format_list_numbered" />
-        <BlockButton format="bulleted-list" icon="format_list_bulleted" />
-        <BlockButton format="left" icon="format_align_left" />
-        <BlockButton format="center" icon="format_align_center" />
-        <BlockButton format="right" icon="format_align_right" />
-        <BlockButton format="justify" icon="format_align_justify" />
-      </Toolbar>
+      <Slate editor={editor} initialValue={initialValue} >
+        <div className={styles.header}>
+          <Toolbar className={styles.header_toolbar}>
+            <MarkButton format="bold" icon="format_bold" />
+            <MarkButton format="italic" icon="format_italic" />
+            <MarkButton format="underline" icon="format_underlined" />
+            <MarkButton format="code" icon="code" />
+            <BlockButton format="heading-one" icon="looks_one" />
+            <BlockButton format="heading-two" icon="looks_two" />
+            <BlockButton format="block-quote" icon="format_quote" />
+            <BlockButton format="numbered-list" icon="format_list_numbered" />
+            <BlockButton format="bulleted-list" icon="format_list_bulleted" />
+            <BlockButton format="left" icon="format_align_left" />
+            <BlockButton format="center" icon="format_align_center" />
+            <BlockButton format="right" icon="format_align_right" />
+            <BlockButton format="justify" icon="format_align_justify" />
+          </Toolbar>
+        </div>
+        <div className={styles.inputarea}>
           <Editable         // Define a new handler which prints the key that was pressed.
-          className={styles.inputarea} 
-          onKeyDown={event => { console.log(event.key) }}
+              className = {styles.editable}
+              renderElement={renderElement}
+              renderLeaf={renderLeaf}
+              placeholder="Enter some rich text…"
+              spellCheck
+              autoFocus
+              onKeyDown={event => {
+                if (isHotkey("mod+enter", event)) {
+                  event.preventDefault()
+                  return
+                }
+
+                // check for hot keys
+                for (const hotkey in HOTKEYS) {
+                  if (isHotkey(hotkey, event as any)) {
+                    event.preventDefault()
+                    const mark = HOTKEYS[hotkey]
+                    toggleMark(editor, mark)
+                  }
+                }
+              }}
           />
+        </div>
+        <div className={styles.footer}>
+          <Toolbar className={styles.footer_toolbar}>
+            <SettingButton icon="send" />
+          </Toolbar>
+        </div>
         </Slate>
-    </div>
   )
 }
 

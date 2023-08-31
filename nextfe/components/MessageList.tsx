@@ -37,13 +37,19 @@ export default function Container(props: any) {
 
   useEffect(() => {
     console.log("Received Topic Events: ", props.topicEvents)
+    const currItems = messageList.items
     if (props.topicEvents && props.topicEvents.length > 0) {
-      const currItems = messageList.items
-      const newItems = [...currItems, ...props.addedMessages]
+      const newItems = [...currItems]
+      for (const tevent of props.topicEvents) {
+        if (tevent.type == "new_message") {
+          newItems.push(tevent.value.message)
+        }
+      }
       setMessageList(new ResultList<any>(newItems))
     }
-  }, [props.addedMessages])
+  }, [props.topicEvents])
 
+  /*
   useEffect(() => {
     console.log("Messages Removed: ", props.removedMessages)
   }, [props.removedMessages])
@@ -51,6 +57,7 @@ export default function Container(props: any) {
   useEffect(() => {
     console.log("Messages Updated: ", props.updatedMessages)
   }, [props.updatedMessages])
+  */
   
   // const delegate = new ContentViewDelegate()
 

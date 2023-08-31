@@ -31,7 +31,7 @@ export default function Container(props: any) {
     console.log("NewMsg: ", msg)
     setTopicEvents([{
       "type": "new_message",
-      "value": "msg",
+      "value": msg,
     }])
   }
 

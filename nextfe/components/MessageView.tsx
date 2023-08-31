@@ -5,6 +5,7 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Avatar from '@mui/material/Avatar';
 import Moment from 'react-moment'
+import moment from 'moment'
 import 'moment-timezone'
 import { Api } from '@/core/Api'
 const api = new Api()
@@ -18,6 +19,7 @@ class ContentView {
 
 export function UserInfo(props: any) {
   const { userid, createdAt } = props
+  const [ format, setFormat ] = useState("LLLL")
   const [ userName, setUserName ] = useState("NoName")
   const [ avatarInitials, setAvatarInitials ] = useState("AI")
   const [ avatarUrl, setAvatarUrl ] = useState(null)
@@ -35,7 +37,22 @@ export function UserInfo(props: any) {
       }
       setUserName(user.name)
     });
-  }, [props.userid])
+    const currmom = moment(createdAt)
+    if (currmom >= moment().startOf('day')) {
+      // only show time and am/pm
+      setFormat("h:mm:ss a")
+    } else if (currmom >= moment().startOf('week')) {
+      // show Sunday 28th time am/pm
+      setFormat("dddd h:mm:ss a")
+    } else if (currmom >= moment().startOf('month')) {
+      // Wed 12th HH:MM:SS AM/PM
+      setFormat("dddd Do h:mm:ss a")
+    } else {
+      setFormat("MMMM Do YYYY, h:mm:ss a")
+    }
+  }, [props.userid, props.createdAt])
+
+  // All these times should be based on user local time
   return <>
     {
     avatarUrl == null ? 
@@ -49,7 +66,7 @@ export function UserInfo(props: any) {
     }
     <span className={styles.header_username}>{userName}</span>
     <span className={styles.header_createdat}>
-      <Moment unix date={createdAt} format="YYYY-MM-D hh:mm A" />
+      <Moment date={createdAt} format={format} />
     </span>
   </>
 }

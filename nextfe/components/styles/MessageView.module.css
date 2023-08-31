@@ -37,6 +37,7 @@
 .header_username {
   padding-left: 10px;
   padding-right: 10px;
+  font-weight: bolder;
 }
 
 .header_createdat {
