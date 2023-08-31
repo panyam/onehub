@@ -38,9 +38,11 @@
   padding-left: 10px;
   padding-right: 10px;
   font-weight: bolder;
+  font-size: larger;
 }
 
 .header_createdat {
   padding-left: 10px;
   padding-right: 10px;
+  font-size: smaller;
 }

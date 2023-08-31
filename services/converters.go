@@ -50,8 +50,9 @@ func TopicFromProto(input *protos.Topic) (out *ds.Topic) {
 }
 
 func MessageToProto(input *ds.Message) (out *protos.Message) {
+	log.Println("Found DS Msg: ", input)
 	out = &protos.Message{
-		CreatedAt:   tspb.New(input.BaseModel.CreatedAt),
+		CreatedAt:   tspb.New(input.CreatedAt),
 		UpdatedAt:   tspb.New(input.BaseModel.UpdatedAt),
 		Id:          input.BaseModel.Id,
 		UserId:      input.UserId,

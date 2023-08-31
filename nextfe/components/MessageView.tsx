@@ -43,12 +43,12 @@ export function UserInfo(props: any) {
       setFormat("h:mm:ss a")
     } else if (currmom >= moment().startOf('week')) {
       // show Sunday 28th time am/pm
-      setFormat("dddd h:mm:ss a")
+      setFormat("ddd h:mm a")
     } else if (currmom >= moment().startOf('month')) {
       // Wed 12th HH:MM:SS AM/PM
-      setFormat("dddd Do h:mm:ss a")
+      setFormat("ddd Do h:mm a")
     } else {
-      setFormat("MMMM Do YYYY, h:mm:ss a")
+      setFormat("MMM Do YYYY, h:mm:ss a")
     }
   }, [props.userid, props.createdAt])
 
