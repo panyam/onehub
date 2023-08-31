@@ -36,7 +36,7 @@ export default function Container(props: any) {
   }
 
   return (<>
-  <div className={styles.header}>{topicName}</div>
+  <div className={styles.header}><h2>{topicName}</h2></div>
   <div className={styles.footer}></div>
   <div className={styles.integrations}></div>
   <div className={styles.messagelist}>
