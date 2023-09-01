@@ -29,6 +29,10 @@
   padding-bottom: 0px;
 }
 
+.topicListItemButton.Mui-selected * {
+  background-color: red;
+}
+
 .footer {
   position:absolute;
   padding: 10px;

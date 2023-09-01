@@ -10,7 +10,6 @@ import IconButton from '@mui/material/IconButton';
 import Avatar from '@mui/material/Avatar';
 
 
-
 import axios from "axios";
 import React, { useState, useEffect } from "react";
 import styles from '@/components/styles/TopicListPanel.module.css'
@@ -104,7 +103,8 @@ export default function Container(props: any) {
         topicList.items.map((topic, index) => {
           return <ListItem className = {styles.topicListItem} key={topic.id}>
             <ListItemButton
-                selected={selectedIndex === 0}
+                className = {styles.topicListItemButton}
+                selected={selectedIndex === index}
                 onClick={(event) => handleListItemClick(event, index)}>
                 <ListItemText primary={topic.name} />
             </ListItemButton>
