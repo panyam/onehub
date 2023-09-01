@@ -102,7 +102,7 @@ export default function Container(props: any) {
   <div className={styles.topiclist}>
     <List sx={{ width: '100%', maxWidth: 360}}>{
         topicList.items.map((topic, index) => {
-          return <ListItem key={topic.id}>
+          return <ListItem className = {styles.topicListItem} key={topic.id}>
             <ListItemButton
                 selected={selectedIndex === 0}
                 onClick={(event) => handleListItemClick(event, index)}>
