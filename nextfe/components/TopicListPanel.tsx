@@ -45,6 +45,11 @@ export default function Container(props: any) {
       const out = new ResultList<any>(response.topics)
       out.hasNext = response.nextPageKey.trim() != ""
       setTopicList(out)
+    }).catch(error => {
+      const out = new ResultList<any>([])
+      out.hasNext = false
+      setTopicList(out)
+      console.log("Error: ", error)
     });
   }, [])
 
@@ -56,6 +61,8 @@ export default function Container(props: any) {
       setTopicList(new ResultList(newTopics))
     })
   }
+
+  const onSearchTopics = () => {}
 
   const onNewTopic = () => {
     const user = api.auth.ensureLoggedIn()
@@ -74,7 +81,7 @@ export default function Container(props: any) {
         "creator_id": user.id,
         },
       }).then(response => {
-        const newTopics = [...topicList.items, response.topic]
+        const newTopics = [response.topic, ...topicList.items]
         const newResults = new ResultList<any>(newTopics )
         setTopicList(newResults)
       });
@@ -85,7 +92,13 @@ export default function Container(props: any) {
   }
 
   return (<>
-  <div className={styles.header}><h3>Topics</h3></div>
+  <div className={styles.header}>
+    <h3>Topics</h3>
+    <div className={styles.TopicsHeaderPanel}>
+      <button onClick={onSearchTopics} className={styles.headerButton}>Search</button>
+      <button onClick={onNewTopic} ref={newButtonRef} className={styles.headerButton}>New</button>
+    </div>
+  </div>
   <div className={styles.topiclist}>
     <List sx={{ width: '100%', maxWidth: 360}}>{
         topicList.items.map((topic, index) => {
@@ -100,9 +113,6 @@ export default function Container(props: any) {
     }</List>
   </div>
   <div className={styles.footer}>
-    <center>
-      <button onClick={onNewTopic} ref={newButtonRef} className={styles.button}>New</button>
-    </center>
   </div>
 </>)
 }

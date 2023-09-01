@@ -1,0 +1,27 @@
+
+.dialog_container {
+    position:  absolute;
+    right:  0px;
+    top: 0px;
+    left: 0px;
+    bottom: 0px;
+}
+
+.dialog_button {
+  padding: 10px;
+  border-radius: 4px;
+  border: 1px solid #888;
+  margin-right: 10px;
+}
+
+.dialog {
+  border-radius: 8px;
+  border: 1px solid #888;
+
+  transform: translate(-50%, -50%);
+  padding: 20px;
+  top: 50%;
+  left: 50%;
+  background-color: #730078;
+}
+

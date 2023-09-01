@@ -13,17 +13,21 @@ export default class Auth {
     if (id == null || id.trim() == "") {
       return null
     }
-    id = id.trim()
-    const user = {
+    return this.setLoggedInUser(id, {
       name: name,
-      id: id,
-    }
-    localStorage.setItem("loggedInUser", JSON.stringify(user))
-    return user
+    })
   }
 
   logout() {
     localStorage.setItem("loggedInUser", JSON.stringify({}))
+  }
+
+  setLoggedInUser(id: string, profile: any) {
+    profile = profile || {}
+    id = id.trim()
+    profile.id = id
+    localStorage.setItem("loggedInUser", JSON.stringify(profile))
+    return profile
   }
 
   get loggedInUser() {

@@ -31,20 +31,19 @@ export default function Container(props: any) {
     console.log("NewMsg: ", msg)
     setTopicEvents([{
       "type": "new_message",
-      "value": "msg",
+      "value": msg,
     }])
   }
 
   return (<>
-  <div className={styles.header}>{topicName}</div>
+  <div className={styles.header}><h2>{topicName}</h2></div>
+  <div className={styles.footer}></div>
+  <div className={styles.integrations}></div>
   <div className={styles.messagelist}>
     <MessageList topicId = {props.topicId} topicEvents={topicEvents} />
   </div>
   <div className={styles.chatbox}>
     <ChatBox topicId = {props.topicId} onNewMessage = {onNewMessage}/>
-  </div>
-  <div className={styles.integrations}></div>
-  <div className={styles.footer}>
   </div>
 </>)
 }

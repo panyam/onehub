@@ -13,6 +13,30 @@
   min-height: 100vh;
 }
 
+.loginForm {
+  display: flex;
+  flex-direction: column;
+}
+
+.loginFormErrorSpan {
+  width: 100%;
+  box-sizing: border-box;
+  color: red;
+}
+
+.loginFormInput {
+  width: 100%;
+  padding: 12px 20px;
+  margin: 8px 0;
+  box-sizing: border-box;
+}
+
+.loginFormLabel {
+  font-weight: bolder;
+  width: 100%;
+  box-sizing: border-box;
+}
+
 .headerLoggedInUser {
   padding: 5px;
 }
@@ -26,9 +50,9 @@
   top: 0px;
   left: 0px;
   right: 0px;
-  height: 60px;
+  height: 55px;
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: space-between;
   /* align-items: center; */
   overflow: scroll;
@@ -49,6 +73,17 @@
   overflow: scroll;
   padding: 1rem;
   border-right: solid 2px white;
+}
+
+.mainpanel {
+  position: absolute;
+  left: 0px;
+  right: 0px;
+  top: 60px;
+  bottom: 0px;
+  margin: 0px;
+  overflow: hidden;
+  border: solid 1px red;
 }
 
 .centerpanel {

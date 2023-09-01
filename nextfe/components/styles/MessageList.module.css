@@ -7,7 +7,14 @@
   right: 0px;
   bottom: 0px;
   top: 0px;
+}
+
+.msgscroller * {
   /* background-color: white; */
   overflow-anchor: none;
 }
 
+.bottomanchor {
+  overflow-anchor: auto;
+  height: 1px;
+}

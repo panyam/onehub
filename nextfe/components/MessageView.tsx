@@ -5,8 +5,10 @@ import React, { useState, useEffect } from 'react'
 import Link from 'next/link'
 import Avatar from '@mui/material/Avatar';
 import Moment from 'react-moment'
+import moment from 'moment'
 import 'moment-timezone'
 import { Api } from '@/core/Api'
+import { hashCode, pickRandColor } from '@/core/utils'
 const api = new Api()
 
 class ContentView {
@@ -18,6 +20,7 @@ class ContentView {
 
 export function UserInfo(props: any) {
   const { userid, createdAt } = props
+  const [ format, setFormat ] = useState("LLLL")
   const [ userName, setUserName ] = useState("NoName")
   const [ avatarInitials, setAvatarInitials ] = useState("AI")
   const [ avatarUrl, setAvatarUrl ] = useState(null)
@@ -35,7 +38,34 @@ export function UserInfo(props: any) {
       }
       setUserName(user.name)
     });
-  }, [props.userid])
+    const currmom = moment(createdAt)
+    if (currmom >= moment().startOf('day')) {
+      // only show time and am/pm
+      setFormat("h:mm:ss a")
+    } else if (currmom >= moment().startOf('week')) {
+      // show Sunday 28th time am/pm
+      setFormat("ddd h:mm a")
+    } else if (currmom >= moment().startOf('month')) {
+      // Wed 12th HH:MM:SS AM/PM
+      setFormat("ddd Do h:mm a")
+    } else {
+      setFormat("MMM Do YYYY, h:mm:ss a")
+    }
+  }, [props.userid, props.createdAt])
+
+  const colorForName = (name: string) => {
+    const hash = hashCode(name)
+    return pickRandColor(100, hash%10)
+/*
+    const red = hash & 0xff
+    const green = (hash >> 8) & 0xff
+    const blue = (hash >> 16) & 0xff
+    const color = `#${red.toString(16) }${green.toString(16) }${blue.toString(16)}`
+    return color
+*/
+  }
+
+  // All these times should be based on user local time
   return <>
     {
     avatarUrl == null ? 
@@ -47,9 +77,9 @@ export function UserInfo(props: any) {
               src={avatarUrl}
               alt={`${userName} ${userid} - Image`} />
     }
-    <span className={styles.header_username}>{userName}</span>
+    <span className={styles.header_username} style={{color: colorForName(userName)}}>{userName}</span>
     <span className={styles.header_createdat}>
-      <Moment unix date={createdAt} format="YYYY-MM-D hh:mm A" />
+      <Moment date={createdAt} format={format} />
     </span>
   </>
 }
@@ -61,7 +91,6 @@ export default function MessageView(props: {
   const [hovered, setHovered] = useState(false)
   const toggleHover = () => setHovered(!hovered)
 
-  // Moment.globalTimezone = 'America/Los_Angeles'
   const contentView = createContentView(message)
   return (
     <div
@@ -78,7 +107,8 @@ export default function MessageView(props: {
 }
 
 export function createContentView(message: any): React.ReactNode {
-    if (message.contentType == "chat/text") {
+    if (message.contentType == "text/plain" ||
+        message.contentType == "chat/text") {
       return <>
         <div style={{wordWrap: "break-word"}}><p>{message.contentText}</p></div>
       </>

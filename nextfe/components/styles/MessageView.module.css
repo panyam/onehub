@@ -1,7 +1,6 @@
 
 
 .container {
-  border: solid 1px red;
   max-height: 300px;
   /*
   position: absolute;
@@ -12,21 +11,16 @@
   */
 }
 
-.bottomanchor {
-  overflow-anchor: auto;
-  height: 1px;
-}
-
 .contentarea {
-  margin-left: 20px;
+  margin-left: 55px;
   margin-bottom: 10px;
 }
 
 .userinfoarea {
-  border-top: solid 2px white;
+  border-top: dashed 1px #444444;
   display: flex;
-  padding-bottom: 10px;
-  padding-top: 10px;
+  padding-bottom: 5px;
+  padding-top: 5px;
   padding-left: 5px;
   align-items: center;
 }
@@ -37,9 +31,12 @@
 .header_username {
   padding-left: 10px;
   padding-right: 10px;
+  font-weight: bolder;
+  font-size: larger;
 }
 
 .header_createdat {
   padding-left: 10px;
   padding-right: 10px;
+  font-size: smaller;
 }
