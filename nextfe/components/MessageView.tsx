@@ -8,6 +8,7 @@ import Moment from 'react-moment'
 import moment from 'moment'
 import 'moment-timezone'
 import { Api } from '@/core/Api'
+import { hashCode, pickRandColor } from '@/core/utils'
 const api = new Api()
 
 class ContentView {
@@ -52,6 +53,18 @@ export function UserInfo(props: any) {
     }
   }, [props.userid, props.createdAt])
 
+  const colorForName = (name: string) => {
+    const hash = hashCode(name)
+    return pickRandColor(100, hash%10)
+/*
+    const red = hash & 0xff
+    const green = (hash >> 8) & 0xff
+    const blue = (hash >> 16) & 0xff
+    const color = `#${red.toString(16) }${green.toString(16) }${blue.toString(16)}`
+    return color
+*/
+  }
+
   // All these times should be based on user local time
   return <>
     {
@@ -64,7 +77,7 @@ export function UserInfo(props: any) {
               src={avatarUrl}
               alt={`${userName} ${userid} - Image`} />
     }
-    <span className={styles.header_username}>{userName}</span>
+    <span className={styles.header_username} style={{color: colorForName(userName)}}>{userName}</span>
     <span className={styles.header_createdat}>
       <Moment date={createdAt} format={format} />
     </span>
@@ -78,7 +91,6 @@ export default function MessageView(props: {
   const [hovered, setHovered] = useState(false)
   const toggleHover = () => setHovered(!hovered)
 
-  // Moment.globalTimezone = 'America/Los_Angeles'
   const contentView = createContentView(message)
   return (
     <div
