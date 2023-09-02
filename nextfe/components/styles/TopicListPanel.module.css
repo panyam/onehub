@@ -16,13 +16,21 @@
 
 .topiclist {
   position:absolute;
-  padding: 10px;
   left: 0px;
   right: 0px;
   bottom: 0px;
   top: 50px;
   overflow: scroll;
   /* border: solid 2px red; */
+}
+
+.topicListItem {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+.topicListItemButton.Mui-selected * {
+  background-color: red;
 }
 
 .footer {
