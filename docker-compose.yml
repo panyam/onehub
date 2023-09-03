@@ -14,7 +14,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     volumes:
-      - ./.pgadmin:/var/lib/pgadmin
+      - ./.data/pgadmin:/var/lib/pgadmin
 
   postgres:
     image: postgres:15.3
@@ -23,7 +23,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./.pgdata:/var/lib/postgresql/data
+      - ./.data/pgdata:/var/lib/postgresql/data
     ports:
       - 54321:5432
     healthcheck:
@@ -45,6 +45,15 @@ services:
       - onehub
       - nextfe 
         # - ohfe
+
+  typesense:
+    image: typesense/typesense:0.25.0
+    restart: on-failure
+    ports:
+      - 8108:8108
+    volumes:
+      - ./.data/typesensedata:/data
+    command: '--data-dir /data --api-key=xyz --enable-cors'
 
   onehub:
     depends_on:
