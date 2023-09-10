@@ -13,13 +13,30 @@
           "cwd": "${workspaceFolder}",
           "dlvFlags": ["--check-go-version=false"]
       }
-        ,
-       {
+      ,{
             "name": "Remote Debugger for OneHub",
             "type": "go",
             "request": "attach",
             "mode": "remote",
             "port": 9091,
+            "showLog": true,
+            "host": "127.0.0.1"
+      }
+      ,{
+          "name": "Launch Sync",
+          "type": "go",
+          "request": "launch",
+          "mode": "debug",
+          "program": "dbsync/cmd/server.go",
+          "cwd": "${workspaceFolder}",
+          "dlvFlags": ["--check-go-version=false"]
+      }
+      ,{
+            "name": "Remote Debugger for DBSync",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "port": 9092,
             "showLog": true,
             "host": "127.0.0.1"
       }

@@ -55,6 +55,17 @@ services:
       - ./.data/typesensedata:/data
     command: '--data-dir /data --api-key=xyz --enable-cors'
 
+  nextfe:
+    build: ./nextfe
+    volumes:
+       - ./nextfe:/app
+       - /app/node_modules
+       - /app/.next
+    restart: always
+    ports:
+      - 4000:4000
+    stdin_open: true
+
   onehub:
     depends_on:
       - basegoimage
@@ -72,6 +83,8 @@ services:
       - ./services:/app/services
       - ./protos:/app/protos
     environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
       POSTGRES_DB: ${POSTGRES_DB}
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
@@ -79,18 +92,33 @@ services:
     ports:
       - 8080:8080
       - 9000:9000
-      - 9091:9091
+      - 9092:9091
 
-  nextfe:
-    build: ./nextfe
+  dbsync:
+    depends_on:
+      - basegoimage
+    build:
+      context: ./dbsync
     volumes:
-       - ./nextfe:/app
-       - /app/node_modules
-       - /app/.next
-    restart: always
+      # - ./ohfe/.air.toml:/app/.air.toml:ro
+      # - ./ohfe/go.mod:/app/go.mod:ro
+      # - ./ohfe/go.sum:/app/go.sum:ro
+      - ./dbsync/core:/app/core
+      - ./dbsync/cmd:/app/cmd
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
+      DBSYNC_CTRL_NAMESPACE: ${DBSYNC_CTRL_NAMESPACE}
+      DBSYNC_WM_TABLENAME: ${DBSYNC_WM_TABLENAME}
+      DBSYNC_PUBNAME: ${DBSYNC_PUBNAME}
+      DBSYNC_REPLSLOT: ${DBSYNC_REPLSLOT}
     ports:
-      - 4000:4000
-    stdin_open: true
+      - 3333:3333
+      - 9093:9091
 
 #  ohfe:
 #    depends_on:
@@ -107,4 +135,4 @@ services:
 #      ONEHUB_GRPC_ENDPOINT: onehub:9090
 #    ports:
 #      - 5080:5000
-#      - 9092:9091
+#      - 9093:9091
