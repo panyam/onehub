@@ -5,12 +5,12 @@ import (
 	"io"
 	"log"
 	"net/http"
-	_ "net/http"
 	"os"
 	"strconv"
 
 	dbsync "dbsync/core"
 
+	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
 )
 
@@ -46,7 +46,7 @@ func getConnStr() string {
 	}
 }
 
-func main() {
+func setupPGDB() (p *dbsync.PGDB) {
 	connstr := getConnStr()
 	db, err := sql.Open("postgres", connstr)
 	if err != nil {
@@ -57,7 +57,7 @@ func main() {
 	wm_table_name := GetEnvOrDefault("DBSYNC_WM_TABLENAME", DEFAULT_DBSYNC_WM_TABLENAME)
 	pubname := GetEnvOrDefault("DBSYNC_PUBNAME", DEFAULT_DBSYNC_PUBNAME)
 	replslot := GetEnvOrDefault("DBSYNC_REPLSLOT", DEFAULT_DBSYNC_REPLSLOT)
-	p := &dbsync.PGDB{
+	p = &dbsync.PGDB{
 		CtrlNamespace: ctrl_namespace,
 		WMTableName:   wm_table_name,
 		Publication:   pubname,
@@ -68,14 +68,67 @@ func main() {
 	if err := p.Setup(db); err != nil {
 		panic(err)
 	}
+	return
+}
+
+func main() {
+	p := setupPGDB()
 
 	selChan := make(chan dbsync.Selection)
 	var currSelection dbsync.Selection
 
+	// State of our processing
+	lastBegin := -1
+	lastCommit := -1
+
+	pgmsghandler := dbsync.PGMSGHandler{
+		HandleBeginMessage: func(idx int, msg *pglogrepl.BeginMessage) error {
+			lastBegin = idx
+			log.Println("Begin Transaction: ", msg)
+			return nil
+		},
+		HandleCommitMessage: func(idx int, msg *pglogrepl.CommitMessage) error {
+			lastCommit = -1
+			log.Println("Commit Transaction: ", lastBegin, msg)
+			return nil
+		},
+		HandleRelationMessage: func(idx int, msg *pglogrepl.RelationMessage) error {
+			log.Println("Relation Message: ", lastBegin, msg)
+			return nil
+		},
+		HandleInsertMessage: func(idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
+			log.Println("Insert Message: ", lastBegin, msg, reln)
+			return nil
+		},
+		HandleDeleteMessage: func(idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {
+			log.Println("Delete Message: ", lastBegin, msg, reln)
+			return nil
+		},
+		HandleUpdateMessage: func(idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {
+			log.Println("Update Message: ", lastBegin, msg, reln)
+			return nil
+		},
+	}
+
 	logQueue := dbsync.NewLogQueue(p, func(msgs []dbsync.PGMSG, err error) (numProcessed int, stop bool) {
 		log.Println("Curr Selection:", currSelection)
-		log.Println("Processing Messages: ", len(msgs), msgs, err)
-		return len(msgs), false
+		if err != nil {
+			log.Println("Error processing messsages: ", err)
+			return 0, false
+		}
+		for i, rawmsg := range msgs {
+			err := pgmsghandler.HandleMessage(i, &rawmsg)
+			if err == dbsync.ErrStopProcessingMessages {
+				break
+			} else if err != nil {
+				log.Println("Error handling message: ", i, err)
+			}
+		}
+		if lastCommit < 0 {
+			return lastCommit + 1, false
+		} else {
+			return len(msgs), false
+		}
 	})
 	go logQueue.Start()
 

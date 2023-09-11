@@ -7,4 +7,4 @@ COPY go.mod go.sum ./
 RUN go mod download
 
 # Command to run the executable
-CMD ["air", "-c", ".air.toml"]
+# CMD ["air", "-c", ".air.toml"]

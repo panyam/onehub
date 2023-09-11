@@ -169,7 +169,9 @@ func (p *PGDB) registerWithPublication() error {
 		alterpub := fmt.Sprintf(`ALTER PUBLICATION %s ADD TABLE %s.%s`, p.Publication, p.CtrlNamespace, p.WMTableName)
 		_, err := p.db.Exec(alterpub)
 		if err != nil {
-			log.Println("ALTER PUB EROR: ", err)
+			log.Println("ALTER PUBLICATION Error : ", err)
+			createpubsql := fmt.Sprintf("CREATE PUBLICATION %s FOR TABLE table1, table2, ..., tableN ;", p.Publication)
+			log.Printf("Did you create the publication?  Try: %s", createpubsql)
 			return err
 		}
 	}

@@ -36,7 +36,7 @@
             "type": "go",
             "request": "attach",
             "mode": "remote",
-            "port": 9092,
+            "port": 9093,
             "showLog": true,
             "host": "127.0.0.1"
       }

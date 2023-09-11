@@ -11,11 +11,11 @@ type cmd struct {
 	Data interface{}
 }
 
-type LogCallbackFunc func([]PGMSG, error) (numProcessed int, stop bool)
+type LogEventCallbackFunc func([]PGMSG, error) (numProcessed int, stop bool)
 
 type LogQueue struct {
 	// How many items will be peeked at a time
-	Callback LogCallbackFunc
+	Callback LogEventCallbackFunc
 
 	// A channel letting us know how many items are to be committed
 	commitReqChan chan int
@@ -30,7 +30,7 @@ type LogQueue struct {
 	MaxDelayBetweenEmptyPeeks time.Duration
 }
 
-func NewLogQueue(pgdb *PGDB, callback LogCallbackFunc) *LogQueue {
+func NewLogQueue(pgdb *PGDB, callback LogEventCallbackFunc) *LogQueue {
 	out := &LogQueue{
 		Callback:                  callback,
 		pgdb:                      pgdb,
@@ -55,6 +55,7 @@ func (l *LogQueue) Stop() {
  */
 func (l *LogQueue) Start() {
 	l.isRunning = true
+	log.Println("Log Processor Started")
 	l.wg.Add(1)
 	l.commitReqChan = make(chan int)
 	timerDelay := 0 * time.Second
@@ -67,6 +68,7 @@ func (l *LogQueue) Start() {
 		}
 		l.commitReqChan = nil
 		l.wg.Done()
+		log.Println("Log Processor Stopped")
 	}()
 	for {
 		select {
