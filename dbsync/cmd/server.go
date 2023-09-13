@@ -11,37 +11,28 @@ import (
 
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
+	"github.com/typesense/typesense-go/typesense"
 )
 
-func main() {
-	p := dbsync.PGDBFromEnv()
+type PG2TS struct {
+	tsclient      *typesense.Client
+	pgdb          *dbsync.PGDB
+	selChan       chan dbsync.Selection
+	currSelection dbsync.Selection
+	msghandler    dbsync.PGMSGHandler
+}
 
-	selChan := make(chan dbsync.Selection)
-	var currSelection dbsync.Selection
-
-	// State of our processing
-	lastBegin := -1
-	lastCommit := -1
-
+func NewPG2TS() *PG2TS {
 	tsclient := dbsync.NewTSClient("", "")
-	log.Println("Created Typesense Client: ", tsclient)
-
-	// Ensure right schemas on TS
-
-	pgmsghandler := dbsync.PGMSGHandler{
-		DB: p,
-		HandleBeginMessage: func(idx int, msg *pglogrepl.BeginMessage) error {
-			lastBegin = idx
-			log.Println("Begin Transaction: ", msg)
-			return nil
-		},
-		HandleCommitMessage: func(idx int, msg *pglogrepl.CommitMessage) error {
-			lastCommit = -1
-			log.Println("Commit Transaction: ", lastBegin, msg)
-			return nil
-		},
-		HandleRelationMessage: func(idx int, msg *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
-			log.Println("Relation Message: ", lastBegin, msg)
+	out := &PG2TS{
+		tsclient: tsclient,
+		pgdb:     dbsync.PGDBFromEnv(),
+		selChan:  make(chan dbsync.Selection),
+	}
+	out.msghandler = dbsync.PGMSGHandler{
+		DB: out.pgdb,
+		HandleRelationMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
+			log.Println("Relation Message: ", m.LastBegin, msg)
 			// Make sure we ahve an equivalent TS schema (or we could do this proactively at the start)
 			// Typically we wouldnt be doing this when handling log events but rather
 			// on startup time
@@ -49,11 +40,11 @@ func main() {
 			dbsync.EnsureSchema(tsclient, doctype, tableInfo)
 			return nil
 		},
-		HandleInsertMessage: func(idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
-			log.Println("Insert Message: ", lastBegin, msg, reln)
+		HandleInsertMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
+			log.Println("Insert Message: ", m.LastBegin, msg, reln)
 			// Now write this to our typesense index
 
-			pkey, out, errors := dbsync.MessageToMap(p, msg.Tuple, reln)
+			pkey, out, errors := dbsync.MessageToMap(out.pgdb, msg.Tuple, reln)
 			if errors != nil {
 				log.Println("Error converting to map: ", errors)
 			}
@@ -76,37 +67,64 @@ func main() {
 
 			return nil
 		},
-		HandleDeleteMessage: func(idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {
-			log.Println("Delete Message: ", lastBegin, msg, reln)
+		HandleDeleteMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {
+			log.Println("Delete Message: ", m.LastBegin, msg, reln)
 			return nil
 		},
-		HandleUpdateMessage: func(idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {
-			log.Println("Update Message: ", lastBegin, msg, reln)
+		HandleUpdateMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {
+			log.Println("Update Message: ", m.LastBegin, msg, reln)
 			return nil
 		},
 	}
+	return out
+}
 
-	logQueue := dbsync.NewLogQueue(p, func(msgs []dbsync.PGMSG, err error) (numProcessed int, stop bool) {
-		log.Println("Curr Selection:", currSelection)
+func (p *PG2TS) NewLogQueue() *dbsync.LogQueue {
+	logQueue := dbsync.NewLogQueue(p.pgdb, func(msgs []dbsync.PGMSG, err error) (numProcessed int, stop bool) {
+		log.Println("Curr Selection:", p.currSelection)
 		if err != nil {
 			log.Println("Error processing messsages: ", err)
 			return 0, false
 		}
 		for i, rawmsg := range msgs {
-			err := pgmsghandler.HandleMessage(i, &rawmsg)
+			err := p.msghandler.HandleMessage(i, &rawmsg)
 			if err == dbsync.ErrStopProcessingMessages {
 				break
 			} else if err != nil {
 				log.Println("Error handling message: ", i, err)
 			}
 		}
-		if lastCommit < 0 {
-			return lastCommit + 1, false
+		if p.msghandler.LastCommit > 0 {
+			return p.msghandler.LastCommit + 1, false
 		} else {
 			return len(msgs), false
 		}
 	})
 	go logQueue.Start()
+	return logQueue
+}
+
+func (p *PG2TS) Start() {
+	log.Println("Created Typesense Client: ", p.tsclient)
+	// Start log processing
+	logQueue := p.NewLogQueue()
+
+	// Now we start the syncer.  This is responsible for:
+	//  Starting/Stopping the logQueue (above)
+	//  Getting Selection requests, executing them (either in a transaction or not)
+	for selReq := range p.selChan {
+		logQueue.Stop()
+		selReq.Execute()
+		p.currSelection = selReq
+		logQueue.Start()
+	}
+}
+
+func main() {
+	// State of our processing
+	p := NewPG2TS()
+
+	// Ensure right schemas on TS
 
 	// Start a simple http server that listens to commands to control the replicator
 	// and to "introduce" selective dumps
@@ -122,13 +140,5 @@ func main() {
 		}
 	}()
 
-	// Now we start the syncer.  This is responsible for:
-	//  Starting/Stopping the logQueue (above)
-	//  Getting Selection requests, executing them (either in a transaction or not)
-	for selReq := range selChan {
-		logQueue.Stop()
-		selReq.Execute()
-		currSelection = selReq
-		logQueue.Start()
-	}
+	p.Start()
 }
