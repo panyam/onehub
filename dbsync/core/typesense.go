@@ -29,7 +29,7 @@ func NewTSClient(address string, apikey string) (tsclient *typesense.Client) {
 var TRUE = true
 var FALSE = false
 
-func TableInfoToSchema(tableInfo *TableInfo) (fields []api.Field, fieldMap map[string]api.Field) {
+func PGTableInfoToSchema(tableInfo *PGTableInfo) (fields []api.Field, fieldMap map[string]api.Field) {
 	fieldMap = make(map[string]api.Field)
 	for colname, colinfo := range tableInfo.ColInfo {
 		coltype := colinfo.ColumnType
@@ -58,8 +58,8 @@ func TableInfoToSchema(tableInfo *TableInfo) (fields []api.Field, fieldMap map[s
 	return
 }
 
-func EnsureSchema(tsclient *typesense.Client, doctype string, tableInfo *TableInfo) {
-	fields, fieldMap := TableInfoToSchema(tableInfo)
+func EnsureSchema(tsclient *typesense.Client, doctype string, tableInfo *PGTableInfo) {
+	fields, fieldMap := PGTableInfoToSchema(tableInfo)
 	schema := &api.CollectionSchema{
 		Name:               doctype,
 		EnableNestedFields: &TRUE,
