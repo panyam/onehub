@@ -2,11 +2,13 @@ package main
 
 import (
 	"database/sql"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
+	"time"
 
 	dbsync "dbsync/core"
 
@@ -71,6 +73,39 @@ func setupPGDB() (p *dbsync.PGDB) {
 	return
 }
 
+func MessageToMap(p *dbsync.PGDB, msg *pglogrepl.TupleData, reln *pglogrepl.RelationMessage) (pkey string, out map[string]interface{}, errors map[string]error) {
+	msgcols := msg.Columns
+	relcols := reln.Columns
+	if len(msgcols) != len(relcols) {
+		log.Printf("Msg cols (%d) and Rel cols (%d) dont match", len(msgcols), len(relcols))
+	}
+	fullschema := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
+	log.Printf("Namespace: %s, RelName: %s, FullSchema: %s", reln.Namespace, reln.RelationName, fullschema)
+	pkey = "id"
+	if out == nil {
+		out = make(map[string]interface{})
+	}
+	tableinfo := p.GetTableInfo(reln.RelationID)
+	for i, col := range reln.Columns {
+		val := msgcols[i]
+		colinfo := tableinfo.ColInfo[col.Name]
+		log.Println("Cols: ", i, col.Name, val, colinfo)
+		var err error
+		if val.DataType == pglogrepl.TupleDataTypeText {
+			out[col.Name], err = colinfo.DecodeText(val.Data)
+		} else if val.DataType == pglogrepl.TupleDataTypeBinary {
+			out[col.Name], err = colinfo.DecodeBytes(val.Data)
+		}
+		if err != nil {
+			if errors == nil {
+				errors = make(map[string]error)
+			}
+			errors[col.Name] = err
+		}
+	}
+	return
+}
+
 func main() {
 	p := setupPGDB()
 
@@ -81,7 +116,13 @@ func main() {
 	lastBegin := -1
 	lastCommit := -1
 
+	tsclient := dbsync.NewTSClient("", "")
+	log.Println("Created Typesense Client: ", tsclient)
+
+	// Ensure right schemas on TS
+
 	pgmsghandler := dbsync.PGMSGHandler{
+		DB: p,
 		HandleBeginMessage: func(idx int, msg *pglogrepl.BeginMessage) error {
 			lastBegin = idx
 			log.Println("Begin Transaction: ", msg)
@@ -92,12 +133,39 @@ func main() {
 			log.Println("Commit Transaction: ", lastBegin, msg)
 			return nil
 		},
-		HandleRelationMessage: func(idx int, msg *pglogrepl.RelationMessage) error {
+		HandleRelationMessage: func(idx int, msg *pglogrepl.RelationMessage, tableInfo *dbsync.TableInfo) error {
 			log.Println("Relation Message: ", lastBegin, msg)
+			// Make sure we ahve an equivalent TS schema (or we could do this proactively at the start)
+			// Typically we wouldnt be doing this when handling log events but rather
+			// on startup time
+			doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
+			dbsync.EnsureSchema(tsclient, doctype, tableInfo)
 			return nil
 		},
 		HandleInsertMessage: func(idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
 			log.Println("Insert Message: ", lastBegin, msg, reln)
+			// Now write this to our typesense index
+
+			pkey, out, errors := MessageToMap(p, msg.Tuple, reln)
+			if errors != nil {
+				log.Println("Error converting to map: ", errors)
+			}
+
+			if _, ok := out["created_at"]; ok {
+				out["created_at"] = out["created_at"].(time.Time).Unix()
+			}
+			if _, ok := out["updated_at"]; ok {
+				out["updated_at"] = out["updated_at"].(time.Time).Unix()
+			}
+			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
+			result, err := tsclient.Collection(doctype).Documents().Upsert(out)
+			if err != nil {
+				schema, err2 := tsclient.Collection(doctype).Retrieve()
+				log.Println("Error Upserting: ", result, err)
+				log.Println("Old Schema: ", schema, err2)
+				panic(err)
+			}
+
 			return nil
 		},
 		HandleDeleteMessage: func(idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {

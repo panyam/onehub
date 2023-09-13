@@ -2,10 +2,141 @@ package dbsync
 
 import (
 	"database/sql"
+	_ "encoding/binary"
 	"fmt"
 	"log"
+	"strconv"
+	"time"
 	// "github.com/jackc/pgproto3/v2"
 )
+
+const PG_TIMESTAMP_FORMAT = "2006-01-02 15:04:05.999999+00"
+
+type TableInfo struct {
+	RelationID uint32
+	ColInfo    map[string]*ColumnInfo
+}
+
+type ColumnInfo struct {
+	DBName          string
+	Namespace       string
+	TableName       string
+	ColumnName      string
+	ColumnType      string
+	OrdinalPosition int
+}
+
+func (c *ColumnInfo) DecodeText(input []byte) (out interface{}, err error) {
+	sval := string(input)
+	if c.ColumnType == "text" {
+		out = sval
+	} else if c.ColumnType == "timestamp with time zone" {
+		out, err = time.Parse(PG_TIMESTAMP_FORMAT, sval)
+	} else if c.ColumnType == "bigint" {
+		out, err = strconv.Atoi(sval)
+	} else {
+		panic(fmt.Errorf("invalid text type: %s", c.ColumnType))
+	}
+	return
+}
+
+func (c *ColumnInfo) DecodeBytes(input []byte) (out interface{}, err error) {
+	panic(fmt.Errorf("invalid binary type: %s", c.ColumnType))
+}
+
+type ColumnType uint8
+
+const (
+	ColumnTypeInvalid     ColumnType = iota
+	ColumnTypeBoolean                // 1 byte
+	ColumnTypeSmallInt               // int16
+	ColumnTypeInteger                // int32
+	ColumnTypeBigInt                 // int64
+	ColumnTypeDecimal                // var length precision
+	ColumnTypeNumeric                // var length precision
+	ColumnTypeReal                   // float
+	ColumnTypeDouble                 // float64
+	ColumnTypeSmallSerial            // uint16
+	ColumnTypeSerial                 // uint32
+	ColumnTypeBigSerial              // uint64
+
+	ColumnTypeVarChar // Varying length characters
+	ColumnTypeChar    // Fixed length characters
+	ColumnTypeText    // text
+	ColumnTypeJson    // json
+
+	ColumnTypeBytea // bytearray
+
+	// https://www.postgresql.org/docs/current/datatype-datetime.html
+	ColumnTypeTimestamp // timestamp (p) [ with/without timezone ] - 8 bytes
+	ColumnTypeDate      // date - 4 bytes
+	ColumnTypeTime      // time with/without timezone - 8 or 12 bytes
+	ColumnTypeInterval  // interval - 16 bytes
+
+	// https://www.postgresql.org/docs/current/datatype-geometric.html
+	ColumnTypePoint   // 16 bytes
+	ColumnTypeLine    // 32 bytes
+	ColumnTypeLSeg    // 32 bytes
+	ColumnTypeBox     // 32 bytes
+	ColumnTypePath    // 16 + 16n bytes
+	ColumnTypePolygon // 40 + 16n bytes
+	ColumnTypeCircle  // 24 bytes
+)
+
+var stringToColumnType = map[string]ColumnType{}
+
+func ToColumnType(coltype string) ColumnType {
+	return ColumnTypeInvalid
+}
+
+func (t ColumnType) String() string {
+	switch t {
+	case ColumnTypeInvalid:
+		return "invalid type"
+	case ColumnTypeBoolean:
+		return "boolean"
+	case ColumnTypeSmallInt:
+		return "smallint"
+	case ColumnTypeInteger:
+		return "integer"
+	case ColumnTypeBigInt:
+		return "bigint"
+	case ColumnTypeDecimal:
+		return "decimal"
+	case ColumnTypeNumeric:
+		return "numeric"
+	case ColumnTypeReal:
+		return "real"
+	case ColumnTypeDouble:
+		return "double"
+	case ColumnTypeSmallSerial:
+		return "smallserial"
+	case ColumnTypeSerial:
+		return "serial"
+	case ColumnTypeBigSerial:
+		return "bigserial"
+	case ColumnTypeVarChar:
+		return "varchar"
+	case ColumnTypeChar:
+		return "char"
+	case ColumnTypeText:
+		return "text"
+	case ColumnTypeJson:
+		return "json"
+	case ColumnTypeBytea:
+		return "bytea"
+	case ColumnTypeTimestamp:
+		return "timestamp"
+	case ColumnTypeDate:
+		return "date"
+	case ColumnTypeTime:
+		return "time"
+	case ColumnTypeInterval:
+		return "time"
+	default:
+		panic(fmt.Sprintf("unknown col type: %d", t))
+	}
+}
 
 type PGMSG struct {
 	LSN  string
@@ -31,6 +162,53 @@ type PGDB struct {
 	// The replication slot we will use to subscribe to change
 	// log events from for this sync
 	ReplSlotName string
+
+	relnToTableInfo map[uint32]*TableInfo
+}
+
+func (p *PGDB) GetTableInfo(relationID uint32) *TableInfo {
+	tableinfo, ok := p.relnToTableInfo[relationID]
+	if !ok {
+		tableinfo = &TableInfo{
+			RelationID: relationID,
+			ColInfo:    make(map[string]*ColumnInfo),
+		}
+		p.relnToTableInfo[relationID] = tableinfo
+	}
+	return tableinfo
+}
+
+func (p *PGDB) RefreshTableInfo(relationID uint32, namespace string, table_name string) (tableInfo *TableInfo, err error) {
+	field_info_query := fmt.Sprintf(`SELECT table_schema, table_name, column_name, ordinal_position, data_type, table_catalog from information_schema.columns WHERE table_schema = '%s' and table_name = '%s' ;`, namespace, table_name)
+	log.Println("Query for field types: ", field_info_query)
+	rows, err := p.db.Query(field_info_query)
+	if err != nil {
+		log.Println("Error getting table info: ", err)
+		return nil, err
+	}
+	defer rows.Close()
+	for rows.Next() {
+		var col ColumnInfo
+		if err := rows.Scan(&col.Namespace, &col.TableName, &col.ColumnName, &col.OrdinalPosition, &col.ColumnType, &col.DBName); err != nil {
+			log.Println("Could not scan row: ", err)
+		} else {
+			if p.relnToTableInfo == nil {
+				p.relnToTableInfo = make(map[uint32]*TableInfo)
+			}
+			tableInfo = p.GetTableInfo(relationID)
+			if colinfo, ok := tableInfo.ColInfo[col.ColumnName]; !ok {
+				tableInfo.ColInfo[col.ColumnName] = &col
+			} else {
+				colinfo.DBName = col.DBName
+				colinfo.Namespace = col.Namespace
+				colinfo.TableName = col.TableName
+				colinfo.ColumnName = col.ColumnName
+				colinfo.ColumnType = col.ColumnType
+				colinfo.OrdinalPosition = col.OrdinalPosition
+			}
+		}
+	}
+	return
 }
 
 func (p *PGDB) Setup(db *sql.DB) (err error) {
@@ -49,6 +227,10 @@ func (p *PGDB) Setup(db *sql.DB) (err error) {
 		err = p.setupReplicationSlots()
 	}
 	return
+}
+
+func (p *PGDB) DB() *sql.DB {
+	return p.db
 }
 
 func (p *PGDB) GetMessages(numMessages int, consume bool, out []PGMSG) (msgs []PGMSG, err error) {
