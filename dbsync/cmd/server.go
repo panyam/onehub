@@ -53,7 +53,7 @@ func main() {
 			log.Println("Insert Message: ", lastBegin, msg, reln)
 			// Now write this to our typesense index
 
-			pkey, out, errors := MessageToMap(p, msg.Tuple, reln)
+			pkey, out, errors := dbsync.MessageToMap(p, msg.Tuple, reln)
 			if errors != nil {
 				log.Println("Error converting to map: ", errors)
 			}

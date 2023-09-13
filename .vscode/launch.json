@@ -29,7 +29,8 @@
           "mode": "debug",
           "program": "dbsync/cmd/server.go",
           "cwd": "${workspaceFolder}",
-          "dlvFlags": ["--check-go-version=false"]
+          "dlvFlags": ["--check-go-version=false"],
+          "env": { "POSTGRES_PORT": "54321" }
       }
       ,{
             "name": "Remote Debugger for DBSync",
