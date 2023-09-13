@@ -86,6 +86,9 @@ func PGDBFromEnv() (p *PGDB) {
 }
 
 func (p *PGDB) GetTableInfo(relationID uint32) *PGTableInfo {
+	if p.relnToPGTableInfo == nil {
+		p.relnToPGTableInfo = make(map[uint32]*PGTableInfo)
+	}
 	tableinfo, ok := p.relnToPGTableInfo[relationID]
 	if !ok {
 		tableinfo = &PGTableInfo{
@@ -106,15 +109,12 @@ func (p *PGDB) SetTableInfo(relationID uint32, namespace string, table_name stri
 		return nil, err
 	}
 	defer rows.Close()
+	tableInfo = p.GetTableInfo(relationID)
 	for rows.Next() {
 		var col PGColumnInfo
 		if err := rows.Scan(&col.Namespace, &col.TableName, &col.ColumnName, &col.OrdinalPosition, &col.ColumnType, &col.DBName); err != nil {
 			log.Println("Could not scan row: ", err)
 		} else {
-			if p.relnToPGTableInfo == nil {
-				p.relnToPGTableInfo = make(map[uint32]*PGTableInfo)
-			}
-			tableInfo = p.GetTableInfo(relationID)
 			if colinfo, ok := tableInfo.ColInfo[col.ColumnName]; !ok {
 				tableInfo.ColInfo[col.ColumnName] = &col
 			} else {

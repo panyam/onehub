@@ -49,7 +49,10 @@ func PGTableInfoToSchema(tableInfo *PGTableInfo) (fields []api.Field, fieldMap m
 			field.Type = "string"
 		} else if strings.HasPrefix(colinfo.ColumnType, "json") {
 			field.Type = "object"
+		} else if strings.ToLower(colinfo.ColumnType) == "array" {
+			field.Type = "string[]"
 		} else {
+			log.Println("Invalid type in decoding: ", colinfo.ColumnType)
 			panic("Invalid type")
 		}
 		fields = append(fields, field)
