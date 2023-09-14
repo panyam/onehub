@@ -55,7 +55,7 @@ class MessageServiceServicer(object):
 
     def CreateMessage(self, request, context):
         """*
-        Create a new sesssion
+        Create a single message or messages in batch
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')

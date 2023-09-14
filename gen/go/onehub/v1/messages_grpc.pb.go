@@ -32,7 +32,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageServiceClient interface {
 	// *
-	// Create a new sesssion
+	// Create a single message or messages in batch
 	CreateMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error)
 	// *
 	// List all messages in a topic
@@ -118,7 +118,7 @@ func (c *messageServiceClient) UpdateMessage(ctx context.Context, in *UpdateMess
 // for forward compatibility
 type MessageServiceServer interface {
 	// *
-	// Create a new sesssion
+	// Create a single message or messages in batch
 	CreateMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error)
 	// *
 	// List all messages in a topic

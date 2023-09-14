@@ -17,7 +17,7 @@ export const MessageService = {
   methods: {
     /**
      * *
-     * Create a new sesssion
+     * Create a single message or messages in batch
      *
      * @generated from rpc onehub.v1.MessageService.CreateMessage
      */

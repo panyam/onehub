@@ -346,7 +346,7 @@
     },
     "/v1/topics/{message.topicId}/messages": {
       "post": {
-        "summary": "*\nCreate a new sesssion",
+        "summary": "*\nCreate a single message or messages in batch",
         "operationId": "MessageService_CreateMessage",
         "responses": {
           "200": {
@@ -798,20 +798,6 @@
                 "updateMask": {
                   "type": "string",
                   "description": "*\nMask of fields being updated in this User to make partial changes."
-                },
-                "addUsers": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "*\nIDs of users to be added to this user."
-                },
-                "removeUsers": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "*\nIDs of users to be removed from this user."
                 }
               },
               "description": "*\nThe request for (partially) updating an User.",
@@ -902,7 +888,11 @@
       "type": "object",
       "properties": {
         "message": {
-          "$ref": "#/definitions/v1Message",
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
           "title": "*\nMessage being created"
         }
       },

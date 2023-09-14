@@ -12,7 +12,7 @@ import "google/api/annotations.proto";
  */
 service MessageService {
   /**
-   * Create a new sesssion
+   * Create a single message or messages in batch
    */
   rpc CreateMessage(CreateMessageRequest) returns (CreateMessageResponse) {
     option (google.api.http) = {
@@ -75,7 +75,7 @@ message CreateMessageRequest {
   /**
    * Message being updated
    */
-  Message message = 1;
+  repeated Message message = 1;
 }
 
 /**
@@ -85,7 +85,7 @@ message CreateMessageResponse {
   /**
    * Message being created
    */
-  Message message = 1;
+  repeated Message message = 1;
 }
 
 /**

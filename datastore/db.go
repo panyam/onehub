@@ -39,7 +39,7 @@ func NewOneHubDB(gormdb *gorm.DB) *OneHubDB {
 }
 
 func randid() string {
-	max_id := int64(math.Pow(36, 4))
+	max_id := int64(math.Pow(36, 8))
 	randval := rand.Int63() % max_id
 	return strconv.FormatInt(randval, 36)
 }
@@ -48,9 +48,10 @@ func (tdb *OneHubDB) NextId(cls string) string {
 	for {
 		gid := GenId{Id: randid(), Class: cls, CreatedAt: time.Now()}
 		err := tdb.storage.Create(gid).Error
-		log.Println("ID Create Error: ", err)
 		if err == nil {
 			return gid.Id
+		} else {
+			log.Println("ID Create Error: ", err)
 		}
 	}
 }

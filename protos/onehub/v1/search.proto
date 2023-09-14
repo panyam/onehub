@@ -1,0 +1,15 @@
+syntax = "proto3";
+import "google/protobuf/field_mask.proto";
+import "protoc-gen-openapiv2/options/annotations.proto";
+
+option go_package = "github.com/onehub/protos";
+package onehub.v1;
+
+import "onehub/v1/models.proto";
+import "google/api/annotations.proto";
+
+/**
+ * Search related queries
+ */
+service SearchService {
+}

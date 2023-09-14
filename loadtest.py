@@ -1,4 +1,5 @@
 import ipdb
+import time
 import random
 import csv
 import requests
@@ -59,13 +60,16 @@ def ensure_topics(users, ntopics=100):
             topics[topic["id"]] = topic
     return topics
 
-def generate_messages(users, topics):
+def generate_messages(users, topics, start=0, count=1000):
+    starttime = time.time()
     lines = list(csv.reader(open("./chatmessages.csv")))
-    for tid, msg in lines:
-        tid = int(tid) % len(topics)
+    for tid, msg in lines[start:count]:
+        tid = 1 + (int(tid) % len(topics))
         creator = random.choice(users)["id"]
         auth = f"{creator}:{creator}123"
         sendmsg(creator, f"lt{tid}", msg)
+    endtime = time.time()
+    print(f"Generated {count} messages in {endtime - starttime} seconds")
 
 def make_random_name():
   adj = random.choice(ADJECTIVES)

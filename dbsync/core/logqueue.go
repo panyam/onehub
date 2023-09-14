@@ -83,7 +83,7 @@ func (l *LogQueue) Start() {
 			}
 		case <-readTimer.C:
 			// TODO - make 1024 upto the caller
-			msgs, err := l.pgdb.GetMessages(1024, false, nil)
+			msgs, err := l.pgdb.GetMessages(10000, false, nil)
 			if err != nil {
 				l.Callback(nil, err)
 				return
