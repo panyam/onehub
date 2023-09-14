@@ -7,11 +7,10 @@ import (
 	"net/http"
 	"time"
 
-	dbsync "dbsync/core"
-
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
 	ohds "github.com/panyam/onehub/clients"
+	dbsync "github.com/panyam/onehub/dbsync"
 	"github.com/typesense/typesense-go/typesense"
 )
 
@@ -26,10 +25,12 @@ type PG2TS struct {
 
 func NewPG2TS() *PG2TS {
 	tsclient := dbsync.NewTSClient("", "")
+	tsclient2 := ohds.NewClient("", "")
 	out := &PG2TS{
-		tsclient: tsclient,
-		pgdb:     dbsync.PGDBFromEnv(),
-		selChan:  make(chan dbsync.Selection),
+		tsclient:  tsclient,
+		tsclient2: tsclient2,
+		pgdb:      dbsync.PGDBFromEnv(),
+		selChan:   make(chan dbsync.Selection),
 	}
 	out.msghandler = dbsync.PGMSGHandler{
 		DB: out.pgdb,
@@ -60,7 +61,7 @@ func NewPG2TS() *PG2TS {
 			}
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
-			result, err := tsclient2.Upsert(doctype, out["id"], out)
+			result, err := tsclient2.Upsert(doctype, out["id"].(string), out)
 			if err != nil {
 				schema, err2 := tsclient.Collection(doctype).Retrieve()
 				log.Println("Error Upserting: ", result, err)
@@ -78,7 +79,7 @@ func NewPG2TS() *PG2TS {
 			doc := tsclient.Collection(doctype).Document(docid)
 			result, err := doc.Delete()
 			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
-			if err != nil && err.Status != 404 {
+			if err != nil {
 				schema, err2 := tsclient.Collection(doctype).Delete()
 				log.Println("Error Deleting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
