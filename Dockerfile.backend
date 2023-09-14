@@ -2,7 +2,7 @@ FROM basegoimage
 
 WORKDIR /app
 
-COPY .air.* ./
+COPY cmd/backend/.air.* ./
 COPY go.mod go.sum ./
 RUN go mod download
 

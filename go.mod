@@ -3,6 +3,9 @@ module github.com/panyam/onehub
 go 1.20
 
 require (
+	github.com/jackc/pglogrepl v0.0.0-20230826184802-9ed16cb201f6
+	github.com/lib/pq v1.10.9
+	github.com/typesense/typesense-go v0.8.0
 	google.golang.org/grpc v1.57.0
 	google.golang.org/protobuf v1.31.0
 )
