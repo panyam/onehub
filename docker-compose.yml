@@ -72,17 +72,19 @@ services:
       - postgres
     build:
       context: .
-      dockerfile: ./Dockerfile
+      dockerfile: ./Dockerfile.backend
     volumes:
       # - ./.air.toml:/app/.air.toml:ro
       # - ./go.mod:/app/go.mod:ro
       # - ./go.sum:/app/go.sum:ro
       - ./cmd:/app/cmd
       - ./gen:/app/gen
+      - ./dbsync:/app/dbsync
+      - ./clients:/app/clients
       - ./datastore:/app/datastore
-      - ./services:/app/services
       - ./protos:/app/protos
-    command: ["air", "-c", ".air.toml"]
+      - ./services:/app/services
+    command: ["air", "-c", "cmd/backend/.air.toml"]
       # command: ["air", "-c", ".air.debug.toml"]
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
@@ -100,15 +102,17 @@ services:
     depends_on:
       - basegoimage
     build:
-      context: ./dbsync
+      context: .
+      dockerfile: ./Dockerfile.dbsync
     volumes:
       # - ./ohfe/.air.toml:/app/.air.toml:ro
       # - ./ohfe/go.mod:/app/go.mod:ro
       # - ./ohfe/go.sum:/app/go.sum:ro
-      - ./dbsync/core:/app/core
-      - ./dbsync/cmd:/app/cmd
-        # command: ["air", "-c", ".air.debug.toml"]
-        # command: ["air", "-c", ".air.toml"]
+      - ./cmd:/app/cmd
+      - ./dbsync:/app/dbsync
+      - ./clients:/app/clients
+#    command: ["air", "-c", "cmd/dbsync/.air.toml"]
+#      # command: ["air", "-c", "cmd/dbsync/.air.debug.toml"]
     ports:
       - 3333:3333
       - 9093:9091
@@ -128,14 +132,15 @@ services:
 #    depends_on:
 #      - basegoimage
 #    build:
-#      context: ./ohfe
+#      context: .
+#      dockerfile: ./Dockerfile.ohfe
 #    volumes:
 #      # - ./ohfe/.air.toml:/app/.air.toml:ro
 #      # - ./ohfe/go.mod:/app/go.mod:ro
 #      # - ./ohfe/go.sum:/app/go.sum:ro
 #      - ./ohfe/cmd:/app/cmd
-#    command: ["air", "-c", ".air.toml"]
-#      # command: ["air", "-c", ".air.debug.toml"]
+#    command: ["air", "-c", "cmd/ohfe/.air.toml"]
+#      # command: ["air", "-c", "cmd/ohfe/.air.debug.toml"]
 #    environment:
 #      ONEHUB_ENDPOINT: http://onehub:8080/api
 #      ONEHUB_GRPC_ENDPOINT: onehub:9090
