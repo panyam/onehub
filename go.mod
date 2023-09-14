@@ -1,6 +1,6 @@
 module github.com/panyam/onehub
 
-go 1.18
+go 1.20
 
 require (
 	google.golang.org/grpc v1.57.0
