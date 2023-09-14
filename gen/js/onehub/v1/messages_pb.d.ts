@@ -11,60 +11,80 @@ import type { Message as Message$1 } from "./models_pb.js";
  * *
  * Message creation request object
  *
- * @generated from message onehub.v1.CreateMessageRequest
+ * @generated from message onehub.v1.CreateMessagesRequest
  */
-export declare class CreateMessageRequest extends Message<CreateMessageRequest> {
+export declare class CreateMessagesRequest extends Message<CreateMessagesRequest> {
+  /**
+   * *
+   * Topic where messages are being created
+   *
+   * @generated from field: string topic_id = 1;
+   */
+  topicId: string;
+
   /**
    * *
    * Message being updated
    *
-   * @generated from field: repeated onehub.v1.Message message = 1;
+   * @generated from field: repeated onehub.v1.Message messages = 2;
    */
-  message: Message$1[];
+  messages: Message$1[];
 
-  constructor(data?: PartialMessage<CreateMessageRequest>);
+  /**
+   * *
+   * Whether to allow custom user IDs or whether to
+   * force user IDs to be overridden to the logged in user.
+   * In batch mode we want the option to have diff user IDs
+   * In prod - we want to ensure that only Admins can provide
+   * this option.
+   *
+   * @generated from field: bool allow_userids = 3;
+   */
+  allowUserids: boolean;
+
+  constructor(data?: PartialMessage<CreateMessagesRequest>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "onehub.v1.CreateMessageRequest";
+  static readonly typeName = "onehub.v1.CreateMessagesRequest";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateMessageRequest;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateMessagesRequest;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateMessageRequest;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateMessagesRequest;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateMessageRequest;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateMessagesRequest;
 
-  static equals(a: CreateMessageRequest | PlainMessage<CreateMessageRequest> | undefined, b: CreateMessageRequest | PlainMessage<CreateMessageRequest> | undefined): boolean;
+  static equals(a: CreateMessagesRequest | PlainMessage<CreateMessagesRequest> | undefined, b: CreateMessagesRequest | PlainMessage<CreateMessagesRequest> | undefined): boolean;
 }
 
 /**
  * *
  * Response of an message creation.
  *
- * @generated from message onehub.v1.CreateMessageResponse
+ * @generated from message onehub.v1.CreateMessagesResponse
  */
-export declare class CreateMessageResponse extends Message<CreateMessageResponse> {
+export declare class CreateMessagesResponse extends Message<CreateMessagesResponse> {
   /**
    * *
    * Message being created
    *
-   * @generated from field: repeated onehub.v1.Message message = 1;
+   * @generated from field: repeated onehub.v1.Message messages = 1;
    */
-  message: Message$1[];
+  messages: Message$1[];
 
-  constructor(data?: PartialMessage<CreateMessageResponse>);
+  constructor(data?: PartialMessage<CreateMessagesResponse>);
 
   static readonly runtime: typeof proto3;
-  static readonly typeName = "onehub.v1.CreateMessageResponse";
+  static readonly typeName = "onehub.v1.CreateMessagesResponse";
   static readonly fields: FieldList;
 
-  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateMessageResponse;
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): CreateMessagesResponse;
 
-  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateMessageResponse;
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): CreateMessagesResponse;
 
-  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateMessageResponse;
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): CreateMessagesResponse;
 
-  static equals(a: CreateMessageResponse | PlainMessage<CreateMessageResponse> | undefined, b: CreateMessageResponse | PlainMessage<CreateMessageResponse> | undefined): boolean;
+  static equals(a: CreateMessagesResponse | PlainMessage<CreateMessagesResponse> | undefined, b: CreateMessagesResponse | PlainMessage<CreateMessagesResponse> | undefined): boolean;
 }
 
 /**

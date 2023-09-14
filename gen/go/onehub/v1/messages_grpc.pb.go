@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	MessageService_CreateMessage_FullMethodName = "/onehub.v1.MessageService/CreateMessage"
-	MessageService_ListMessages_FullMethodName  = "/onehub.v1.MessageService/ListMessages"
-	MessageService_GetMessage_FullMethodName    = "/onehub.v1.MessageService/GetMessage"
-	MessageService_GetMessages_FullMethodName   = "/onehub.v1.MessageService/GetMessages"
-	MessageService_DeleteMessage_FullMethodName = "/onehub.v1.MessageService/DeleteMessage"
-	MessageService_UpdateMessage_FullMethodName = "/onehub.v1.MessageService/UpdateMessage"
+	MessageService_CreateMessages_FullMethodName = "/onehub.v1.MessageService/CreateMessages"
+	MessageService_ListMessages_FullMethodName   = "/onehub.v1.MessageService/ListMessages"
+	MessageService_GetMessage_FullMethodName     = "/onehub.v1.MessageService/GetMessage"
+	MessageService_GetMessages_FullMethodName    = "/onehub.v1.MessageService/GetMessages"
+	MessageService_DeleteMessage_FullMethodName  = "/onehub.v1.MessageService/DeleteMessage"
+	MessageService_UpdateMessage_FullMethodName  = "/onehub.v1.MessageService/UpdateMessage"
 )
 
 // MessageServiceClient is the client API for MessageService service.
@@ -33,7 +33,7 @@ const (
 type MessageServiceClient interface {
 	// *
 	// Create a single message or messages in batch
-	CreateMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error)
+	CreateMessages(ctx context.Context, in *CreateMessagesRequest, opts ...grpc.CallOption) (*CreateMessagesResponse, error)
 	// *
 	// List all messages in a topic
 	ListMessages(ctx context.Context, in *ListMessagesRequest, opts ...grpc.CallOption) (*ListMessagesResponse, error)
@@ -59,9 +59,9 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 	return &messageServiceClient{cc}
 }
 
-func (c *messageServiceClient) CreateMessage(ctx context.Context, in *CreateMessageRequest, opts ...grpc.CallOption) (*CreateMessageResponse, error) {
-	out := new(CreateMessageResponse)
-	err := c.cc.Invoke(ctx, MessageService_CreateMessage_FullMethodName, in, out, opts...)
+func (c *messageServiceClient) CreateMessages(ctx context.Context, in *CreateMessagesRequest, opts ...grpc.CallOption) (*CreateMessagesResponse, error) {
+	out := new(CreateMessagesResponse)
+	err := c.cc.Invoke(ctx, MessageService_CreateMessages_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -119,7 +119,7 @@ func (c *messageServiceClient) UpdateMessage(ctx context.Context, in *UpdateMess
 type MessageServiceServer interface {
 	// *
 	// Create a single message or messages in batch
-	CreateMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error)
+	CreateMessages(context.Context, *CreateMessagesRequest) (*CreateMessagesResponse, error)
 	// *
 	// List all messages in a topic
 	ListMessages(context.Context, *ListMessagesRequest) (*ListMessagesResponse, error)
@@ -141,8 +141,8 @@ type MessageServiceServer interface {
 type UnimplementedMessageServiceServer struct {
 }
 
-func (UnimplementedMessageServiceServer) CreateMessage(context.Context, *CreateMessageRequest) (*CreateMessageResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method CreateMessage not implemented")
+func (UnimplementedMessageServiceServer) CreateMessages(context.Context, *CreateMessagesRequest) (*CreateMessagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateMessages not implemented")
 }
 func (UnimplementedMessageServiceServer) ListMessages(context.Context, *ListMessagesRequest) (*ListMessagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListMessages not implemented")
@@ -171,20 +171,20 @@ func RegisterMessageServiceServer(s grpc.ServiceRegistrar, srv MessageServiceSer
 	s.RegisterService(&MessageService_ServiceDesc, srv)
 }
 
-func _MessageService_CreateMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CreateMessageRequest)
+func _MessageService_CreateMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateMessagesRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(MessageServiceServer).CreateMessage(ctx, in)
+		return srv.(MessageServiceServer).CreateMessages(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: MessageService_CreateMessage_FullMethodName,
+		FullMethod: MessageService_CreateMessages_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(MessageServiceServer).CreateMessage(ctx, req.(*CreateMessageRequest))
+		return srv.(MessageServiceServer).CreateMessages(ctx, req.(*CreateMessagesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -287,8 +287,8 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*MessageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "CreateMessage",
-			Handler:    _MessageService_CreateMessage_Handler,
+			MethodName: "CreateMessages",
+			Handler:    _MessageService_CreateMessages_Handler,
 		},
 		{
 			MethodName: "ListMessages",

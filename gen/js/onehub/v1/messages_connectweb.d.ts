@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateMessageRequest, CreateMessageResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ListMessagesRequest, ListMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
+import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ListMessagesRequest, ListMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -19,12 +19,12 @@ export declare const MessageService: {
      * *
      * Create a single message or messages in batch
      *
-     * @generated from rpc onehub.v1.MessageService.CreateMessage
+     * @generated from rpc onehub.v1.MessageService.CreateMessages
      */
-    readonly createMessage: {
-      readonly name: "CreateMessage",
-      readonly I: typeof CreateMessageRequest,
-      readonly O: typeof CreateMessageResponse,
+    readonly createMessages: {
+      readonly name: "CreateMessages",
+      readonly I: typeof CreateMessagesRequest,
+      readonly O: typeof CreateMessagesResponse,
       readonly kind: MethodKind.Unary,
     },
     /**

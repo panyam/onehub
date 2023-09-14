@@ -10,12 +10,14 @@ import { Message } from "./models_pb.js";
  * *
  * Message creation request object
  *
- * @generated from message onehub.v1.CreateMessageRequest
+ * @generated from message onehub.v1.CreateMessagesRequest
  */
-export const CreateMessageRequest = proto3.makeMessageType(
-  "onehub.v1.CreateMessageRequest",
+export const CreateMessagesRequest = proto3.makeMessageType(
+  "onehub.v1.CreateMessagesRequest",
   () => [
-    { no: 1, name: "message", kind: "message", T: Message, repeated: true },
+    { no: 1, name: "topic_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "messages", kind: "message", T: Message, repeated: true },
+    { no: 3, name: "allow_userids", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
   ],
 );
 
@@ -23,12 +25,12 @@ export const CreateMessageRequest = proto3.makeMessageType(
  * *
  * Response of an message creation.
  *
- * @generated from message onehub.v1.CreateMessageResponse
+ * @generated from message onehub.v1.CreateMessagesResponse
  */
-export const CreateMessageResponse = proto3.makeMessageType(
-  "onehub.v1.CreateMessageResponse",
+export const CreateMessagesResponse = proto3.makeMessageType(
+  "onehub.v1.CreateMessagesResponse",
   () => [
-    { no: 1, name: "message", kind: "message", T: Message, repeated: true },
+    { no: 1, name: "messages", kind: "message", T: Message, repeated: true },
   ],
 );
 

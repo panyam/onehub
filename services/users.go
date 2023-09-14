@@ -33,7 +33,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequ
 			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("User with id '%s' already exists", user.Id))
 		}
 	} else {
-		user.Id = s.DB.NextId("User")
+		user.Id = s.DB.NewID("User")
 	}
 	if user.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "Name must be specified")
@@ -100,7 +100,7 @@ func (s *UserService) UpdateUser(ctx context.Context, req *protos.UpdateUserRequ
 
 	update_mask := req.UpdateMask
 	has_update_mask := update_mask != nil && len(update_mask.Paths) > 0
-	if !has_update_mask && len(req.AddUsers) == 0 && len(req.RemoveUsers) == 0 {
+	if !has_update_mask {
 		return nil, status.Error(codes.InvalidArgument,
 			"update_mask should specify (nested) fields to update")
 	}

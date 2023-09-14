@@ -344,86 +344,6 @@
         ]
       }
     },
-    "/v1/topics/{message.topicId}/messages": {
-      "post": {
-        "summary": "*\nCreate a single message or messages in batch",
-        "operationId": "MessageService_CreateMessage",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1CreateMessageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "message.topicId",
-            "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "pattern": "[^/]+"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "object",
-                  "properties": {
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "*\nWhen the message was created on the server."
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
-                    },
-                    "id": {
-                      "type": "string",
-                      "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified."
-                    },
-                    "userId": {
-                      "type": "string",
-                      "description": "*\nUser sending this message."
-                    },
-                    "contentType": {
-                      "type": "string",
-                      "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
-                    },
-                    "contentText": {
-                      "type": "string",
-                      "description": "*\nA simple way to just send text."
-                    },
-                    "contentData": {
-                      "type": "object",
-                      "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
-                    }
-                  },
-                  "title": "*\nMessage being updated"
-                }
-              },
-              "title": "*\nMessage creation request object"
-            }
-          }
-        ],
-        "tags": [
-          "MessageService"
-        ]
-      }
-    },
     "/v1/topics/{topic.id}": {
       "patch": {
         "summary": "*\nUpdates specific fields of a topic",
@@ -557,6 +477,60 @@
             "required": false,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      },
+      "post": {
+        "summary": "*\nCreate a single message or messages in batch",
+        "operationId": "MessageService_CreateMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topicId",
+            "description": "*\nTopic where messages are being created",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "messages": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/v1Message"
+                  },
+                  "title": "*\nMessage being updated"
+                },
+                "allowUserids": {
+                  "type": "boolean",
+                  "description": "*\nWhether to allow custom user IDs or whether to\nforce user IDs to be overridden to the logged in user.\nIn batch mode we want the option to have diff user IDs\nIn prod - we want to ensure that only Admins can provide\nthis option."
+                }
+              },
+              "title": "*\nMessage creation request object"
+            }
           }
         ],
         "tags": [
@@ -884,10 +858,10 @@
         }
       }
     },
-    "v1CreateMessageResponse": {
+    "v1CreateMessagesResponse": {
       "type": "object",
       "properties": {
-        "message": {
+        "messages": {
           "type": "array",
           "items": {
             "type": "object",

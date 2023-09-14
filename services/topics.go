@@ -37,7 +37,7 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Topic with id '%s' already exists", topic.Id))
 		}
 	} else {
-		topic.Id = s.DB.NextId("Topic")
+		topic.Id = s.DB.NewID("Topic")
 	}
 	if topic.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "Name not found")

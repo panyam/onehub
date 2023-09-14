@@ -67,6 +67,16 @@ func (tdb *OneHubDB) ListMessages(topic_id string, pageKey string, pageSize int)
 	return out, err
 }
 
+func (tdb *OneHubDB) CreateMessages(msgs []*Message) (err error) {
+	for _, msg := range msgs {
+		msg.CreatedAt = time.Now()
+		msg.UpdatedAt = time.Now()
+	}
+	result := tdb.storage.Model(&Message{}).Create(msgs)
+	err = result.Error
+	return
+}
+
 func (tdb *OneHubDB) CreateMessage(msg *Message) (err error) {
 	msg.CreatedAt = time.Now()
 	msg.UpdatedAt = time.Now()

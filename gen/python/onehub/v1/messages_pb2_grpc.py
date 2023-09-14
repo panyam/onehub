@@ -16,10 +16,10 @@ class MessageServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
-        self.CreateMessage = channel.unary_unary(
-                '/onehub.v1.MessageService/CreateMessage',
-                request_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessageRequest.SerializeToString,
-                response_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessageResponse.FromString,
+        self.CreateMessages = channel.unary_unary(
+                '/onehub.v1.MessageService/CreateMessages',
+                request_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.SerializeToString,
+                response_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.FromString,
                 )
         self.ListMessages = channel.unary_unary(
                 '/onehub.v1.MessageService/ListMessages',
@@ -53,7 +53,7 @@ class MessageServiceServicer(object):
     Service for operating on messages
     """
 
-    def CreateMessage(self, request, context):
+    def CreateMessages(self, request, context):
         """*
         Create a single message or messages in batch
         """
@@ -104,10 +104,10 @@ class MessageServiceServicer(object):
 
 def add_MessageServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
-            'CreateMessage': grpc.unary_unary_rpc_method_handler(
-                    servicer.CreateMessage,
-                    request_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessageRequest.FromString,
-                    response_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessageResponse.SerializeToString,
+            'CreateMessages': grpc.unary_unary_rpc_method_handler(
+                    servicer.CreateMessages,
+                    request_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.FromString,
+                    response_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.SerializeToString,
             ),
             'ListMessages': grpc.unary_unary_rpc_method_handler(
                     servicer.ListMessages,
@@ -147,7 +147,7 @@ class MessageService(object):
     """
 
     @staticmethod
-    def CreateMessage(request,
+    def CreateMessages(request,
             target,
             options=(),
             channel_credentials=None,
@@ -157,9 +157,9 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/CreateMessage',
-            onehub_dot_v1_dot_messages__pb2.CreateMessageRequest.SerializeToString,
-            onehub_dot_v1_dot_messages__pb2.CreateMessageResponse.FromString,
+        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/CreateMessages',
+            onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.SerializeToString,
+            onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

@@ -1,20 +1,38 @@
 import ipdb
+from collections import defaultdict
+import itertools
 import time
 import random
 import csv
 import requests
 
-def sendmsg(uid, tid, msg):
-    payload = {"message": {
-        "topic_id": tid,
-        "user_id": uid,
-        "content_type": "text/plain",
-        "content_text": msg,
-    }}
-    auth = f"{uid}:{uid}123"
+def sendmsg(users, tid, msg):
+    creator = random.choice(users)["id"]
+    auth = f"{creator}:{creator}123"
+    payload = {
+            "messages": [{
+                "topic_id": tid,
+                "user_id": creator,
+                "content_type": "text/plain",
+                "content_text": msg,
+            } for msg in msgs]}
     resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
     rj = resp.json()
-    return rj["message"]
+    return rj["messages"]
+
+def sendmsgs(users, tid, msgs):
+    auth = f"admin:admin123"
+    payload = {
+            "allow_userids": True,
+            "messages": [{
+                "topic_id": tid,
+                "user_id": random.choice(users)["id"],
+                "content_type": "text/plain",
+                "content_text": msg,
+            } for msg in msgs]}
+    resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
+    rj = resp.json()
+    return rj["messages"]
 
 def ensure_users(nusers=100):
     out = []
@@ -60,14 +78,33 @@ def ensure_topics(users, ntopics=100):
             topics[topic["id"]] = topic
     return topics
 
-def generate_messages(users, topics, start=0, count=1000):
-    starttime = time.time()
+def grouped_messages():
+    # should use groupby but cant get it to work
+    grouped = defaultdict(list)
     lines = list(csv.reader(open("./chatmessages.csv")))
+    for tid, msg in lines:
+        grouped[tid].append(msg)
+    grouped = list(grouped.items())
+    grouped.sort()
+    return grouped
+
+def generate_batch_messages(users, topics, start=0, ngroups=100):
+    grouped = grouped_messages() 
+    starttime = time.time()
+    count = 0
+    for tid, msgs in grouped[start:ngroups]:
+        tid = 1 + (int(tid) % len(topics))
+        sendmsgs(users, f"lt{tid}", msgs)
+        count += len(msgs)
+    endtime = time.time()
+    print(f"Generated {count} messages in {endtime - starttime} seconds")
+
+def generate_messages(users, topics, start=0, count=1000):
+    lines = list(csv.reader(open("./chatmessages.csv")))
+    starttime = time.time()
     for tid, msg in lines[start:count]:
         tid = 1 + (int(tid) % len(topics))
-        creator = random.choice(users)["id"]
-        auth = f"{creator}:{creator}123"
-        sendmsg(creator, f"lt{tid}", msg)
+        sendmsg(users, f"lt{tid}", msg)
     endtime = time.time()
     print(f"Generated {count} messages in {endtime - starttime} seconds")
 

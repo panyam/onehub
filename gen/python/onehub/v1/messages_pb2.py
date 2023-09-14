@@ -16,7 +16,7 @@ from onehub.v1 import models_pb2 as onehub_dot_v1_dot_models__pb2
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18onehub/v1/messages.proto\x12\tonehub.v1\x1a google/protobuf/field_mask.proto\x1a\x16onehub/v1/models.proto\x1a\x1cgoogle/api/annotations.proto\"D\n\x14\x43reateMessageRequest\x12,\n\x07message\x18\x01 \x03(\x0b\x32\x12.onehub.v1.MessageR\x07message\"E\n\x15\x43reateMessageResponse\x12,\n\x07message\x18\x01 \x03(\x0b\x32\x12.onehub.v1.MessageR\x07message\"h\n\x13ListMessagesRequest\x12\x19\n\x08page_key\x18\x01 \x01(\tR\x07pageKey\x12\x1b\n\tpage_size\x18\x02 \x01(\x05R\x08pageSize\x12\x19\n\x08topic_id\x18\x03 \x01(\tR\x07topicId\"j\n\x14ListMessagesResponse\x12.\n\x08messages\x18\x01 \x03(\x0b\x32\x12.onehub.v1.MessageR\x08messages\x12\"\n\rnext_page_key\x18\x02 \x01(\tR\x0bnextPageKey\"#\n\x11GetMessageRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"B\n\x12GetMessageResponse\x12,\n\x07message\x18\x01 \x01(\x0b\x32\x12.onehub.v1.MessageR\x07message\"&\n\x12GetMessagesRequest\x12\x10\n\x03ids\x18\x01 \x03(\tR\x03ids\"\xb0\x01\n\x13GetMessagesResponse\x12H\n\x08messages\x18\x01 \x03(\x0b\x32,.onehub.v1.GetMessagesResponse.MessagesEntryR\x08messages\x1aO\n\rMessagesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12(\n\x05value\x18\x02 \x01(\x0b\x32\x12.onehub.v1.MessageR\x05value:\x02\x38\x01\"&\n\x14\x44\x65leteMessageRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"\x17\n\x15\x44\x65leteMessageResponse\"\xbe\x01\n\x14UpdateMessageRequest\x12,\n\x07message\x18\x01 \x01(\x0b\x32\x12.onehub.v1.MessageR\x07message\x12;\n\x0bupdate_mask\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nupdateMask\x12;\n\x0b\x61ppend_mask\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nappendMask\"E\n\x15UpdateMessageResponse\x12,\n\x07message\x18\x01 \x01(\x0b\x32\x12.onehub.v1.MessageR\x07message2\xd7\x05\n\x0eMessageService\x12\x87\x01\n\rCreateMessage\x12\x1f.onehub.v1.CreateMessageRequest\x1a .onehub.v1.CreateMessageResponse\"3\x82\xd3\xe4\x93\x02-\"(/v1/topics/{message.topic_id=*}/messages:\x01*\x12y\n\x0cListMessages\x12\x1e.onehub.v1.ListMessagesRequest\x1a\x1f.onehub.v1.ListMessagesResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /v1/topics/{topic_id=*}/messages\x12\x66\n\nGetMessage\x12\x1c.onehub.v1.GetMessageRequest\x1a\x1d.onehub.v1.GetMessageResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/messages/{id=*}\x12k\n\x0bGetMessages\x12\x1d.onehub.v1.GetMessagesRequest\x1a\x1e.onehub.v1.GetMessagesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/messages:batchGet\x12o\n\rDeleteMessage\x12\x1f.onehub.v1.DeleteMessageRequest\x1a .onehub.v1.DeleteMessageResponse\"\x1b\x82\xd3\xe4\x93\x02\x15*\x13/v1/messages/{id=*}\x12z\n\rUpdateMessage\x12\x1f.onehub.v1.UpdateMessageRequest\x1a .onehub.v1.UpdateMessageResponse\"&\x82\xd3\xe4\x93\x02 2\x1b/v1/messages/{message.id=*}:\x01*B}\n\rcom.onehub.v1B\rMessagesProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x18onehub/v1/messages.proto\x12\tonehub.v1\x1a google/protobuf/field_mask.proto\x1a\x16onehub/v1/models.proto\x1a\x1cgoogle/api/annotations.proto\"\x87\x01\n\x15\x43reateMessagesRequest\x12\x19\n\x08topic_id\x18\x01 \x01(\tR\x07topicId\x12.\n\x08messages\x18\x02 \x03(\x0b\x32\x12.onehub.v1.MessageR\x08messages\x12#\n\rallow_userids\x18\x03 \x01(\x08R\x0c\x61llowUserids\"H\n\x16\x43reateMessagesResponse\x12.\n\x08messages\x18\x01 \x03(\x0b\x32\x12.onehub.v1.MessageR\x08messages\"h\n\x13ListMessagesRequest\x12\x19\n\x08page_key\x18\x01 \x01(\tR\x07pageKey\x12\x1b\n\tpage_size\x18\x02 \x01(\x05R\x08pageSize\x12\x19\n\x08topic_id\x18\x03 \x01(\tR\x07topicId\"j\n\x14ListMessagesResponse\x12.\n\x08messages\x18\x01 \x03(\x0b\x32\x12.onehub.v1.MessageR\x08messages\x12\"\n\rnext_page_key\x18\x02 \x01(\tR\x0bnextPageKey\"#\n\x11GetMessageRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"B\n\x12GetMessageResponse\x12,\n\x07message\x18\x01 \x01(\x0b\x32\x12.onehub.v1.MessageR\x07message\"&\n\x12GetMessagesRequest\x12\x10\n\x03ids\x18\x01 \x03(\tR\x03ids\"\xb0\x01\n\x13GetMessagesResponse\x12H\n\x08messages\x18\x01 \x03(\x0b\x32,.onehub.v1.GetMessagesResponse.MessagesEntryR\x08messages\x1aO\n\rMessagesEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12(\n\x05value\x18\x02 \x01(\x0b\x32\x12.onehub.v1.MessageR\x05value:\x02\x38\x01\"&\n\x14\x44\x65leteMessageRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"\x17\n\x15\x44\x65leteMessageResponse\"\xbe\x01\n\x14UpdateMessageRequest\x12,\n\x07message\x18\x01 \x01(\x0b\x32\x12.onehub.v1.MessageR\x07message\x12;\n\x0bupdate_mask\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nupdateMask\x12;\n\x0b\x61ppend_mask\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nappendMask\"E\n\x15UpdateMessageResponse\x12,\n\x07message\x18\x01 \x01(\x0b\x32\x12.onehub.v1.MessageR\x07message2\xd2\x05\n\x0eMessageService\x12\x82\x01\n\x0e\x43reateMessages\x12 .onehub.v1.CreateMessagesRequest\x1a!.onehub.v1.CreateMessagesResponse\"+\x82\xd3\xe4\x93\x02%\" /v1/topics/{topic_id=*}/messages:\x01*\x12y\n\x0cListMessages\x12\x1e.onehub.v1.ListMessagesRequest\x1a\x1f.onehub.v1.ListMessagesResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /v1/topics/{topic_id=*}/messages\x12\x66\n\nGetMessage\x12\x1c.onehub.v1.GetMessageRequest\x1a\x1d.onehub.v1.GetMessageResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/messages/{id=*}\x12k\n\x0bGetMessages\x12\x1d.onehub.v1.GetMessagesRequest\x1a\x1e.onehub.v1.GetMessagesResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/v1/messages:batchGet\x12o\n\rDeleteMessage\x12\x1f.onehub.v1.DeleteMessageRequest\x1a .onehub.v1.DeleteMessageResponse\"\x1b\x82\xd3\xe4\x93\x02\x15*\x13/v1/messages/{id=*}\x12z\n\rUpdateMessage\x12\x1f.onehub.v1.UpdateMessageRequest\x1a .onehub.v1.UpdateMessageResponse\"&\x82\xd3\xe4\x93\x02 2\x1b/v1/messages/{message.id=*}:\x01*B}\n\rcom.onehub.v1B\rMessagesProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -26,8 +26,8 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   DESCRIPTOR._serialized_options = b'\n\rcom.onehub.v1B\rMessagesProtoP\001Z\030github.com/onehub/protos\242\002\003OXX\252\002\tOnehub.V1\312\002\tOnehub\\V1\342\002\025Onehub\\V1\\GPBMetadata\352\002\nOnehub::V1'
   _GETMESSAGESRESPONSE_MESSAGESENTRY._options = None
   _GETMESSAGESRESPONSE_MESSAGESENTRY._serialized_options = b'8\001'
-  _MESSAGESERVICE.methods_by_name['CreateMessage']._options = None
-  _MESSAGESERVICE.methods_by_name['CreateMessage']._serialized_options = b'\202\323\344\223\002-\"(/v1/topics/{message.topic_id=*}/messages:\001*'
+  _MESSAGESERVICE.methods_by_name['CreateMessages']._options = None
+  _MESSAGESERVICE.methods_by_name['CreateMessages']._serialized_options = b'\202\323\344\223\002%\" /v1/topics/{topic_id=*}/messages:\001*'
   _MESSAGESERVICE.methods_by_name['ListMessages']._options = None
   _MESSAGESERVICE.methods_by_name['ListMessages']._serialized_options = b'\202\323\344\223\002\"\022 /v1/topics/{topic_id=*}/messages'
   _MESSAGESERVICE.methods_by_name['GetMessage']._options = None
@@ -38,32 +38,32 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _MESSAGESERVICE.methods_by_name['DeleteMessage']._serialized_options = b'\202\323\344\223\002\025*\023/v1/messages/{id=*}'
   _MESSAGESERVICE.methods_by_name['UpdateMessage']._options = None
   _MESSAGESERVICE.methods_by_name['UpdateMessage']._serialized_options = b'\202\323\344\223\002 2\033/v1/messages/{message.id=*}:\001*'
-  _globals['_CREATEMESSAGEREQUEST']._serialized_start=127
-  _globals['_CREATEMESSAGEREQUEST']._serialized_end=195
-  _globals['_CREATEMESSAGERESPONSE']._serialized_start=197
-  _globals['_CREATEMESSAGERESPONSE']._serialized_end=266
-  _globals['_LISTMESSAGESREQUEST']._serialized_start=268
-  _globals['_LISTMESSAGESREQUEST']._serialized_end=372
-  _globals['_LISTMESSAGESRESPONSE']._serialized_start=374
-  _globals['_LISTMESSAGESRESPONSE']._serialized_end=480
-  _globals['_GETMESSAGEREQUEST']._serialized_start=482
-  _globals['_GETMESSAGEREQUEST']._serialized_end=517
-  _globals['_GETMESSAGERESPONSE']._serialized_start=519
-  _globals['_GETMESSAGERESPONSE']._serialized_end=585
-  _globals['_GETMESSAGESREQUEST']._serialized_start=587
-  _globals['_GETMESSAGESREQUEST']._serialized_end=625
-  _globals['_GETMESSAGESRESPONSE']._serialized_start=628
-  _globals['_GETMESSAGESRESPONSE']._serialized_end=804
-  _globals['_GETMESSAGESRESPONSE_MESSAGESENTRY']._serialized_start=725
-  _globals['_GETMESSAGESRESPONSE_MESSAGESENTRY']._serialized_end=804
-  _globals['_DELETEMESSAGEREQUEST']._serialized_start=806
-  _globals['_DELETEMESSAGEREQUEST']._serialized_end=844
-  _globals['_DELETEMESSAGERESPONSE']._serialized_start=846
-  _globals['_DELETEMESSAGERESPONSE']._serialized_end=869
-  _globals['_UPDATEMESSAGEREQUEST']._serialized_start=872
-  _globals['_UPDATEMESSAGEREQUEST']._serialized_end=1062
-  _globals['_UPDATEMESSAGERESPONSE']._serialized_start=1064
-  _globals['_UPDATEMESSAGERESPONSE']._serialized_end=1133
-  _globals['_MESSAGESERVICE']._serialized_start=1136
-  _globals['_MESSAGESERVICE']._serialized_end=1863
+  _globals['_CREATEMESSAGESREQUEST']._serialized_start=128
+  _globals['_CREATEMESSAGESREQUEST']._serialized_end=263
+  _globals['_CREATEMESSAGESRESPONSE']._serialized_start=265
+  _globals['_CREATEMESSAGESRESPONSE']._serialized_end=337
+  _globals['_LISTMESSAGESREQUEST']._serialized_start=339
+  _globals['_LISTMESSAGESREQUEST']._serialized_end=443
+  _globals['_LISTMESSAGESRESPONSE']._serialized_start=445
+  _globals['_LISTMESSAGESRESPONSE']._serialized_end=551
+  _globals['_GETMESSAGEREQUEST']._serialized_start=553
+  _globals['_GETMESSAGEREQUEST']._serialized_end=588
+  _globals['_GETMESSAGERESPONSE']._serialized_start=590
+  _globals['_GETMESSAGERESPONSE']._serialized_end=656
+  _globals['_GETMESSAGESREQUEST']._serialized_start=658
+  _globals['_GETMESSAGESREQUEST']._serialized_end=696
+  _globals['_GETMESSAGESRESPONSE']._serialized_start=699
+  _globals['_GETMESSAGESRESPONSE']._serialized_end=875
+  _globals['_GETMESSAGESRESPONSE_MESSAGESENTRY']._serialized_start=796
+  _globals['_GETMESSAGESRESPONSE_MESSAGESENTRY']._serialized_end=875
+  _globals['_DELETEMESSAGEREQUEST']._serialized_start=877
+  _globals['_DELETEMESSAGEREQUEST']._serialized_end=915
+  _globals['_DELETEMESSAGERESPONSE']._serialized_start=917
+  _globals['_DELETEMESSAGERESPONSE']._serialized_end=940
+  _globals['_UPDATEMESSAGEREQUEST']._serialized_start=943
+  _globals['_UPDATEMESSAGEREQUEST']._serialized_end=1133
+  _globals['_UPDATEMESSAGERESPONSE']._serialized_start=1135
+  _globals['_UPDATEMESSAGERESPONSE']._serialized_end=1204
+  _globals['_MESSAGESERVICE']._serialized_start=1207
+  _globals['_MESSAGESERVICE']._serialized_end=1929
 # @@protoc_insertion_point(module_scope)

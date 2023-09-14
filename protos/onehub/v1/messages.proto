@@ -14,9 +14,9 @@ service MessageService {
   /**
    * Create a single message or messages in batch
    */
-  rpc CreateMessage(CreateMessageRequest) returns (CreateMessageResponse) {
+  rpc CreateMessages(CreateMessagesRequest) returns (CreateMessagesResponse) {
     option (google.api.http) = {
-      post: "/v1/topics/{message.topic_id=*}/messages",
+      post: "/v1/topics/{topic_id=*}/messages",
       body: "*",
     };
   }
@@ -71,21 +71,35 @@ service MessageService {
 /**
  * Message creation request object
  */
-message CreateMessageRequest {
+message CreateMessagesRequest {
+  /**
+   * Topic where messages are being created
+   */
+  string topic_id = 1;
+
   /**
    * Message being updated
    */
-  repeated Message message = 1;
+  repeated Message messages = 2;
+
+  /**
+   * Whether to allow custom user IDs or whether to
+   * force user IDs to be overridden to the logged in user.
+   * In batch mode we want the option to have diff user IDs
+   * In prod - we want to ensure that only Admins can provide
+   * this option.
+   */
+  bool allow_userids = 3;
 }
 
 /**
  * Response of an message creation.
  */
-message CreateMessageResponse {
+message CreateMessagesResponse {
   /**
    * Message being created
    */
-  repeated Message message = 1;
+  repeated Message messages = 1;
 }
 
 /**
