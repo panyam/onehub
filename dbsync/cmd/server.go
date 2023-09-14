@@ -11,11 +11,13 @@ import (
 
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
+	ohds "github.com/panyam/onehub/datastore"
 	"github.com/typesense/typesense-go/typesense"
 )
 
 type PG2TS struct {
 	tsclient      *typesense.Client
+	tsclient2     *ohds.TSClient
 	pgdb          *dbsync.PGDB
 	selChan       chan dbsync.Selection
 	currSelection dbsync.Selection
@@ -57,7 +59,8 @@ func NewPG2TS() *PG2TS {
 				out["updated_at"] = out["updated_at"].(time.Time).Unix()
 			}
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
-			result, err := tsclient.Collection(doctype).Documents().Upsert(out)
+			// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
+			result, err := tsclient2.Upsert(doctype, out["id"], out)
 			if err != nil {
 				schema, err2 := tsclient.Collection(doctype).Retrieve()
 				log.Println("Error Upserting: ", result, err)
@@ -75,7 +78,7 @@ func NewPG2TS() *PG2TS {
 			doc := tsclient.Collection(doctype).Document(docid)
 			result, err := doc.Delete()
 			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
-			if err != nil {
+			if err != nil && err.Status != 404 {
 				schema, err2 := tsclient.Collection(doctype).Delete()
 				log.Println("Error Deleting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
