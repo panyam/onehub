@@ -68,7 +68,19 @@ func NewPG2TS() *PG2TS {
 			return nil
 		},
 		HandleDeleteMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {
-			log.Println("Delete Message: ", m.LastBegin, msg, reln)
+			tableinfo := out.pgdb.GetTableInfo(reln.RelationID)
+			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
+			docid := tableinfo.GetRecordID(msg.OldTuple, reln)
+			log.Println("Delete Message (%s/%s): ", doctype, docid, m.LastBegin, msg, reln)
+			doc := tsclient.Collection(doctype).Document(docid)
+			result, err := doc.Delete()
+			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
+			if err != nil {
+				schema, err2 := tsclient.Collection(doctype).Delete()
+				log.Println("Error Deleting: ", result, err)
+				log.Println("Old Schema: ", schema, err2)
+				panic(err)
+			}
 			return nil
 		},
 		HandleUpdateMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {

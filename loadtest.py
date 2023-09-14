@@ -3,10 +3,20 @@ import random
 import csv
 import requests
 
-def ensure_users():
+def sendmsg(uid, tid, msg):
+    payload = {"message": {
+        "topic_id": tid,
+        "user_id": uid,
+        "content_type": "text/plain",
+        "content_text": msg,
+    }}
+    auth = f"{uid}:{uid}123"
+    return requests.post(f"http://{auth}@localhost:7080/api/v1/{currtid}/messages", json= payload)["message"]
+
+def ensure_users(nusers=100):
     out = []
     auth = f"admin:admin123"
-    for i in range(100):
+    for i in range(nusers):
         userid = f"ltuser{i}"
         resp = requests.get(f"http://{auth}@localhost:7080/api/v1/users/{userid}")
         if resp.status_code == 200:
@@ -22,22 +32,12 @@ def ensure_users():
             print("Created User: ", user)
     return out
 
-def sendmsg(uid, tid, msg):
-    payload = {"message": {
-        "topic_id": tid,
-        "user_id": uid,
-        "content_type": "text/plain",
-        "content_text": msg,
-    }}
-    auth = f"{uid}:{uid}123"
-    return requests.post(f"http://{auth}@localhost:7080/api/v1/{currtid}/messages", json= payload)["message"]
-
-def ensure_topics():
-    users = ensure_users()
+def ensure_topics(users, ntopics=100):
     lines = list(csv.reader(open("./chatmessages.csv")))
     topics = {}
     currtid = None
     for tid, msg in lines:
+        if len(topics) >= ntopics: break
         creator = random.choice(users)["id"]
         auth = f"{creator}:{creator}123"
         if tid != currtid:
@@ -55,12 +55,12 @@ def ensure_topics():
                 topic = resp.json()["topic"]
                 print("Created Topic: ", topic)
             topics[topic["id"]] = topic
-    return users, topics
+    return topics
 
-def generate_messages():
-    users, topics = ensure_topics()
+def generate_messages(users, topics):
     lines = list(csv.reader(open("./chatmessages.csv")))
     for tid, msg in lines:
+        tid = int(tid) % len(topics)
         creator = random.choice(users)["id"]
         auth = f"{creator}:{creator}123"
         sendmsg(creator, f"lt{tid}", msg)
