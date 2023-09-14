@@ -11,7 +11,7 @@ import (
 
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
-	ohds "github.com/panyam/onehub/datastore"
+	ohds "github.com/panyam/onehub/clients"
 	"github.com/typesense/typesense-go/typesense"
 )
 
