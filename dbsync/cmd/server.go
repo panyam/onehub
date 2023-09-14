@@ -46,9 +46,9 @@ func NewPG2TS() *PG2TS {
 
 			pkey, out, errors := dbsync.MessageToMap(out.pgdb, msg.Tuple, reln)
 			if errors != nil {
-				log.Println("Error converting to map: ", errors)
+				log.Println("Error converting to map: ", pkey, errors)
 			}
-			log.Println("Converted: ", pkey, out)
+			// log.Println("Converted: ", pkey, out)
 
 			if _, ok := out["created_at"]; ok {
 				out["created_at"] = out["created_at"].(time.Time).Unix()
@@ -71,7 +71,7 @@ func NewPG2TS() *PG2TS {
 			tableinfo := out.pgdb.GetTableInfo(reln.RelationID)
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			docid := tableinfo.GetRecordID(msg.OldTuple, reln)
-			log.Println("Delete Message (%s/%s): ", doctype, docid, m.LastBegin, msg, reln)
+			log.Println(fmt.Sprintf("Delete Message (%s/%s): ", doctype, docid), m.LastBegin, msg, reln)
 			doc := tsclient.Collection(doctype).Document(docid)
 			result, err := doc.Delete()
 			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()

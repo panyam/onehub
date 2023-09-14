@@ -121,8 +121,8 @@ func MessageToMap(p *PGDB, msg *pglogrepl.TupleData, reln *pglogrepl.RelationMes
 	if len(msgcols) != len(relcols) {
 		log.Printf("Msg cols (%d) and Rel cols (%d) dont match", len(msgcols), len(relcols))
 	}
-	fullschema := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
-	log.Printf("Namespace: %s, RelName: %s, FullSchema: %s", reln.Namespace, reln.RelationName, fullschema)
+	// fullschema := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
+	// log.Printf("Namespace: %s, RelName: %s, FullSchema: %s", reln.Namespace, reln.RelationName, fullschema)
 	pkey = "id"
 	if out == nil {
 		out = make(map[string]interface{})

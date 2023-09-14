@@ -11,7 +11,9 @@ def sendmsg(uid, tid, msg):
         "content_text": msg,
     }}
     auth = f"{uid}:{uid}123"
-    return requests.post(f"http://{auth}@localhost:7080/api/v1/{currtid}/messages", json= payload)["message"]
+    resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
+    rj = resp.json()
+    return rj["message"]
 
 def ensure_users(nusers=100):
     out = []
