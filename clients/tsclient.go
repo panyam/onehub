@@ -94,7 +94,121 @@ func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, 
 	return response, err
 }
 
+/**
+ * Gets a collection schema.
+ */
+func (t *TSClient) GetCollection(doctype string) (gut.StringMap, error) {
+	endpoint := fmt.Sprintf("collections/%s", doctype)
+	return t.Request("GET", endpoint, nil)
+}
+
+func (t *TSClient) UpdateCollection(doctype string, fields []gut.StringMap) (gut.StringMap, error) {
+	endpoint := fmt.Sprintf("collections/%s", doctype)
+	return t.Request("PATCH", endpoint, gut.StringMap{
+		"fields": fields,
+	})
+}
+
+/**
+ * Create a collection with the given field info.
+ */
+func (t *TSClient) CreateCollection(schema gut.StringMap) (gut.StringMap, error) {
+	endpoint := "/collections"
+	return t.Request("POST", endpoint, schema)
+}
+
+/**
+ * Delete a collection.
+ */
+func (t *TSClient) DeleteCollection(doctype string) (gut.StringMap, error) {
+	endpoint := fmt.Sprintf("collections/%s", doctype)
+	return t.Request("DELETE", endpoint, nil)
+}
+
+/**
+ * Gets a document by its ID in a given collection.
+ */
+func (t *TSClient) GetDocument(doctype string, docid string) (out gut.StringMap, err error) {
+	endpoint := fmt.Sprintf("collections/%s/documents/%s", doctype, docid)
+	return t.Request("GET", endpoint, nil)
+}
+
+/**
+ * Gets a document by its ID in a given collection.
+ */
+func (t *TSClient) DeleteDocument(doctype string, docid string) (out gut.StringMap, err error) {
+	endpoint := fmt.Sprintf("collections/%s/documents/%s", doctype, docid)
+	return t.Request("DELETE", endpoint, nil)
+}
+
+/**
+ * Upserts a document given its ID into a collection.
+ */
 func (t *TSClient) Upsert(doctype string, docid string, doc gut.StringMap) (out gut.StringMap, err error) {
 	endpoint := fmt.Sprintf("collections/%s/documents/%s", doctype, docid)
 	return t.Request("PATCH", endpoint, doc)
+}
+
+func (t *TSClient) EnsureSchema(doctype string, fieldMap map[string]gut.StringMap) {
+	var fields []gut.StringMap
+	for _, field := range fieldMap {
+		fields = append(fields, field)
+	}
+	// fields, fieldMap := PGTableInfoToSchema(tableInfo)
+	schema := gut.StringMap{
+		"name":                 doctype,
+		"enable_nested_fields": true,
+		"fields":               fields,
+	}
+	existing, err := t.GetCollection(doctype)
+	if err != nil {
+		log.Println("Schema Fetch Error: ", err)
+	}
+	if existing == nil {
+		res, err := t.CreateCollection(schema)
+		log.Println("Schema Creation: ", doctype, res, err)
+		if err != nil {
+			panic(err)
+		}
+	} else {
+		// TODO - check there are *acutally* changes first
+		// update it
+		var newFields []gut.StringMap
+		for _, ef := range existing["fields"].([]interface{}) {
+			efield := ef.(gut.StringMap)
+			fieldName := efield["name"].(string)
+			fieldType := efield["type"].(string)
+			fieldOptional := efield["optional"].(bool)
+			newField, ok := fieldMap[fieldName]
+			newFieldName := newField["name"].(string)
+			newFieldType := newField["type"].(string)
+			newFieldOptional := newField["optional"].(bool)
+			if !ok || newFieldName != fieldName {
+				// New field added
+				newFields = append(newFields, newField)
+			} else if newFieldType != fieldType || fieldOptional != newFieldOptional {
+				// drop and reload it
+				newFields = append(newFields, gut.StringMap{
+					"drop": true,
+					"name": newFieldName,
+					"type": fieldType,
+				})
+
+				// now added
+				newFields = append(newFields, gut.StringMap{
+					"name":     newFieldName,
+					"type":     newFieldType,
+					"optional": true,
+				})
+			}
+		}
+		if newFields != nil {
+			res, err := t.UpdateCollection(doctype, fields)
+			log.Println("Schema Update: ", doctype, res, err)
+			if err != nil {
+				panic(err)
+			}
+		}
+	}
+	return
 }

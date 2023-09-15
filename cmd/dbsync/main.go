@@ -5,18 +5,20 @@ import (
 	"io"
 	"log"
 	"net/http"
+	"strings"
 	"time"
 
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
+	gut "github.com/panyam/goutils/utils"
 	ohds "github.com/panyam/onehub/clients"
 	dbsync "github.com/panyam/onehub/dbsync"
-	"github.com/typesense/typesense-go/typesense"
+	// "github.com/typesense/typesense-go/typesense"
 )
 
 type PG2TS struct {
-	tsclient      *typesense.Client
-	tsclient2     *ohds.TSClient
+	// tsclient      *typesense.Client
+	tsclient      *ohds.TSClient
 	pgdb          *dbsync.PGDB
 	selChan       chan dbsync.Selection
 	currSelection dbsync.Selection
@@ -24,13 +26,13 @@ type PG2TS struct {
 }
 
 func NewPG2TS() *PG2TS {
-	tsclient := dbsync.NewTSClient("", "")
-	tsclient2 := ohds.NewClient("", "")
+	// tsclient := dbsync.NewTSClient("", "")
+	tsclient := ohds.NewClient("", "")
 	out := &PG2TS{
-		tsclient:  tsclient,
-		tsclient2: tsclient2,
-		pgdb:      dbsync.PGDBFromEnv(),
-		selChan:   make(chan dbsync.Selection),
+		tsclient: tsclient,
+		// tsclient2: tsclient2,
+		pgdb:    dbsync.PGDBFromEnv(),
+		selChan: make(chan dbsync.Selection),
 	}
 	out.msghandler = dbsync.PGMSGHandler{
 		DB: out.pgdb,
@@ -40,7 +42,8 @@ func NewPG2TS() *PG2TS {
 			// Typically we wouldnt be doing this when handling log events but rather
 			// on startup time
 			doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
-			dbsync.EnsureSchema(tsclient, doctype, tableInfo)
+			_, fieldMap := PGTableInfoToSchema(tableInfo)
+			tsclient.EnsureSchema(doctype, fieldMap)
 			return nil
 		},
 		HandleInsertMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
@@ -61,9 +64,9 @@ func NewPG2TS() *PG2TS {
 			}
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
-			result, err := tsclient2.Upsert(doctype, out["id"].(string), out)
+			result, err := tsclient.Upsert(doctype, out["id"].(string), out)
 			if err != nil {
-				schema, err2 := tsclient.Collection(doctype).Retrieve()
+				schema, err2 := tsclient.GetCollection(doctype)
 				log.Println("Error Upserting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
 				panic(err)
@@ -76,11 +79,10 @@ func NewPG2TS() *PG2TS {
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			docid := tableinfo.GetRecordID(msg.OldTuple, reln)
 			log.Println(fmt.Sprintf("Delete Message (%s/%s): ", doctype, docid), m.LastBegin, msg, reln)
-			doc := tsclient.Collection(doctype).Document(docid)
-			result, err := doc.Delete()
+			result, err := tsclient.DeleteDocument(doctype, docid)
 			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
 			if err != nil {
-				schema, err2 := tsclient.Collection(doctype).Delete()
+				schema, err2 := tsclient.DeleteCollection(doctype)
 				log.Println("Error Deleting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
 				panic(err)
@@ -157,4 +159,36 @@ func main() {
 	}()
 
 	p.Start()
+}
+
+func PGTableInfoToSchema(tableInfo *dbsync.PGTableInfo) (fields []gut.StringMap, fieldMap map[string]gut.StringMap) {
+	fieldMap = make(map[string]gut.StringMap)
+	for colname, colinfo := range tableInfo.ColInfo {
+		coltype := colinfo.ColumnType
+		log.Println("C: ", colinfo)
+		field := gut.StringMap{
+			"name":     colname,
+			"optional": true,
+			"type":     "string",
+		}
+		if coltype == "smallint" || coltype == "integer" {
+			field["type"] = "int32"
+		} else if colinfo.ColumnType == "bigint" {
+			field["type"] = "int64"
+		} else if strings.HasPrefix(colinfo.ColumnType, "timestamp") {
+			field["type"] = "int64"
+		} else if strings.HasPrefix(colinfo.ColumnType, "text") {
+			field["type"] = "string"
+		} else if strings.HasPrefix(colinfo.ColumnType, "json") {
+			field["type"] = "object"
+		} else if strings.ToLower(colinfo.ColumnType) == "array" {
+			field["type"] = "string[]"
+		} else {
+			log.Println("Invalid type in decoding: ", colinfo.ColumnType)
+			panic("Invalid type")
+		}
+		fields = append(fields, field)
+		fieldMap[colname] = field
+	}
+	return
 }
