@@ -127,6 +127,7 @@ services:
       DBSYNC_WM_TABLENAME: ${DBSYNC_WM_TABLENAME}
       DBSYNC_PUBNAME: ${DBSYNC_PUBNAME}
       DBSYNC_REPLSLOT: ${DBSYNC_REPLSLOT}
+      TYPESENSE_API_KEY: xyz
 
 #  ohfe:
 #    depends_on:

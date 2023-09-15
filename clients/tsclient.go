@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -14,6 +15,8 @@ import (
 
 	gut "github.com/panyam/goutils/utils"
 )
+
+var ErrEntityNotFound = errors.New("Entity Not Found")
 
 type TSClient struct {
 	Host   string
@@ -43,27 +46,33 @@ func (t *TSClient) Request(method string, endpoint string, body gut.StringMap) (
 	return t.RequestWithArgs(method, endpoint, "", body)
 }
 
-func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, body gut.StringMap) (gut.StringMap, error) {
+func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, body gut.StringMap) (response gut.StringMap, err error) {
 	if strings.HasPrefix(endpoint, "/") {
 		endpoint = endpoint[1:]
 	}
+	var req *http.Request
+	var resp *http.Response
 	url := fmt.Sprintf("%s/%s", t.Host, endpoint)
 	if args != "" {
 		url += "?" + args
 	}
-	reqBody, err := json.Marshal(body)
-	if err != nil {
-		return nil, err
+	var reqBody []byte
+	if body != nil {
+		reqBody, err = json.Marshal(body)
+		if err != nil {
+			return nil, err
+		}
+		log.Printf("BODY: %s", reqBody)
+		bodyReader := bytes.NewBuffer(reqBody)
+		req, err = http.NewRequest("POST", url, bodyReader)
+	} else {
+		req, err = http.NewRequest("POST", url, nil)
 	}
-	bodyReader := bytes.NewBuffer(reqBody)
-	req, err := http.NewRequest("POST", url, bodyReader)
 	if err != nil {
-		return nil, err
+		return
 	}
 
 	log.Printf("Sending request: 'POST %s", url)
-	log.Printf("BODY: %s", reqBody)
-
 	req.Header.Set("X-TYPESENSE-API-KEY", t.ApiKey)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -78,7 +87,10 @@ func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, 
 		Timeout:   30 * time.Second,
 		Transport: transport,
 	}
-	resp, err := client.Do(req)
+	resp, err = client.Do(req)
+	if resp.StatusCode == 404 {
+		return nil, ErrEntityNotFound
+	}
 	if err != nil {
 		fmt.Printf("client: error making http request: %s\n", err)
 		return nil, err
@@ -89,7 +101,6 @@ func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, 
 		return nil, err
 	}
 
-	var response gut.StringMap
 	err = json.Unmarshal(respbody, &response)
 	return response, err
 }
