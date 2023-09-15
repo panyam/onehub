@@ -160,10 +160,11 @@ func (t *TSClient) Upsert(doctype string, docid string, doc gut.StringMap) (out 
 	return t.Request("PATCH", endpoint, doc)
 }
 
-func (t *TSClient) EnsureSchema(doctype string, fieldMap map[string]gut.StringMap) {
-	var fields []gut.StringMap
-	for _, field := range fieldMap {
-		fields = append(fields, field)
+func (t *TSClient) EnsureSchema(doctype string, fields []gut.StringMap) {
+	fieldMap := make(map[string]gut.StringMap)
+	for _, field := range fields {
+		name := field["name"].(string)
+		fieldMap[name] = field
 	}
 	// fields, fieldMap := PGTableInfoToSchema(tableInfo)
 	schema := gut.StringMap{
@@ -221,5 +222,4 @@ func (t *TSClient) EnsureSchema(doctype string, fieldMap map[string]gut.StringMa
 			}
 		}
 	}
-	return
 }

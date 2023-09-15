@@ -11,6 +11,7 @@ import (
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
 	gut "github.com/panyam/goutils/utils"
+	"github.com/panyam/onehub/clients"
 	ohds "github.com/panyam/onehub/clients"
 	dbsync "github.com/panyam/onehub/dbsync"
 	// "github.com/typesense/typesense-go/typesense"
@@ -37,13 +38,12 @@ func NewPG2TS() *PG2TS {
 	out.msghandler = dbsync.PGMSGHandler{
 		DB: out.pgdb,
 		HandleRelationMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
-			log.Println("Relation Message: ", m.LastBegin, msg)
 			// Make sure we ahve an equivalent TS schema (or we could do this proactively at the start)
 			// Typically we wouldnt be doing this when handling log events but rather
 			// on startup time
 			doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
 			_, fieldMap := PGTableInfoToSchema(tableInfo)
-			tsclient.EnsureSchema(doctype, fieldMap)
+			log.Println(fmt.Sprintf("Relation Message (%s): ", doctype), m.LastBegin, msg, "Fields: ", fieldMap)
 			return nil
 		},
 		HandleInsertMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
@@ -65,7 +65,7 @@ func NewPG2TS() *PG2TS {
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
 			result, err := tsclient.Upsert(doctype, out["id"].(string), out)
-			if err != nil {
+			if err != nil && err != clients.ErrEntityNotFound {
 				schema, err2 := tsclient.GetCollection(doctype)
 				log.Println("Error Upserting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
@@ -81,7 +81,7 @@ func NewPG2TS() *PG2TS {
 			log.Println(fmt.Sprintf("Delete Message (%s/%s): ", doctype, docid), m.LastBegin, msg, reln)
 			result, err := tsclient.DeleteDocument(doctype, docid)
 			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
-			if err != nil {
+			if err != nil && err != clients.ErrEntityNotFound {
 				schema, err2 := tsclient.DeleteCollection(doctype)
 				log.Println("Error Deleting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
@@ -143,6 +143,35 @@ func main() {
 	p := NewPG2TS()
 
 	// Ensure right schemas on TS
+	p.tsclient.EnsureSchema("public.users", []gut.StringMap{
+		{"name": "id", "type": "string"},
+		{"name": "version", "type": "int64"},
+		{"name": "created_at", "type": "int64"},
+		{"name": "updated_at", "type": "int64"},
+		{"name": "name", "type": "string"},
+		{"name": "avatar", "type": "string", "optional": true},
+		{"name": "profile_data", "type": "object", "optional": true},
+	})
+	p.tsclient.EnsureSchema("public.messages", []gut.StringMap{
+		{"name": "id", "type": "string"},
+		{"name": "version", "type": "int64"},
+		{"name": "created_at", "type": "int64"},
+		{"name": "updated_at", "type": "int64"},
+		{"name": "user_id", "type": "string"},
+		{"name": "topic_id", "type": "string"},
+		{"name": "parent_id", "type": "string", "optional": true},
+		{"name": "source_id", "type": "string", "optional": true},
+		{"name": "content_type", "type": "string", "optional": true},
+		{"name": "content_text", "type": "string", "optional": true},
+		{"name": "content_data", "type": "object", "optional": true},
+	})
+	p.tsclient.EnsureSchema("public.topics", []gut.StringMap{
+		{"name": "id", "type": "string"},
+		{"name": "version", "type": "int64"},
+		{"name": "created_at", "type": "int64"},
+		{"name": "updated_at", "type": "int64"},
+		{"name": "users", "type": "string[]", "optional": true},
+	})
 
 	// Start a simple http server that listens to commands to control the replicator
 	// and to "introduce" selective dumps
