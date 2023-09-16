@@ -21,7 +21,10 @@
           "program": "cmd/dbsync/main.go",
           "cwd": "${workspaceFolder}",
           "dlvFlags": ["--check-go-version=false"],
-          "env": { "POSTGRES_PORT": "54321" }
+          "env": {
+            "POSTGRES_PORT": "54321",
+            "TYPESENSE_API_KEY": "xyz"
+          }
       }
       ,{
             "name": "Remote Debugger - OneHub Backend",

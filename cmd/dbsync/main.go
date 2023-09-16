@@ -78,7 +78,6 @@ func NewPG2TS() *PG2TS {
 			tableinfo := out.pgdb.GetTableInfo(reln.RelationID)
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			docid := tableinfo.GetRecordID(msg.OldTuple, reln)
-			log.Println(fmt.Sprintf("Delete Message (%s/%s): ", doctype, docid), m.LastBegin, msg, reln)
 			result, err := tsclient.DeleteDocument(doctype, docid)
 			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
 			if err != nil && err != clients.ErrEntityNotFound {

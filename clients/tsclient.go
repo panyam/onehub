@@ -16,11 +16,16 @@ import (
 	gut "github.com/panyam/goutils/utils"
 )
 
-var ErrEntityNotFound = errors.New("Entity Not Found")
+var ErrEntityNotFound = errors.New("entity not found")
+var ErrInvalidCredentials = errors.New("invalid credentials")
+var ErrAuthorized = errors.New("unauthorized")
+var ErrInvalidRequest = errors.New("request is invalid")
 
 type TSClient struct {
-	Host   string
-	ApiKey string
+	Host       string
+	ApiKey     string
+	LogRequest bool
+	LogBody    bool
 }
 
 func NewClient(host string, apikey string) *TSClient {
@@ -37,8 +42,10 @@ func NewClient(host string, apikey string) *TSClient {
 		}
 	}
 	return &TSClient{
-		Host:   host,
-		ApiKey: apikey,
+		Host:       host,
+		ApiKey:     apikey,
+		LogRequest: true,
+		LogBody:    true,
 	}
 }
 
@@ -47,9 +54,7 @@ func (t *TSClient) Request(method string, endpoint string, body gut.StringMap) (
 }
 
 func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, body gut.StringMap) (response gut.StringMap, err error) {
-	if strings.HasPrefix(endpoint, "/") {
-		endpoint = endpoint[1:]
-	}
+	endpoint = strings.TrimPrefix(endpoint, "/")
 	var req *http.Request
 	var resp *http.Response
 	url := fmt.Sprintf("%s/%s", t.Host, endpoint)
@@ -62,17 +67,15 @@ func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, 
 		if err != nil {
 			return nil, err
 		}
-		log.Printf("BODY: %s", reqBody)
 		bodyReader := bytes.NewBuffer(reqBody)
-		req, err = http.NewRequest("POST", url, bodyReader)
+		req, err = http.NewRequest(method, url, bodyReader)
 	} else {
-		req, err = http.NewRequest("POST", url, nil)
+		req, err = http.NewRequest(method, url, nil)
 	}
 	if err != nil {
 		return
 	}
 
-	log.Printf("Sending request: 'POST %s", url)
 	req.Header.Set("X-TYPESENSE-API-KEY", t.ApiKey)
 	req.Header.Set("Content-Type", "application/json")
 
@@ -87,18 +90,36 @@ func (t *TSClient) RequestWithArgs(method string, endpoint string, args string, 
 		Timeout:   30 * time.Second,
 		Transport: transport,
 	}
-	resp, err = client.Do(req)
-	if resp.StatusCode == 404 {
-		return nil, ErrEntityNotFound
+
+	log.Printf("Request: '%s %s", method, url)
+	if body != nil {
+		marshalled, _ := json.MarshalIndent(body, "", "  ")
+		log.Println("BODY: ", string(marshalled))
 	}
+	startTime := time.Now()
+	resp, err = client.Do(req)
 	if err != nil {
-		fmt.Printf("client: error making http request: %s\n", err)
+		log.Println("client: error making http request: ", err)
 		return nil, err
 	}
-
+	endTime := time.Now()
 	respbody, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, err
+	}
+	log.Printf("Response: %d in %f seconds", resp.StatusCode, (endTime.Sub(startTime)).Seconds())
+	if resp.StatusCode != 200 {
+		log.Println("Response Message: ", string(respbody))
+	}
+
+	if resp.StatusCode == 400 {
+		return nil, ErrInvalidRequest
+	} else if resp.StatusCode == 401 {
+		return nil, ErrInvalidCredentials
+	} else if resp.StatusCode == 403 {
+		return nil, ErrAuthorized
+	} else if resp.StatusCode == 404 {
+		return nil, ErrEntityNotFound
 	}
 
 	err = json.Unmarshal(respbody, &response)
@@ -189,13 +210,20 @@ func (t *TSClient) EnsureSchema(doctype string, fields []gut.StringMap) {
 		for _, ef := range existing["fields"].([]interface{}) {
 			efield := ef.(gut.StringMap)
 			fieldName := efield["name"].(string)
+			if fieldName == "id" {
+				// Field `id` cannot be altered.
+				continue
+			}
 			fieldType := efield["type"].(string)
 			fieldOptional := efield["optional"].(bool)
-			newField, ok := fieldMap[fieldName]
+			newField := fieldMap[fieldName]
 			newFieldName := newField["name"].(string)
 			newFieldType := newField["type"].(string)
-			newFieldOptional := newField["optional"].(bool)
-			if !ok || newFieldName != fieldName {
+			newFieldOptional := false
+			if _, ok := newField["optional"]; ok {
+				newFieldOptional = newField["optional"].(bool)
+			}
+			if newFieldName != fieldName {
 				// New field added
 				newFields = append(newFields, newField)
 			} else if newFieldType != fieldType || fieldOptional != newFieldOptional {
@@ -215,7 +243,7 @@ func (t *TSClient) EnsureSchema(doctype string, fields []gut.StringMap) {
 			}
 		}
 		if newFields != nil {
-			res, err := t.UpdateCollection(doctype, fields)
+			res, err := t.UpdateCollection(doctype, newFields)
 			log.Println("Schema Update: ", doctype, res, err)
 			if err != nil {
 				panic(err)
