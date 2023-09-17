@@ -181,69 +181,107 @@ func (t *TSClient) Upsert(doctype string, docid string, doc gut.StringMap) (out 
 	return t.Request("PATCH", endpoint, doc)
 }
 
-func (t *TSClient) EnsureSchema(doctype string, fields []gut.StringMap) {
-	fieldMap := make(map[string]gut.StringMap)
-	for _, field := range fields {
-		name := field["name"].(string)
-		fieldMap[name] = field
+func fieldDifferent(oldField gut.StringMap, newField gut.StringMap) bool {
+	if oldField == nil {
+		return true
 	}
+	newFieldType := newField["type"].(string)
+	newFieldOptional := false
+	if _, ok := newField["optional"]; ok {
+		newFieldOptional = newField["optional"].(bool)
+	}
+	oldFieldType := oldField["type"].(string)
+	oldFieldOptional := false
+	if _, ok := oldField["optional"]; ok {
+		oldFieldOptional = oldField["optional"].(bool)
+	}
+	if newFieldType != oldFieldType || oldFieldOptional != newFieldOptional {
+		return true
+	}
+	// TODO - check other field attribs too
+	return false
+}
+
+func (t *TSClient) EnsureSchema(doctype string, newFields []gut.StringMap) {
 	// fields, fieldMap := PGTableInfoToSchema(tableInfo)
-	schema := gut.StringMap{
-		"name":                 doctype,
-		"enable_nested_fields": true,
-		"fields":               fields,
-	}
 	existing, err := t.GetCollection(doctype)
 	if err != nil {
 		log.Println("Schema Fetch Error: ", err)
 	}
 	if existing == nil {
+		schema := gut.StringMap{
+			"name":                 doctype,
+			"enable_nested_fields": true,
+			"fields":               newFields,
+		}
 		res, err := t.CreateCollection(schema)
 		log.Println("Schema Creation: ", doctype, res, err)
 		if err != nil {
 			panic(err)
 		}
 	} else {
-		// TODO - check there are *acutally* changes first
-		// update it
-		var newFields []gut.StringMap
-		for _, ef := range existing["fields"].([]interface{}) {
-			efield := ef.(gut.StringMap)
-			fieldName := efield["name"].(string)
-			if fieldName == "id" {
+		oldFields := existing["fields"].([]interface{})
+		oldFieldMap := make(map[string]gut.StringMap)
+		for _, f := range oldFields {
+			field := f.(gut.StringMap)
+			name := field["name"].(string)
+			oldFieldMap[name] = field
+		}
+		newFieldMap := make(map[string]gut.StringMap)
+		for _, field := range newFields {
+			name := field["name"].(string)
+			newFieldMap[name] = field
+		}
+		// Go through *new* fields and see which either dont exist
+		// or have changed and add those
+		var patchinfo []gut.StringMap
+		for _, newField := range newFields {
+			newFieldName := newField["name"].(string)
+			// Does it not exist in prev?
+			if newFieldName == "id" {
 				// Field `id` cannot be altered.
 				continue
 			}
-			fieldType := efield["type"].(string)
-			fieldOptional := efield["optional"].(bool)
-			newField := fieldMap[fieldName]
-			newFieldName := newField["name"].(string)
-			newFieldType := newField["type"].(string)
-			newFieldOptional := false
-			if _, ok := newField["optional"]; ok {
-				newFieldOptional = newField["optional"].(bool)
-			}
-			if newFieldName != fieldName {
-				// New field added
-				newFields = append(newFields, newField)
-			} else if newFieldType != fieldType || fieldOptional != newFieldOptional {
-				// drop and reload it
-				newFields = append(newFields, gut.StringMap{
-					"drop": true,
-					"name": newFieldName,
-					"type": fieldType,
-				})
+			oldField, ok := oldFieldMap[newFieldName]
+			if !ok || oldField == nil {
+				// It does not exist in the old set so just add it
+				patchinfo = append(patchinfo, newField)
+			} else {
+				if fieldDifferent(newField, oldField) {
+					// drop and reload it
+					patchinfo = append(patchinfo, gut.StringMap{
+						"drop": true,
+						"name": newFieldName,
+					})
 
-				// now added
-				newFields = append(newFields, gut.StringMap{
-					"name":     newFieldName,
-					"type":     newFieldType,
-					"optional": true,
+					// now added
+					patchinfo = append(patchinfo, newField)
+				}
+			}
+		}
+
+		// Now go through fields that have been "droped"
+		for _, f := range oldFields {
+			oldField := f.(gut.StringMap)
+			oldFieldName := oldField["name"].(string)
+			// Does it not exist in prev?
+			if oldFieldName == "id" {
+				// Field `id` cannot be altered.
+				continue
+			}
+			newField, ok := newFieldMap[oldFieldName]
+			if !ok || newField == nil {
+				// Does not exist in new so drop it
+				// It does not exist in the old set so just add it
+				patchinfo = append(patchinfo, gut.StringMap{
+					"drop": true,
+					"name": oldFieldName,
 				})
 			}
 		}
-		if newFields != nil {
-			res, err := t.UpdateCollection(doctype, newFields)
+
+		if patchinfo != nil {
+			res, err := t.UpdateCollection(doctype, patchinfo)
 			log.Println("Schema Update: ", doctype, res, err)
 			if err != nil {
 				panic(err)
