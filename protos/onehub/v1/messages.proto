@@ -22,6 +22,16 @@ service MessageService {
   }
 
   /**
+   * Import messages in bulk
+   */
+  rpc ImportMessages(ImportMessagesRequest) returns (ImportMessagesResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages:import",
+      body: "*",
+    };
+  }
+
+  /**
    * List all messages in a topic
    */
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) { 

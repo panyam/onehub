@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	MessageService_CreateMessages_FullMethodName = "/onehub.v1.MessageService/CreateMessages"
+	MessageService_ImportMessages_FullMethodName = "/onehub.v1.MessageService/ImportMessages"
 	MessageService_ListMessages_FullMethodName   = "/onehub.v1.MessageService/ListMessages"
 	MessageService_GetMessage_FullMethodName     = "/onehub.v1.MessageService/GetMessage"
 	MessageService_GetMessages_FullMethodName    = "/onehub.v1.MessageService/GetMessages"
@@ -34,6 +35,9 @@ type MessageServiceClient interface {
 	// *
 	// Create a single message or messages in batch
 	CreateMessages(ctx context.Context, in *CreateMessagesRequest, opts ...grpc.CallOption) (*CreateMessagesResponse, error)
+	// *
+	// Import messages in bulk
+	ImportMessages(ctx context.Context, in *ImportMessagesRequest, opts ...grpc.CallOption) (*ImportMessagesResponse, error)
 	// *
 	// List all messages in a topic
 	ListMessages(ctx context.Context, in *ListMessagesRequest, opts ...grpc.CallOption) (*ListMessagesResponse, error)
@@ -62,6 +66,15 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 func (c *messageServiceClient) CreateMessages(ctx context.Context, in *CreateMessagesRequest, opts ...grpc.CallOption) (*CreateMessagesResponse, error) {
 	out := new(CreateMessagesResponse)
 	err := c.cc.Invoke(ctx, MessageService_CreateMessages_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageServiceClient) ImportMessages(ctx context.Context, in *ImportMessagesRequest, opts ...grpc.CallOption) (*ImportMessagesResponse, error) {
+	out := new(ImportMessagesResponse)
+	err := c.cc.Invoke(ctx, MessageService_ImportMessages_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -121,6 +134,9 @@ type MessageServiceServer interface {
 	// Create a single message or messages in batch
 	CreateMessages(context.Context, *CreateMessagesRequest) (*CreateMessagesResponse, error)
 	// *
+	// Import messages in bulk
+	ImportMessages(context.Context, *ImportMessagesRequest) (*ImportMessagesResponse, error)
+	// *
 	// List all messages in a topic
 	ListMessages(context.Context, *ListMessagesRequest) (*ListMessagesResponse, error)
 	// *
@@ -143,6 +159,9 @@ type UnimplementedMessageServiceServer struct {
 
 func (UnimplementedMessageServiceServer) CreateMessages(context.Context, *CreateMessagesRequest) (*CreateMessagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMessages not implemented")
+}
+func (UnimplementedMessageServiceServer) ImportMessages(context.Context, *ImportMessagesRequest) (*ImportMessagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ImportMessages not implemented")
 }
 func (UnimplementedMessageServiceServer) ListMessages(context.Context, *ListMessagesRequest) (*ListMessagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListMessages not implemented")
@@ -185,6 +204,24 @@ func _MessageService_CreateMessages_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MessageServiceServer).CreateMessages(ctx, req.(*CreateMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MessageService_ImportMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ImportMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServiceServer).ImportMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MessageService_ImportMessages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServiceServer).ImportMessages(ctx, req.(*ImportMessagesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -289,6 +326,10 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMessages",
 			Handler:    _MessageService_CreateMessages_Handler,
+		},
+		{
+			MethodName: "ImportMessages",
+			Handler:    _MessageService_ImportMessages_Handler,
 		},
 		{
 			MethodName: "ListMessages",

@@ -16,7 +16,7 @@ OUT_DIR:=$(SRC_DIR)/gen/go
 all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
 up: down
-	docker compose up --remove-orphans
+	docker compose up --remove-orphans -d
 
 down:
 	docker compose down --remove-orphans

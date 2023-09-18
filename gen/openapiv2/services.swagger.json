@@ -209,6 +209,40 @@
         ]
       }
     },
+    "/v1/messages:import": {
+      "post": {
+        "summary": "*\nImport messages in bulk",
+        "operationId": "MessageService_ImportMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ImportMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "*\nBulk importing of messages with very minimal checks.\nHere no validation is performed on the messages (ie checking topic IDS)\nsetting current user id, setting created/updated time stamps etc.\n\nUse this either for recovery (typically you should do DR on the DB) or\nor for testing.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ImportMessagesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
     "/v1/topics": {
       "get": {
         "summary": "*\nList all topics from a user.",
@@ -986,6 +1020,34 @@
         }
       },
       "title": "*\nUser batch-get response"
+    },
+    "v1ImportMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
+          "title": "*\nMessage being updated"
+        }
+      },
+      "description": "*\nBulk importing of messages with very minimal checks.\nHere no validation is performed on the messages (ie checking topic IDS)\nsetting current user id, setting created/updated time stamps etc.\n\nUse this either for recovery (typically you should do DR on the DB) or\nor for testing."
+    },
+    "v1ImportMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
+          "title": "*\nMessage being created"
+        }
+      },
+      "description": "*\nResponse of an message import."
     },
     "v1ListMessagesResponse": {
       "type": "object",

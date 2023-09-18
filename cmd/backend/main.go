@@ -156,8 +156,6 @@ func ErrorLogger( /* Add configs here */ ) grpc.UnaryServerInterceptor {
 				err = status.Errorf(codes.Internal, "panic: %s", r)
 				errmsg := fmt.Sprintf("[PANIC] %s\n\n%s", r, string(debug.Stack()))
 				log.Println(errmsg)
-			} else {
-				log.Println("onPanic: ", string(debug.Stack()))
 			}
 		}
 		defer onPanic()
