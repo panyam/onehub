@@ -15,7 +15,7 @@ require (
 	github.com/gin-contrib/sessions v0.0.5
 	github.com/gin-gonic/gin v1.8.1
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.1
-	github.com/panyam/goutils v0.0.38
+	github.com/panyam/goutils v0.0.40
 	github.com/stretchr/testify v1.8.4
 	google.golang.org/genproto/googleapis/api v0.0.0-20230724170836-66ad5b6ff146
 	gorm.io/driver/postgres v1.5.2

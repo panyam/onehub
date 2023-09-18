@@ -11,7 +11,6 @@ import (
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
 	gut "github.com/panyam/goutils/utils"
-	"github.com/panyam/onehub/clients"
 	ohds "github.com/panyam/onehub/clients"
 	dbsync "github.com/panyam/onehub/dbsync"
 	// "github.com/typesense/typesense-go/typesense"
@@ -24,6 +23,8 @@ type PG2TS struct {
 	selChan       chan dbsync.Selection
 	currSelection dbsync.Selection
 	msghandler    dbsync.PGMSGHandler
+	upserts       map[string](map[string]gut.StringMap)
+	deletions     map[string](map[string]bool)
 }
 
 func NewPG2TS() *PG2TS {
@@ -32,8 +33,10 @@ func NewPG2TS() *PG2TS {
 	out := &PG2TS{
 		tsclient: tsclient,
 		// tsclient2: tsclient2,
-		pgdb:    dbsync.PGDBFromEnv(),
-		selChan: make(chan dbsync.Selection),
+		pgdb:      dbsync.PGDBFromEnv(),
+		selChan:   make(chan dbsync.Selection),
+		upserts:   make(map[string](map[string]gut.StringMap)),
+		deletions: make(map[string](map[string]bool)),
 	}
 	out.msghandler = dbsync.PGMSGHandler{
 		DB: out.pgdb,
@@ -50,42 +53,59 @@ func NewPG2TS() *PG2TS {
 			log.Println("Insert Message: ", m.LastBegin, msg, reln)
 			// Now write this to our typesense index
 
-			pkey, out, errors := dbsync.MessageToMap(out.pgdb, msg.Tuple, reln)
+			pkey, outmap, errors := dbsync.MessageToMap(out.pgdb, msg.Tuple, reln)
 			if errors != nil {
 				log.Println("Error converting to map: ", pkey, errors)
 			}
 			// log.Println("Converted: ", pkey, out)
 
-			if _, ok := out["created_at"]; ok {
-				out["created_at"] = out["created_at"].(time.Time).Unix()
+			if _, ok := outmap["created_at"]; ok {
+				outmap["created_at"] = outmap["created_at"].(time.Time).Unix()
 			}
-			if _, ok := out["updated_at"]; ok {
-				out["updated_at"] = out["updated_at"].(time.Time).Unix()
+			if _, ok := outmap["updated_at"]; ok {
+				outmap["updated_at"] = outmap["updated_at"].(time.Time).Unix()
 			}
+			tableinfo := out.pgdb.GetTableInfo(reln.RelationID)
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
-			result, err := tsclient.Upsert(doctype, out["id"].(string), out)
-			if err != nil && err != clients.ErrEntityNotFound {
+			// docid := outmap["id"].(string)
+			docid := tableinfo.GetRecordID(msg.Tuple, reln)
+
+			if _, ok := out.upserts[doctype]; !ok {
+				out.upserts[doctype] = make(map[string]gut.StringMap)
+			}
+			if _, ok := out.deletions[doctype]; !ok {
+				out.deletions[doctype] = make(map[string]bool)
+			}
+			delete(out.deletions[doctype], docid)
+			out.upserts[doctype][docid] = outmap
+
+			/* - Uncomment to do single gets instead of batch
+			result, err := tsclient.Upsert(doctype, docid, outmap)
+			if err != nil && clients.TSErrorCode(err) != clients.ErrCodeEntityNotFound {
 				schema, err2 := tsclient.GetCollection(doctype)
 				log.Println("Error Upserting: ", result, err)
 				log.Println("Old Schema: ", schema, err2)
 				panic(err)
 			}
+			*/
 
 			return nil
 		},
 		HandleDeleteMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {
+			// Instead of individual deletes we will batch them by collections
 			tableinfo := out.pgdb.GetTableInfo(reln.RelationID)
 			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
 			docid := tableinfo.GetRecordID(msg.OldTuple, reln)
-			result, err := tsclient.DeleteDocument(doctype, docid)
-			// result, err := tsclient.Collections(doctype).Documents(docid).Delete()
-			if err != nil && err != clients.ErrEntityNotFound {
-				schema, err2 := tsclient.DeleteCollection(doctype)
-				log.Println("Error Deleting: ", result, err)
-				log.Println("Old Schema: ", schema, err2)
-				panic(err)
+
+			if _, ok := out.upserts[doctype]; !ok {
+				out.upserts[doctype] = make(map[string]gut.StringMap)
 			}
+			if _, ok := out.deletions[doctype]; !ok {
+				out.deletions[doctype] = make(map[string]bool)
+			}
+			delete(out.upserts[doctype], docid)
+			out.deletions[doctype][docid] = true
 			return nil
 		},
 		HandleUpdateMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {
@@ -105,12 +125,36 @@ func (p *PG2TS) NewLogQueue() *dbsync.LogQueue {
 		}
 		for i, rawmsg := range msgs {
 			err := p.msghandler.HandleMessage(i, &rawmsg)
+			// Handle batch deletions
 			if err == dbsync.ErrStopProcessingMessages {
 				break
 			} else if err != nil {
 				log.Println("Error handling message: ", i, err)
 			}
 		}
+		for doctype, docs := range p.deletions {
+			docids := gut.MapKeys[string](docs)
+			if len(docids) > 0 {
+				res, err := p.tsclient.BatchDelete(doctype, docids)
+				if err != nil {
+					log.Println("Error deleting: ", doctype, docids, err, res)
+				}
+			}
+		}
+
+		// And batch inserts too
+		for doctype, docmaps := range p.upserts {
+			if len(docmaps) > 0 {
+				docs := gut.MapValues[gut.StringMap](docmaps)
+				res, err := p.tsclient.BatchUpsert(doctype, docs)
+				if err != nil {
+					log.Println("Batch Upsert Error: ", doctype, err, res)
+				}
+			}
+		}
+		// Reset this stuff
+		p.upserts = make(map[string]map[string]gut.StringMap)
+		p.deletions = make(map[string]map[string]bool)
 		if p.msghandler.LastCommit > 0 {
 			return p.msghandler.LastCommit + 1, false
 		} else {
