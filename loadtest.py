@@ -1,4 +1,4 @@
-import ipdb
+from ipdb import set_trace
 from collections import defaultdict
 import itertools
 import time
@@ -67,6 +67,19 @@ def ensure_users(nusers=100):
             print("Created User: ", user)
     return out
 
+def extract_topic_title(msg, max_length=40):
+    parts = [m.strip() for m in msg.replace("\t", " ").split(" ") if m.strip()]
+    if len(parts) == 1:
+        return parts[0][:max_length]
+    else:
+        out = []
+        for i,part in enumerate(parts):
+            out.append(part)
+            if len(" ".join(out)) > max_length:
+                out.pop()
+                break
+        return " ".join(out)
+
 def ensure_topics(users, ntopics=100):
     lines = list(csv.reader(open("./chatmessages.csv")))
     topics = {}
@@ -79,7 +92,7 @@ def ensure_topics(users, ntopics=100):
             currtid = tid
             # create new topic
             tid = f"lt{tid}"
-            topicname = msg
+            topicname = extract_topic_title(msg)
             topic = {"topic": { "id": tid, "name": topicname, }}
             resp = requests.get(f"http://{auth}@localhost:7080/api/v1/topics/{tid}")
             if resp.status_code == 200:

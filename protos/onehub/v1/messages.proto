@@ -103,6 +103,31 @@ message CreateMessagesResponse {
 }
 
 /**
+ * Bulk importing of messages with very minimal checks.
+ * Here no validation is performed on the messages (ie checking topic IDS)
+ * setting current user id, setting created/updated time stamps etc.
+ * 
+ * Use this either for recovery (typically you should do DR on the DB) or
+ * or for testing.
+ */
+message ImportMessagesRequest {
+  /**
+   * Message being updated
+   */
+  repeated Message messages = 2;
+}
+
+/**
+ * Response of an message import.
+ */
+message ImportMessagesResponse {
+  /**
+   * Message being created
+   */
+  repeated Message messages = 1;
+}
+
+/**
  * A message listing request.  For now only paginations params are provided.
  */
 message ListMessagesRequest {

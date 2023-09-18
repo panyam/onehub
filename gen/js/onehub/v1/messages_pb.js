@@ -36,6 +36,37 @@ export const CreateMessagesResponse = proto3.makeMessageType(
 
 /**
  * *
+ * Bulk importing of messages with very minimal checks.
+ * Here no validation is performed on the messages (ie checking topic IDS)
+ * setting current user id, setting created/updated time stamps etc.
+ *
+ * Use this either for recovery (typically you should do DR on the DB) or
+ * or for testing.
+ *
+ * @generated from message onehub.v1.ImportMessagesRequest
+ */
+export const ImportMessagesRequest = proto3.makeMessageType(
+  "onehub.v1.ImportMessagesRequest",
+  () => [
+    { no: 2, name: "messages", kind: "message", T: Message, repeated: true },
+  ],
+);
+
+/**
+ * *
+ * Response of an message import.
+ *
+ * @generated from message onehub.v1.ImportMessagesResponse
+ */
+export const ImportMessagesResponse = proto3.makeMessageType(
+  "onehub.v1.ImportMessagesResponse",
+  () => [
+    { no: 1, name: "messages", kind: "message", T: Message, repeated: true },
+  ],
+);
+
+/**
+ * *
  * A message listing request.  For now only paginations params are provided.
  *
  * @generated from message onehub.v1.ListMessagesRequest

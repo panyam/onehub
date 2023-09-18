@@ -89,6 +89,71 @@ export declare class CreateMessagesResponse extends Message<CreateMessagesRespon
 
 /**
  * *
+ * Bulk importing of messages with very minimal checks.
+ * Here no validation is performed on the messages (ie checking topic IDS)
+ * setting current user id, setting created/updated time stamps etc.
+ *
+ * Use this either for recovery (typically you should do DR on the DB) or
+ * or for testing.
+ *
+ * @generated from message onehub.v1.ImportMessagesRequest
+ */
+export declare class ImportMessagesRequest extends Message<ImportMessagesRequest> {
+  /**
+   * *
+   * Message being updated
+   *
+   * @generated from field: repeated onehub.v1.Message messages = 2;
+   */
+  messages: Message$1[];
+
+  constructor(data?: PartialMessage<ImportMessagesRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.ImportMessagesRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImportMessagesRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImportMessagesRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImportMessagesRequest;
+
+  static equals(a: ImportMessagesRequest | PlainMessage<ImportMessagesRequest> | undefined, b: ImportMessagesRequest | PlainMessage<ImportMessagesRequest> | undefined): boolean;
+}
+
+/**
+ * *
+ * Response of an message import.
+ *
+ * @generated from message onehub.v1.ImportMessagesResponse
+ */
+export declare class ImportMessagesResponse extends Message<ImportMessagesResponse> {
+  /**
+   * *
+   * Message being created
+   *
+   * @generated from field: repeated onehub.v1.Message messages = 1;
+   */
+  messages: Message$1[];
+
+  constructor(data?: PartialMessage<ImportMessagesResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.ImportMessagesResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImportMessagesResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImportMessagesResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImportMessagesResponse;
+
+  static equals(a: ImportMessagesResponse | PlainMessage<ImportMessagesResponse> | undefined, b: ImportMessagesResponse | PlainMessage<ImportMessagesResponse> | undefined): boolean;
+}
+
+/**
+ * *
  * A message listing request.  For now only paginations params are provided.
  *
  * @generated from message onehub.v1.ListMessagesRequest
