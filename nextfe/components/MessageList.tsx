@@ -30,8 +30,16 @@ export default function Container(props: any) {
     if (props.topicId == null) return
     api.getMessages(props.topicId).then(resp => {
       console.log("Bingo: ", resp)
-      setMessageList(new ResultList<any>(resp.messages))
-      setTimeout(() => { scrollTo(-1) }, 0)
+      // get all suers in this list of messages
+      const userids = new Set<string>()
+      for (const msg of resp.messages) {
+        userids.add(msg.userId)
+      }
+      const messages = resp.messages
+      api.getUserInfos(Array.from(userids.values())).then(resp => {
+        setMessageList(new ResultList<any>(messages))
+        setTimeout(() => { scrollTo(-1) }, 0)
+      });
     });
   }, [props.topicId, msglistElem, msgscrollerElem])
 

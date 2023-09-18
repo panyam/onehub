@@ -45,6 +45,12 @@ export class Api {
     return resp.data
   }
 
+  async getUserInfos(userids: string[]): Promise<any> {
+    const path = this.getApiPath(`users:batchGet?ids=${userids.join(',')}`)
+    const resp = await axios.get(path, {auth: this.basicAuthParamsFor("admin")})
+    return resp.data
+  }
+
   async getUserInfo(userid: string): Promise<any> {
     const resp = await axios.get(this.getApiPath(`users/${userid}`), {auth: this.basicAuthParamsFor(userid)})
     return resp.data
