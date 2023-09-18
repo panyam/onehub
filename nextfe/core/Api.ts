@@ -83,7 +83,8 @@ export class Api {
   }
 
   async createMessage(topicId: string, message: any): Promise<any> {
-    const resp = await axios.post(this.getApiPath(`topics/${topicId}/messages`), message, {auth: this.basicAuthParams})
-    return resp.data
+    const path = this.getApiPath(`topics/${topicId}/messages`)
+    const resp = await axios.post(path, {"messages": [message]}, {auth: this.basicAuthParams})
+    return resp.data["messages"][0]
   }
 }

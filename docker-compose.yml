@@ -84,7 +84,7 @@ services:
       - ./datastore:/app/datastore
       - ./protos:/app/protos
       - ./services:/app/services
-    command: ["air", "-c", "cmd/backend/.air.debug.toml"]
+    command: ["air", "-c", "cmd/backend/.air.toml"]
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}

@@ -56,7 +56,7 @@ export default function Container(props: any) {
       const newItems = [...currItems]
       for (const tevent of props.topicEvents) {
         if (tevent.type == "new_message") {
-          newItems.push(tevent.value.message)
+          newItems.push(tevent.value)
         }
       }
       setMessageList(new ResultList<any>(newItems))
