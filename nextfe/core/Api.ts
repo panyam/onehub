@@ -5,7 +5,7 @@ import Auth from './Auth'
 export class Api {
   auth = new Auth()
 
-  basicAuthParamsFor(username) {
+  basicAuthParamsFor(username: string) {
     return {
       username: username,
       password: username + "123",
@@ -46,7 +46,8 @@ export class Api {
   }
 
   async getUserInfos(userids: string[]): Promise<any> {
-    const path = this.getApiPath(`users:batchGet?ids=${userids.join(',')}`)
+    const userIds = userids.map(uid => "ids=" + uid)
+    const path = this.getApiPath(`users:batchGet?${userIds.join('&')}`)
     const resp = await axios.get(path, {auth: this.basicAuthParamsFor("admin")})
     return resp.data
   }

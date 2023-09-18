@@ -25,6 +25,7 @@ export default function Container(props: any) {
   const [messageList, setMessageList] = useState(new ResultList<any>([]));
   const [msglistElem, setMsgListElem] = useState<Element | null>(null);
   const [msgscrollerElem, setMsgScrollerElem] = useState<Element | null>(null);
+  const [userMap, setUserMap] = useState<Map<string, any>>(new Map<string, any>());
   useEffect(() => {
     console.log("TopicId: ", props.topicId)
     if (props.topicId == null) return
@@ -36,7 +37,10 @@ export default function Container(props: any) {
         userids.add(msg.userId)
       }
       const messages = resp.messages
+      const newUserMap = new Map(userMap)
       api.getUserInfos(Array.from(userids.values())).then(resp => {
+        for (const uid in resp.users) { newUserMap.set(uid, resp.users[uid]) }
+        setUserMap(newUserMap)
         setMessageList(new ResultList<any>(messages))
         setTimeout(() => { scrollTo(-1) }, 0)
       });
@@ -87,8 +91,9 @@ export default function Container(props: any) {
       <div ref={setMsgScrollerElem} className={styles.msgscroller}>{
               messageList.items.map((message, index) => {
                 return <MessageView
-                            message={message}
-                            key={message.id} />
+                          user = {userMap.get(message.userId)}
+                          message={message}
+                          key={message.id} />
               })
             }
             <div className={styles.bottomanchor}></div>
