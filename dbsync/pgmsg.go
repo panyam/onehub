@@ -69,7 +69,7 @@ func (p *PGMSGHandler) HandleMessage(idx int, rawmsg *PGMSG) (err error) {
 			msg.Decode(rawmsg.Data[1:])
 			return p.HandleBeginMessage(p, idx, &msg)
 		} else {
-			log.Println("Begin Transaction: ", rawmsg)
+			// log.Println("Begin Transaction: ", rawmsg)
 		}
 	case 'C':
 		p.LastCommit = idx
@@ -78,7 +78,7 @@ func (p *PGMSGHandler) HandleMessage(idx int, rawmsg *PGMSG) (err error) {
 			msg.Decode(rawmsg.Data[1:])
 			return p.HandleCommitMessage(p, idx, &msg)
 		} else {
-			log.Println("Commit Transaction: ", p.LastBegin, rawmsg)
+			// log.Println("Commit Transaction: ", p.LastBegin, rawmsg)
 		}
 	case 'R':
 		if p.HandleRelationMessage != nil {

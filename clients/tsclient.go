@@ -149,7 +149,7 @@ func (t *TSClient) Call(req *http.Request) (response interface{}, err error) {
 	}
 
 	if resp.StatusCode >= 400 {
-		err = &TSError{resp.StatusCode, string(respbody)}
+		return nil, &TSError{resp.StatusCode, string(respbody)}
 	}
 
 	content_type := resp.Header.Get("Content-Type")
@@ -258,7 +258,6 @@ func (t *TSClient) BatchUpsert(doctype string, docs []gut.StringMap) (interface{
 		jsonlines = append(jsonlines, marshalled...)
 	}
 	endpoint := fmt.Sprintf("collections/%s/documents/import?action=upsert", doctype)
-	log.Println("JsonLines: ", string(jsonlines))
 	req, err := t.MakeBytesRequest("POST", endpoint, jsonlines)
 	req.Header.Set("Content-Type", "application/jsonlines")
 	if err != nil {

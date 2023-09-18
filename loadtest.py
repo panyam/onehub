@@ -6,6 +6,20 @@ import random
 import csv
 import requests
 
+
+def tsreq(path, method="GET", body=None):
+    methfunc = getattr(requests, method.lower().strip())
+    headers = { "X-TYPESENSE-API-KEY": "xyz" }
+    json=False
+    if body is None or type(body) is dict:
+        json=True
+        headers["Content-Type"] = "application/json"
+    url = f"http://localhost:8108/{path}"
+    if json:
+        return methfunc(url, headers=headers, json=body)
+    else:
+        return methfunc(url, headers=headers, data=body)
+
 def sendmsg(users, tid, msg):
     creator = random.choice(users)["id"]
     auth = f"{creator}:{creator}123"
@@ -88,11 +102,12 @@ def grouped_messages():
     grouped.sort()
     return grouped
 
-def generate_batch_messages(users, topics, start=0, ngroups=100):
+def generate_batch_messages(users, topics, start=0, ngroups=100000):
     grouped = grouped_messages() 
     starttime = time.time()
     count = 0
     for tid, msgs in grouped[start:ngroups]:
+        print(f"Generating messages for topic: {tid}")
         tid = 1 + (int(tid) % len(topics))
         sendmsgs(users, f"lt{tid}", msgs)
         count += len(msgs)
@@ -102,9 +117,13 @@ def generate_batch_messages(users, topics, start=0, ngroups=100):
 def generate_messages(users, topics, start=0, count=1000):
     lines = list(csv.reader(open("./chatmessages.csv")))
     starttime = time.time()
+    lasttid = None
     for tid, msg in lines[start:count]:
         tid = 1 + (int(tid) % len(topics))
+        if tid is not lasttid:
+            print(f"Generating messages for topic: {tid}")
         sendmsg(users, f"lt{tid}", msg)
+        lasttid = tid
     endtime = time.time()
     print(f"Generated {count} messages in {endtime - starttime} seconds")
 

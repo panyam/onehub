@@ -44,13 +44,13 @@ func NewPG2TS() *PG2TS {
 			// Make sure we ahve an equivalent TS schema (or we could do this proactively at the start)
 			// Typically we wouldnt be doing this when handling log events but rather
 			// on startup time
-			doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
-			_, fieldMap := PGTableInfoToSchema(tableInfo)
-			log.Println(fmt.Sprintf("Relation Message (%s): ", doctype), m.LastBegin, msg, "Fields: ", fieldMap)
+			// doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
+			// _, fieldMap := PGTableInfoToSchema(tableInfo)
+			// log.Println(fmt.Sprintf("Relation Message (%s): ", doctype), m.LastBegin, msg, "Fields: ", fieldMap)
 			return nil
 		},
 		HandleInsertMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
-			log.Println("Insert Message: ", m.LastBegin, msg, reln)
+			// log.Println("Insert Message: ", m.LastBegin, msg, reln)
 			// Now write this to our typesense index
 
 			pkey, outmap, errors := dbsync.MessageToMap(out.pgdb, msg.Tuple, reln)
@@ -109,7 +109,7 @@ func NewPG2TS() *PG2TS {
 			return nil
 		},
 		HandleUpdateMessage: func(m *dbsync.PGMSGHandler, idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {
-			log.Println("Update Message: ", m.LastBegin, msg, reln)
+			// log.Println("Update Message: ", m.LastBegin, msg, reln)
 			return nil
 		},
 	}
@@ -118,7 +118,7 @@ func NewPG2TS() *PG2TS {
 
 func (p *PG2TS) NewLogQueue() *dbsync.LogQueue {
 	logQueue := dbsync.NewLogQueue(p.pgdb, func(msgs []dbsync.PGMSG, err error) (numProcessed int, stop bool) {
-		log.Println("Curr Selection:", p.currSelection)
+		// log.Println("Curr Selection:", p.currSelection)
 		if err != nil {
 			log.Println("Error processing messsages: ", err)
 			return 0, false
@@ -237,7 +237,6 @@ func PGTableInfoToSchema(tableInfo *dbsync.PGTableInfo) (fields []gut.StringMap,
 	fieldMap = make(map[string]gut.StringMap)
 	for colname, colinfo := range tableInfo.ColInfo {
 		coltype := colinfo.ColumnType
-		log.Println("C: ", colinfo)
 		field := gut.StringMap{
 			"name":     colname,
 			"optional": true,
