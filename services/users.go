@@ -79,16 +79,21 @@ func (s *UserService) GetUser(ctx context.Context, req *protos.GetUserRequest) (
 
 func (s *UserService) GetUsers(ctx context.Context, req *protos.GetUsersRequest) (resp *protos.GetUsersResponse, err error) {
 	log.Println("Batch Getting Users: ", req.Ids, len(req.Ids))
-	users := gut.BatchGet(req.Ids, func(id string) (out *protos.User, err error) {
-		resp, err := s.GetUser(ctx, &protos.GetUserRequest{Id: id})
-		if err != nil {
-			return nil, err
-		}
-		return resp.User, nil
-	})
-	resp = &protos.GetUsersResponse{
-		Users: users,
+	users, err := s.DB.GetUsers(req.Ids)
+	/*
+		users := gut.BatchGet(req.Ids, func(id string) (out *protos.User, err error) {
+			resp, err := s.GetUser(ctx, &protos.GetUserRequest{Id: id})
+			if err != nil {
+				return nil, err
+			}
+			return resp.User, nil
+		})
+	*/
+	out := make(map[string]*protos.User)
+	for _, user := range users {
+		out[user.Id] = UserToProto(user)
 	}
+	resp = &protos.GetUsersResponse{Users: out}
 	return
 }
 

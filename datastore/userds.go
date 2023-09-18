@@ -34,6 +34,15 @@ func (tdb *OneHubDB) DeleteUser(topicId string) (err error) {
 	return
 }
 
+func (tdb *OneHubDB) GetUsers(ids []string) (out []*User, err error) {
+	err = tdb.storage.Find(&out, ids).Error
+	if err != nil {
+		log.Println("GetUsers Error: ", ids, err)
+	}
+
+	return
+}
+
 func (tdb *OneHubDB) GetUser(id string) (*User, error) {
 	var out User
 	err := tdb.storage.First(&out, "id = ?", id).Error
