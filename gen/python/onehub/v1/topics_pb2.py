@@ -17,7 +17,7 @@ from onehub.v1 import models_pb2 as onehub_dot_v1_dot_models__pb2
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16onehub/v1/topics.proto\x12\tonehub.v1\x1a google/protobuf/field_mask.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x16onehub/v1/models.proto\x1a\x1cgoogle/api/annotations.proto\"<\n\x12\x43reateTopicRequest\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\"=\n\x13\x43reateTopicResponse\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\"K\n\x11ListTopicsRequest\x12\x19\n\x08page_key\x18\x01 \x01(\tR\x07pageKey\x12\x1b\n\tpage_size\x18\x02 \x01(\x05R\x08pageSize\"b\n\x12ListTopicsResponse\x12(\n\x06topics\x18\x01 \x03(\x0b\x32\x10.onehub.v1.TopicR\x06topics\x12\"\n\rnext_page_key\x18\x02 \x01(\tR\x0bnextPageKey\"!\n\x0fGetTopicRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\":\n\x10GetTopicResponse\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\"$\n\x10GetTopicsRequest\x12\x10\n\x03ids\x18\x01 \x03(\tR\x03ids\"\xa2\x01\n\x11GetTopicsResponse\x12@\n\x06topics\x18\x01 \x03(\x0b\x32(.onehub.v1.GetTopicsResponse.TopicsEntryR\x06topics\x1aK\n\x0bTopicsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12&\n\x05value\x18\x02 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05value:\x02\x38\x01\"$\n\x12\x44\x65leteTopicRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"\x15\n\x13\x44\x65leteTopicResponse\"\xd4\x01\n\x12UpdateTopicRequest\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\x12;\n\x0bupdate_mask\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nupdateMask\x12\x1b\n\tadd_users\x18\x03 \x03(\tR\x08\x61\x64\x64Users\x12!\n\x0cremove_users\x18\x04 \x03(\tR\x0bremoveUsers:\x19\x92\x41\x16\n\x14*\x12UpdateTopicRequest\"Y\n\x13UpdateTopicResponse\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic:\x1a\x92\x41\x17\n\x15*\x13UpdateTopicResponse2\xf2\x04\n\x0cTopicService\x12\x63\n\x0b\x43reateTopic\x12\x1d.onehub.v1.CreateTopicRequest\x1a\x1e.onehub.v1.CreateTopicResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\"\n/v1/topics:\x01*\x12]\n\nListTopics\x12\x1c.onehub.v1.ListTopicsRequest\x1a\x1d.onehub.v1.ListTopicsResponse\"\x12\x82\xd3\xe4\x93\x02\x0c\x12\n/v1/topics\x12^\n\x08GetTopic\x12\x1a.onehub.v1.GetTopicRequest\x1a\x1b.onehub.v1.GetTopicResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/topics/{id=*}\x12\x63\n\tGetTopics\x12\x1b.onehub.v1.GetTopicsRequest\x1a\x1c.onehub.v1.GetTopicsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/topics:batchGet\x12g\n\x0b\x44\x65leteTopic\x12\x1d.onehub.v1.DeleteTopicRequest\x1a\x1e.onehub.v1.DeleteTopicResponse\"\x19\x82\xd3\xe4\x93\x02\x13*\x11/v1/topics/{id=*}\x12p\n\x0bUpdateTopic\x12\x1d.onehub.v1.UpdateTopicRequest\x1a\x1e.onehub.v1.UpdateTopicResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x32\x17/v1/topics/{topic.id=*}:\x01*B{\n\rcom.onehub.v1B\x0bTopicsProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16onehub/v1/topics.proto\x12\tonehub.v1\x1a google/protobuf/field_mask.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x16onehub/v1/models.proto\x1a\x1cgoogle/api/annotations.proto\"<\n\x12\x43reateTopicRequest\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\"=\n\x13\x43reateTopicResponse\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\"J\n\x11ListTopicsRequest\x12\x35\n\npagination\x18\x01 \x01(\x0b\x32\x15.onehub.v1.PaginationR\npagination\"}\n\x12ListTopicsResponse\x12(\n\x06topics\x18\x01 \x03(\x0b\x32\x10.onehub.v1.TopicR\x06topics\x12=\n\npagination\x18\x02 \x01(\x0b\x32\x1d.onehub.v1.PaginationResponseR\npagination\"!\n\x0fGetTopicRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\":\n\x10GetTopicResponse\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\"$\n\x10GetTopicsRequest\x12\x10\n\x03ids\x18\x01 \x03(\tR\x03ids\"\xa2\x01\n\x11GetTopicsResponse\x12@\n\x06topics\x18\x01 \x03(\x0b\x32(.onehub.v1.GetTopicsResponse.TopicsEntryR\x06topics\x1aK\n\x0bTopicsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12&\n\x05value\x18\x02 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05value:\x02\x38\x01\"$\n\x12\x44\x65leteTopicRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"\x15\n\x13\x44\x65leteTopicResponse\"\xd4\x01\n\x12UpdateTopicRequest\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic\x12;\n\x0bupdate_mask\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nupdateMask\x12\x1b\n\tadd_users\x18\x03 \x03(\tR\x08\x61\x64\x64Users\x12!\n\x0cremove_users\x18\x04 \x03(\tR\x0bremoveUsers:\x19\x92\x41\x16\n\x14*\x12UpdateTopicRequest\"Y\n\x13UpdateTopicResponse\x12&\n\x05topic\x18\x01 \x01(\x0b\x32\x10.onehub.v1.TopicR\x05topic:\x1a\x92\x41\x17\n\x15*\x13UpdateTopicResponse2\xf2\x04\n\x0cTopicService\x12\x63\n\x0b\x43reateTopic\x12\x1d.onehub.v1.CreateTopicRequest\x1a\x1e.onehub.v1.CreateTopicResponse\"\x15\x82\xd3\xe4\x93\x02\x0f\"\n/v1/topics:\x01*\x12]\n\nListTopics\x12\x1c.onehub.v1.ListTopicsRequest\x1a\x1d.onehub.v1.ListTopicsResponse\"\x12\x82\xd3\xe4\x93\x02\x0c\x12\n/v1/topics\x12^\n\x08GetTopic\x12\x1a.onehub.v1.GetTopicRequest\x1a\x1b.onehub.v1.GetTopicResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/v1/topics/{id=*}\x12\x63\n\tGetTopics\x12\x1b.onehub.v1.GetTopicsRequest\x1a\x1c.onehub.v1.GetTopicsResponse\"\x1b\x82\xd3\xe4\x93\x02\x15\x12\x13/v1/topics:batchGet\x12g\n\x0b\x44\x65leteTopic\x12\x1d.onehub.v1.DeleteTopicRequest\x1a\x1e.onehub.v1.DeleteTopicResponse\"\x19\x82\xd3\xe4\x93\x02\x13*\x11/v1/topics/{id=*}\x12p\n\x0bUpdateTopic\x12\x1d.onehub.v1.UpdateTopicRequest\x1a\x1e.onehub.v1.UpdateTopicResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x32\x17/v1/topics/{topic.id=*}:\x01*B{\n\rcom.onehub.v1B\x0bTopicsProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -48,27 +48,27 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CREATETOPICRESPONSE']._serialized_start=235
   _globals['_CREATETOPICRESPONSE']._serialized_end=296
   _globals['_LISTTOPICSREQUEST']._serialized_start=298
-  _globals['_LISTTOPICSREQUEST']._serialized_end=373
-  _globals['_LISTTOPICSRESPONSE']._serialized_start=375
-  _globals['_LISTTOPICSRESPONSE']._serialized_end=473
-  _globals['_GETTOPICREQUEST']._serialized_start=475
-  _globals['_GETTOPICREQUEST']._serialized_end=508
-  _globals['_GETTOPICRESPONSE']._serialized_start=510
-  _globals['_GETTOPICRESPONSE']._serialized_end=568
-  _globals['_GETTOPICSREQUEST']._serialized_start=570
-  _globals['_GETTOPICSREQUEST']._serialized_end=606
-  _globals['_GETTOPICSRESPONSE']._serialized_start=609
-  _globals['_GETTOPICSRESPONSE']._serialized_end=771
-  _globals['_GETTOPICSRESPONSE_TOPICSENTRY']._serialized_start=696
-  _globals['_GETTOPICSRESPONSE_TOPICSENTRY']._serialized_end=771
-  _globals['_DELETETOPICREQUEST']._serialized_start=773
-  _globals['_DELETETOPICREQUEST']._serialized_end=809
-  _globals['_DELETETOPICRESPONSE']._serialized_start=811
-  _globals['_DELETETOPICRESPONSE']._serialized_end=832
-  _globals['_UPDATETOPICREQUEST']._serialized_start=835
-  _globals['_UPDATETOPICREQUEST']._serialized_end=1047
-  _globals['_UPDATETOPICRESPONSE']._serialized_start=1049
-  _globals['_UPDATETOPICRESPONSE']._serialized_end=1138
-  _globals['_TOPICSERVICE']._serialized_start=1141
-  _globals['_TOPICSERVICE']._serialized_end=1767
+  _globals['_LISTTOPICSREQUEST']._serialized_end=372
+  _globals['_LISTTOPICSRESPONSE']._serialized_start=374
+  _globals['_LISTTOPICSRESPONSE']._serialized_end=499
+  _globals['_GETTOPICREQUEST']._serialized_start=501
+  _globals['_GETTOPICREQUEST']._serialized_end=534
+  _globals['_GETTOPICRESPONSE']._serialized_start=536
+  _globals['_GETTOPICRESPONSE']._serialized_end=594
+  _globals['_GETTOPICSREQUEST']._serialized_start=596
+  _globals['_GETTOPICSREQUEST']._serialized_end=632
+  _globals['_GETTOPICSRESPONSE']._serialized_start=635
+  _globals['_GETTOPICSRESPONSE']._serialized_end=797
+  _globals['_GETTOPICSRESPONSE_TOPICSENTRY']._serialized_start=722
+  _globals['_GETTOPICSRESPONSE_TOPICSENTRY']._serialized_end=797
+  _globals['_DELETETOPICREQUEST']._serialized_start=799
+  _globals['_DELETETOPICREQUEST']._serialized_end=835
+  _globals['_DELETETOPICRESPONSE']._serialized_start=837
+  _globals['_DELETETOPICRESPONSE']._serialized_end=858
+  _globals['_UPDATETOPICREQUEST']._serialized_start=861
+  _globals['_UPDATETOPICREQUEST']._serialized_end=1073
+  _globals['_UPDATETOPICRESPONSE']._serialized_start=1075
+  _globals['_UPDATETOPICRESPONSE']._serialized_end=1164
+  _globals['_TOPICSERVICE']._serialized_start=1167
+  _globals['_TOPICSERVICE']._serialized_end=1793
 # @@protoc_insertion_point(module_scope)

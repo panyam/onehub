@@ -17,7 +17,7 @@ from onehub.v1 import models_pb2 as onehub_dot_v1_dot_models__pb2
 from google.api import annotations_pb2 as google_dot_api_dot_annotations__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15onehub/v1/users.proto\x12\tonehub.v1\x1a google/protobuf/field_mask.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x16onehub/v1/models.proto\x1a\x1cgoogle/api/annotations.proto\"8\n\x11\x43reateUserRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\"9\n\x12\x43reateUserResponse\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\"J\n\x10ListUsersRequest\x12\x19\n\x08page_key\x18\x01 \x01(\tR\x07pageKey\x12\x1b\n\tpage_size\x18\x02 \x01(\x05R\x08pageSize\"^\n\x11ListUsersResponse\x12%\n\x05users\x18\x01 \x03(\x0b\x32\x0f.onehub.v1.UserR\x05users\x12\"\n\rnext_page_key\x18\x02 \x01(\tR\x0bnextPageKey\" \n\x0eGetUserRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"6\n\x0fGetUserResponse\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\"#\n\x0fGetUsersRequest\x12\x10\n\x03ids\x18\x01 \x03(\tR\x03ids\"\x9b\x01\n\x10GetUsersResponse\x12<\n\x05users\x18\x01 \x03(\x0b\x32&.onehub.v1.GetUsersResponse.UsersEntryR\x05users\x1aI\n\nUsersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x0f.onehub.v1.UserR\x05value:\x02\x38\x01\"#\n\x11\x44\x65leteUserRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"\x14\n\x12\x44\x65leteUserResponse\"\x8f\x01\n\x11UpdateUserRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\x12;\n\x0bupdate_mask\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nupdateMask:\x18\x92\x41\x15\n\x13*\x11UpdateUserRequest\"T\n\x12UpdateUserResponse\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user:\x19\x92\x41\x16\n\x14*\x12UpdateUserResponse2\xd8\x04\n\x0bUserService\x12_\n\nCreateUser\x12\x1c.onehub.v1.CreateUserRequest\x1a\x1d.onehub.v1.CreateUserResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\"\t/v1/users:\x01*\x12Y\n\tListUsers\x12\x1b.onehub.v1.ListUsersRequest\x1a\x1c.onehub.v1.ListUsersResponse\"\x11\x82\xd3\xe4\x93\x02\x0b\x12\t/v1/users\x12Z\n\x07GetUser\x12\x19.onehub.v1.GetUserRequest\x1a\x1a.onehub.v1.GetUserResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/users/{id=*}\x12_\n\x08GetUsers\x12\x1a.onehub.v1.GetUsersRequest\x1a\x1b.onehub.v1.GetUsersResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/users:batchGet\x12\x63\n\nDeleteUser\x12\x1c.onehub.v1.DeleteUserRequest\x1a\x1d.onehub.v1.DeleteUserResponse\"\x18\x82\xd3\xe4\x93\x02\x12*\x10/v1/users/{id=*}\x12k\n\nUpdateUser\x12\x1c.onehub.v1.UpdateUserRequest\x1a\x1d.onehub.v1.UpdateUserResponse\" \x82\xd3\xe4\x93\x02\x1a\x32\x15/v1/users/{user.id=*}:\x01*Bz\n\rcom.onehub.v1B\nUsersProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x15onehub/v1/users.proto\x12\tonehub.v1\x1a google/protobuf/field_mask.proto\x1a.protoc-gen-openapiv2/options/annotations.proto\x1a\x16onehub/v1/models.proto\x1a\x1cgoogle/api/annotations.proto\"8\n\x11\x43reateUserRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\"9\n\x12\x43reateUserResponse\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\"I\n\x10ListUsersRequest\x12\x35\n\npagination\x18\x01 \x01(\x0b\x32\x15.onehub.v1.PaginationR\npagination\"y\n\x11ListUsersResponse\x12%\n\x05users\x18\x01 \x03(\x0b\x32\x0f.onehub.v1.UserR\x05users\x12=\n\npagination\x18\x02 \x01(\x0b\x32\x1d.onehub.v1.PaginationResponseR\npagination\" \n\x0eGetUserRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"6\n\x0fGetUserResponse\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\"#\n\x0fGetUsersRequest\x12\x10\n\x03ids\x18\x01 \x03(\tR\x03ids\"\x9b\x01\n\x10GetUsersResponse\x12<\n\x05users\x18\x01 \x03(\x0b\x32&.onehub.v1.GetUsersResponse.UsersEntryR\x05users\x1aI\n\nUsersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12%\n\x05value\x18\x02 \x01(\x0b\x32\x0f.onehub.v1.UserR\x05value:\x02\x38\x01\"#\n\x11\x44\x65leteUserRequest\x12\x0e\n\x02id\x18\x01 \x01(\tR\x02id\"\x14\n\x12\x44\x65leteUserResponse\"\x8f\x01\n\x11UpdateUserRequest\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user\x12;\n\x0bupdate_mask\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.FieldMaskR\nupdateMask:\x18\x92\x41\x15\n\x13*\x11UpdateUserRequest\"T\n\x12UpdateUserResponse\x12#\n\x04user\x18\x01 \x01(\x0b\x32\x0f.onehub.v1.UserR\x04user:\x19\x92\x41\x16\n\x14*\x12UpdateUserResponse2\xd8\x04\n\x0bUserService\x12_\n\nCreateUser\x12\x1c.onehub.v1.CreateUserRequest\x1a\x1d.onehub.v1.CreateUserResponse\"\x14\x82\xd3\xe4\x93\x02\x0e\"\t/v1/users:\x01*\x12Y\n\tListUsers\x12\x1b.onehub.v1.ListUsersRequest\x1a\x1c.onehub.v1.ListUsersResponse\"\x11\x82\xd3\xe4\x93\x02\x0b\x12\t/v1/users\x12Z\n\x07GetUser\x12\x19.onehub.v1.GetUserRequest\x1a\x1a.onehub.v1.GetUserResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/v1/users/{id=*}\x12_\n\x08GetUsers\x12\x1a.onehub.v1.GetUsersRequest\x1a\x1b.onehub.v1.GetUsersResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/v1/users:batchGet\x12\x63\n\nDeleteUser\x12\x1c.onehub.v1.DeleteUserRequest\x1a\x1d.onehub.v1.DeleteUserResponse\"\x18\x82\xd3\xe4\x93\x02\x12*\x10/v1/users/{id=*}\x12k\n\nUpdateUser\x12\x1c.onehub.v1.UpdateUserRequest\x1a\x1d.onehub.v1.UpdateUserResponse\" \x82\xd3\xe4\x93\x02\x1a\x32\x15/v1/users/{user.id=*}:\x01*Bz\n\rcom.onehub.v1B\nUsersProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -48,27 +48,27 @@ if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['_CREATEUSERRESPONSE']._serialized_start=230
   _globals['_CREATEUSERRESPONSE']._serialized_end=287
   _globals['_LISTUSERSREQUEST']._serialized_start=289
-  _globals['_LISTUSERSREQUEST']._serialized_end=363
-  _globals['_LISTUSERSRESPONSE']._serialized_start=365
-  _globals['_LISTUSERSRESPONSE']._serialized_end=459
-  _globals['_GETUSERREQUEST']._serialized_start=461
-  _globals['_GETUSERREQUEST']._serialized_end=493
-  _globals['_GETUSERRESPONSE']._serialized_start=495
-  _globals['_GETUSERRESPONSE']._serialized_end=549
-  _globals['_GETUSERSREQUEST']._serialized_start=551
-  _globals['_GETUSERSREQUEST']._serialized_end=586
-  _globals['_GETUSERSRESPONSE']._serialized_start=589
-  _globals['_GETUSERSRESPONSE']._serialized_end=744
-  _globals['_GETUSERSRESPONSE_USERSENTRY']._serialized_start=671
-  _globals['_GETUSERSRESPONSE_USERSENTRY']._serialized_end=744
-  _globals['_DELETEUSERREQUEST']._serialized_start=746
-  _globals['_DELETEUSERREQUEST']._serialized_end=781
-  _globals['_DELETEUSERRESPONSE']._serialized_start=783
-  _globals['_DELETEUSERRESPONSE']._serialized_end=803
-  _globals['_UPDATEUSERREQUEST']._serialized_start=806
-  _globals['_UPDATEUSERREQUEST']._serialized_end=949
-  _globals['_UPDATEUSERRESPONSE']._serialized_start=951
-  _globals['_UPDATEUSERRESPONSE']._serialized_end=1035
-  _globals['_USERSERVICE']._serialized_start=1038
-  _globals['_USERSERVICE']._serialized_end=1638
+  _globals['_LISTUSERSREQUEST']._serialized_end=362
+  _globals['_LISTUSERSRESPONSE']._serialized_start=364
+  _globals['_LISTUSERSRESPONSE']._serialized_end=485
+  _globals['_GETUSERREQUEST']._serialized_start=487
+  _globals['_GETUSERREQUEST']._serialized_end=519
+  _globals['_GETUSERRESPONSE']._serialized_start=521
+  _globals['_GETUSERRESPONSE']._serialized_end=575
+  _globals['_GETUSERSREQUEST']._serialized_start=577
+  _globals['_GETUSERSREQUEST']._serialized_end=612
+  _globals['_GETUSERSRESPONSE']._serialized_start=615
+  _globals['_GETUSERSRESPONSE']._serialized_end=770
+  _globals['_GETUSERSRESPONSE_USERSENTRY']._serialized_start=697
+  _globals['_GETUSERSRESPONSE_USERSENTRY']._serialized_end=770
+  _globals['_DELETEUSERREQUEST']._serialized_start=772
+  _globals['_DELETEUSERREQUEST']._serialized_end=807
+  _globals['_DELETEUSERRESPONSE']._serialized_start=809
+  _globals['_DELETEUSERRESPONSE']._serialized_end=829
+  _globals['_UPDATEUSERREQUEST']._serialized_start=832
+  _globals['_UPDATEUSERREQUEST']._serialized_end=975
+  _globals['_UPDATEUSERRESPONSE']._serialized_start=977
+  _globals['_UPDATEUSERRESPONSE']._serialized_end=1061
+  _globals['_USERSERVICE']._serialized_start=1064
+  _globals['_USERSERVICE']._serialized_end=1664
 # @@protoc_insertion_point(module_scope)

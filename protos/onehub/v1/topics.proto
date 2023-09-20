@@ -94,15 +94,9 @@ message CreateTopicResponse {
  */
 message ListTopicsRequest {
   /**
-   * Instead of an offset an abstract  "page" key is provided that offers
-   * an opaque "pointer" into some offset in a result set.
+   * Pagination paramaters.
    */
-  string page_key = 1;
-
-  /**
-   * Number of results to return.
-   */
-  int32 page_size = 2;
+  Pagination pagination = 1;
 }
 
 /**
@@ -115,10 +109,9 @@ message ListTopicsResponse {
   repeated Topic topics = 1;
 
   /**
-   * The key/pointer string that subsequent List requests should pass to
-   * continue the pagination.
+   * Pagination response info
    */
-  string next_page_key = 2;
+  PaginationResponse pagination = 2;
 }
 
 /**

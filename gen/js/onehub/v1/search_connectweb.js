@@ -3,6 +3,9 @@
 /* eslint-disable */
 // @ts-nocheck
 
+import { SearchTopicsRequest } from "./search_pb.js";
+import { MethodKind } from "@bufbuild/protobuf";
+
 /**
  * *
  * Search related queries
@@ -12,6 +15,18 @@
 export const SearchService = {
   typeName: "onehub.v1.SearchService",
   methods: {
+    /**
+     * *
+     * Searches for topics given a certain criteria
+     *
+     * @generated from rpc onehub.v1.SearchService.SearchTopics
+     */
+    searchTopics: {
+      name: "SearchTopics",
+      I: SearchTopicsRequest,
+      O: SearchTopicsRequest,
+      kind: MethodKind.Unary,
+    },
   }
 };
 

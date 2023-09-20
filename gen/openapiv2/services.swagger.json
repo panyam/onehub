@@ -9,6 +9,9 @@
       "name": "MessageService"
     },
     {
+      "name": "SearchService"
+    },
+    {
       "name": "TopicService"
     },
     {
@@ -243,6 +246,29 @@
         ]
       }
     },
+    "/v1/search/topics": {
+      "get": {
+        "summary": "*\nSearches for topics given a certain criteria",
+        "operationId": "SearchService_SearchTopics",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SearchTopicsRequest"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "tags": [
+          "SearchService"
+        ]
+      }
+    },
     "/v1/topics": {
       "get": {
         "summary": "*\nList all topics from a user.",
@@ -263,14 +289,14 @@
         },
         "parameters": [
           {
-            "name": "pageKey",
+            "name": "pagination.pageKey",
             "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "pagination.pageSize",
             "description": "*\nNumber of results to return.",
             "in": "query",
             "required": false,
@@ -498,14 +524,14 @@
             "pattern": "[^/]+"
           },
           {
-            "name": "pageKey",
+            "name": "pagination.pageKey",
             "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "pagination.pageSize",
             "description": "*\nNumber of results to return.",
             "in": "query",
             "required": false,
@@ -628,14 +654,14 @@
         },
         "parameters": [
           {
-            "name": "pageKey",
+            "name": "pagination.pageKey",
             "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "pagination.pageSize",
             "description": "*\nNumber of results to return.",
             "in": "query",
             "required": false,
@@ -1060,9 +1086,9 @@
           },
           "description": "*\nThe list of topics found as part of this response."
         },
-        "nextPageKey": {
-          "type": "string",
-          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
         }
       },
       "description": "*\nResponse of a topic search/listing."
@@ -1078,9 +1104,9 @@
           },
           "description": "*\nThe list of topics found as part of this response."
         },
-        "nextPageKey": {
-          "type": "string",
-          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
         }
       },
       "description": "*\nResponse of a topic search/listing."
@@ -1096,9 +1122,9 @@
           },
           "description": "*\nThe list of users found as part of this response."
         },
-        "nextPageKey": {
-          "type": "string",
-          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
         }
       },
       "description": "*\nResponse of a user search/listing."
@@ -1142,6 +1168,43 @@
         }
       },
       "title": "*\nAn individual message in a topic"
+    },
+    "v1Pagination": {
+      "type": "object",
+      "properties": {
+        "pageKey": {
+          "type": "string",
+          "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "*\nNumber of results to return."
+        }
+      },
+      "description": "*\nGeneral way to handle pagination in all listing resources."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "nextPageKey": {
+          "type": "string",
+          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        },
+        "hasMoreResults": {
+          "type": "boolean",
+          "description": "*\nWhether more results exist."
+        },
+        "totalNumResults": {
+          "type": "integer",
+          "format": "int32",
+          "title": "*\nTotal number of results in teh collection if pagination did not exist.\n0 or -1 if unknown"
+        }
+      },
+      "description": "*\nStandard way to pass pagination related responses, eg the next page key\nthat can be passed on a paginated request to get the \"next page\" of results."
+    },
+    "v1SearchTopicsRequest": {
+      "type": "object"
     },
     "v1Topic": {
       "type": "object",

@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import type { Message as Message$1 } from "./models_pb.js";
+import type { Message as Message$1, Pagination, PaginationResponse } from "./models_pb.js";
 
 /**
  * *
@@ -161,28 +161,19 @@ export declare class ImportMessagesResponse extends Message<ImportMessagesRespon
 export declare class ListMessagesRequest extends Message<ListMessagesRequest> {
   /**
    * *
-   * Instead of an offset an abstract  "page" key is provided that offers
-   * an opaque "pointer" into some offset in a result set.
-   *
-   * @generated from field: string page_key = 1;
-   */
-  pageKey: string;
-
-  /**
-   * *
-   * Number of results to return.
-   *
-   * @generated from field: int32 page_size = 2;
-   */
-  pageSize: number;
-
-  /**
-   * *
    * Topic in which messages are to be listed.  Required.
    *
-   * @generated from field: string topic_id = 3;
+   * @generated from field: string topic_id = 1;
    */
   topicId: string;
+
+  /**
+   * *
+   * Pagination prameters.
+   *
+   * @generated from field: onehub.v1.Pagination pagination = 2;
+   */
+  pagination?: Pagination;
 
   constructor(data?: PartialMessage<ListMessagesRequest>);
 
@@ -216,12 +207,11 @@ export declare class ListMessagesResponse extends Message<ListMessagesResponse> 
 
   /**
    * *
-   * The key/pointer string that subsequent List requests should pass to
-   * continue the pagination.
+   * Pagination response info
    *
-   * @generated from field: string next_page_key = 2;
+   * @generated from field: onehub.v1.PaginationResponse pagination = 2;
    */
-  nextPageKey: string;
+  pagination?: PaginationResponse;
 
   constructor(data?: PartialMessage<ListMessagesResponse>);
 

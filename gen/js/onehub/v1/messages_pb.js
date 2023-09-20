@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { FieldMask, proto3 } from "@bufbuild/protobuf";
-import { Message } from "./models_pb.js";
+import { Message, Pagination, PaginationResponse } from "./models_pb.js";
 
 /**
  * *
@@ -74,9 +74,8 @@ export const ImportMessagesResponse = proto3.makeMessageType(
 export const ListMessagesRequest = proto3.makeMessageType(
   "onehub.v1.ListMessagesRequest",
   () => [
-    { no: 1, name: "page_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
-    { no: 3, name: "topic_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 1, name: "topic_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "pagination", kind: "message", T: Pagination },
   ],
 );
 
@@ -90,7 +89,7 @@ export const ListMessagesResponse = proto3.makeMessageType(
   "onehub.v1.ListMessagesResponse",
   () => [
     { no: 1, name: "messages", kind: "message", T: Message, repeated: true },
-    { no: 2, name: "next_page_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
 

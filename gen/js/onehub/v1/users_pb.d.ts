@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import type { User } from "./models_pb.js";
+import type { Pagination, PaginationResponse, User } from "./models_pb.js";
 
 /**
  * *
@@ -76,20 +76,11 @@ export declare class CreateUserResponse extends Message<CreateUserResponse> {
 export declare class ListUsersRequest extends Message<ListUsersRequest> {
   /**
    * *
-   * Instead of an offset an abstract  "page" key is provided that offers
-   * an opaque "pointer" into some offset in a result set.
+   * Pagination paramaters.
    *
-   * @generated from field: string page_key = 1;
+   * @generated from field: onehub.v1.Pagination pagination = 1;
    */
-  pageKey: string;
-
-  /**
-   * *
-   * Number of results to return.
-   *
-   * @generated from field: int32 page_size = 2;
-   */
-  pageSize: number;
+  pagination?: Pagination;
 
   constructor(data?: PartialMessage<ListUsersRequest>);
 
@@ -123,12 +114,11 @@ export declare class ListUsersResponse extends Message<ListUsersResponse> {
 
   /**
    * *
-   * The key/pointer string that subsequent List requests should pass to
-   * continue the pagination.
+   * Pagination response info
    *
-   * @generated from field: string next_page_key = 2;
+   * @generated from field: onehub.v1.PaginationResponse pagination = 2;
    */
-  nextPageKey: string;
+  pagination?: PaginationResponse;
 
   constructor(data?: PartialMessage<ListUsersResponse>);
 

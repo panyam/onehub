@@ -12,4 +12,15 @@ import "google/api/annotations.proto";
  * Search related queries
  */
 service SearchService {
+  /**
+   * Searches for topics given a certain criteria
+   */
+  rpc SearchTopics(SearchTopicsRequest) returns (SearchTopicsRequest) {
+    option (google.api.http) = {
+      get: "/v1/search/topics",
+    };
+  }
+}
+
+message SearchTopicsRequest {
 }
