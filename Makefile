@@ -18,6 +18,9 @@ all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 up: down
 	docker compose up --remove-orphans
 
+logs:
+	docker compose logs -f
+
 down:
 	docker compose down --remove-orphans
 
