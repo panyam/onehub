@@ -17,7 +17,7 @@ all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
 up:
 	docker compose down --remove-orphans
-	docker compose up --remove-orphans
+	docker compose up --remove-orphans -d
 
 goprotos:
 	echo "Generating GO bindings"
