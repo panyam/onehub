@@ -20,32 +20,32 @@ class TopicServiceStub(object):
                 '/onehub.v1.TopicService/CreateTopic',
                 request_serializer=onehub_dot_v1_dot_topics__pb2.CreateTopicRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_topics__pb2.CreateTopicResponse.FromString,
-                )
+                _registered_method=True)
         self.ListTopics = channel.unary_unary(
                 '/onehub.v1.TopicService/ListTopics',
                 request_serializer=onehub_dot_v1_dot_topics__pb2.ListTopicsRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_topics__pb2.ListTopicsResponse.FromString,
-                )
+                _registered_method=True)
         self.GetTopic = channel.unary_unary(
                 '/onehub.v1.TopicService/GetTopic',
                 request_serializer=onehub_dot_v1_dot_topics__pb2.GetTopicRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_topics__pb2.GetTopicResponse.FromString,
-                )
+                _registered_method=True)
         self.GetTopics = channel.unary_unary(
                 '/onehub.v1.TopicService/GetTopics',
                 request_serializer=onehub_dot_v1_dot_topics__pb2.GetTopicsRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_topics__pb2.GetTopicsResponse.FromString,
-                )
+                _registered_method=True)
         self.DeleteTopic = channel.unary_unary(
                 '/onehub.v1.TopicService/DeleteTopic',
                 request_serializer=onehub_dot_v1_dot_topics__pb2.DeleteTopicRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_topics__pb2.DeleteTopicResponse.FromString,
-                )
+                _registered_method=True)
         self.UpdateTopic = channel.unary_unary(
                 '/onehub.v1.TopicService/UpdateTopic',
                 request_serializer=onehub_dot_v1_dot_topics__pb2.UpdateTopicRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_topics__pb2.UpdateTopicResponse.FromString,
-                )
+                _registered_method=True)
 
 
 class TopicServiceServicer(object):
@@ -138,6 +138,7 @@ def add_TopicServiceServicer_to_server(servicer, server):
     generic_handler = grpc.method_handlers_generic_handler(
             'onehub.v1.TopicService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('onehub.v1.TopicService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -157,11 +158,21 @@ class TopicService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.TopicService/CreateTopic',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.TopicService/CreateTopic',
             onehub_dot_v1_dot_topics__pb2.CreateTopicRequest.SerializeToString,
             onehub_dot_v1_dot_topics__pb2.CreateTopicResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def ListTopics(request,
@@ -174,11 +185,21 @@ class TopicService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.TopicService/ListTopics',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.TopicService/ListTopics',
             onehub_dot_v1_dot_topics__pb2.ListTopicsRequest.SerializeToString,
             onehub_dot_v1_dot_topics__pb2.ListTopicsResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetTopic(request,
@@ -191,11 +212,21 @@ class TopicService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.TopicService/GetTopic',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.TopicService/GetTopic',
             onehub_dot_v1_dot_topics__pb2.GetTopicRequest.SerializeToString,
             onehub_dot_v1_dot_topics__pb2.GetTopicResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetTopics(request,
@@ -208,11 +239,21 @@ class TopicService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.TopicService/GetTopics',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.TopicService/GetTopics',
             onehub_dot_v1_dot_topics__pb2.GetTopicsRequest.SerializeToString,
             onehub_dot_v1_dot_topics__pb2.GetTopicsResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def DeleteTopic(request,
@@ -225,11 +266,21 @@ class TopicService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.TopicService/DeleteTopic',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.TopicService/DeleteTopic',
             onehub_dot_v1_dot_topics__pb2.DeleteTopicRequest.SerializeToString,
             onehub_dot_v1_dot_topics__pb2.DeleteTopicResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def UpdateTopic(request,
@@ -242,8 +293,18 @@ class TopicService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.TopicService/UpdateTopic',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.TopicService/UpdateTopic',
             onehub_dot_v1_dot_topics__pb2.UpdateTopicRequest.SerializeToString,
             onehub_dot_v1_dot_topics__pb2.UpdateTopicResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)

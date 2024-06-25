@@ -19,25 +19,23 @@ class ContentView {
 }
 
 export function UserInfo(props: any) {
-  const { userid, createdAt } = props
+  const { user, createdAt } = props
   const [ format, setFormat ] = useState("LLLL")
-  const [ userName, setUserName ] = useState("NoName")
+  // const [ userName, setUserName ] = useState("NoName")
   const [ avatarInitials, setAvatarInitials ] = useState("AI")
   const [ avatarUrl, setAvatarUrl ] = useState(null)
   const [ avatarBG, setAvatarBG ] = useState("#ffffff")
 
+  const avatar = user.avatar
+
   useEffect(() => {
-    api.getUserInfo(userid).then((userinfo: any) => {
-      const user = userinfo.user
-      let avatar = (user.avatar || "").trim()
-      if (avatar.startsWith("initials://")) {
-        const initials = avatar.substring("initials://".length).trim()
-        setAvatarInitials(initials)
-      } else {
-        setAvatarUrl(avatar)
-      }
-      setUserName(user.name)
-    });
+    if (avatar.startsWith("initials://")) {
+      const initials = avatar.substring("initials://".length).trim()
+      setAvatarInitials(initials)
+    } else {
+      setAvatarUrl(avatar)
+    }
+    // api.getUserInfo(userid).then((userinfo: any) => { });
     const currmom = moment(createdAt)
     if (currmom >= moment().startOf('day')) {
       // only show time and am/pm
@@ -51,7 +49,7 @@ export function UserInfo(props: any) {
     } else {
       setFormat("MMM Do YYYY, h:mm:ss a")
     }
-  }, [props.userid, props.createdAt])
+  }, [props.user, props.createdAt])
 
   const colorForName = (name: string) => {
     const hash = hashCode(name)
@@ -70,14 +68,14 @@ export function UserInfo(props: any) {
     {
     avatarUrl == null ? 
       <Avatar className={styles.header_avatar}
-              alt={`${userName} ${userid} - Image`}
+              alt={`${user.name} ${user.id} - Image`}
       >{avatarInitials}</Avatar>
     : 
       <Avatar className={styles.header_avatar}
               src={avatarUrl}
-              alt={`${userName} ${userid} - Image`} />
+              alt={`${user.name} ${user.id} - Image`} />
     }
-    <span className={styles.header_username} style={{color: colorForName(userName)}}>{userName}</span>
+    <span className={styles.header_username} style={{color: colorForName(user.name)}}>{user.name}</span>
     <span className={styles.header_createdat}>
       <Moment date={createdAt} format={format} />
     </span>
@@ -85,9 +83,10 @@ export function UserInfo(props: any) {
 }
 
 export default function MessageView(props: {
+  user: any,
   message: any,
 }) {
-  const { message } = props
+  const { user, message } = props
   const [hovered, setHovered] = useState(false)
   const toggleHover = () => setHovered(!hovered)
 
@@ -99,7 +98,7 @@ export default function MessageView(props: {
       onMouseLeave={toggleHover}
     >
       <div className={styles.userinfoarea}>
-        <UserInfo userid={message.userId} createdAt={message.createdAt} />
+        <UserInfo user={user} createdAt={message.createdAt} />
       </div>
       <div className={styles.contentarea}>{contentView}</div>
     </div>

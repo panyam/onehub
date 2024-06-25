@@ -15,9 +15,17 @@ OUT_DIR:=$(SRC_DIR)/gen/go
 
 all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
-up:
-	docker compose down --remove-orphans
+build: down
+	BUILDKIT_PROGRESS=plain docker compose build --no-cache
+
+up: down
 	docker compose up --remove-orphans -d
+
+logs:
+	docker compose logs -f
+
+down:
+	docker compose down --remove-orphans
 
 goprotos:
 	echo "Generating GO bindings"

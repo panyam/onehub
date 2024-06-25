@@ -89,3 +89,42 @@ message Message {
   // to show different things in the View/UI
   google.protobuf.Struct content_data = 8;
 }
+
+/**
+ * General way to handle pagination in all listing resources.
+ */
+message Pagination {
+  /**
+   * Instead of an offset an abstract  "page" key is provided that offers
+   * an opaque "pointer" into some offset in a result set.
+   */
+  string page_key = 1;
+
+  /**
+   * Number of results to return.
+   */
+  int32 page_size = 2;
+}
+
+/**
+ * Standard way to pass pagination related responses, eg the next page key
+ * that can be passed on a paginated request to get the "next page" of results.
+ */
+message PaginationResponse {
+  /**
+   * The key/pointer string that subsequent List requests should pass to
+   * continue the pagination.
+   */
+  string next_page_key = 1;
+
+  /**
+   * Whether more results exist.
+   */
+  bool has_more_results = 2;
+
+  /**
+   * Total number of results in teh collection if pagination did not exist.
+   * 0 or -1 if unknown
+   */
+  int32 total_num_results = 3;
+}

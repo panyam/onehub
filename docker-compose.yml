@@ -14,7 +14,7 @@ services:
       PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
       PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
     volumes:
-      - ./.pgadmin:/var/lib/pgadmin
+      - ./.data/pgadmin:/var/lib/pgadmin
 
   postgres:
     image: postgres:15.3
@@ -23,7 +23,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
-      - ./.pgdata:/var/lib/postgresql/data
+      - ./.data/pgdata:/var/lib/postgresql/data
     ports:
       - 54321:5432
     healthcheck:
@@ -45,32 +45,6 @@ services:
       - onehub
       - nextfe 
       - ohfe
-
-  onehub:
-    depends_on:
-      - basegoimage
-      - postgres
-    build:
-      context: .
-      dockerfile: ./Dockerfile
-    volumes:
-      # - ./.air.toml:/app/.air.toml:ro
-      # - ./go.mod:/app/go.mod:ro
-      # - ./go.sum:/app/go.sum:ro
-      - ./cmd:/app/cmd
-      - ./gen:/app/gen
-      - ./datastore:/app/datastore
-      - ./services:/app/services
-      - ./protos:/app/protos
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
-    ports:
-      - 8080:8080
-      - 9000:9000
-      - 9091:9091
 
   nextfe:
     build: ./nextfe
@@ -94,8 +68,38 @@ services:
       - ./ohfe/go.sum:/app/go.sum:ro
       - ./ohfe/cmd:/app/cmd
     environment:
-      ONEHUB_ENDPOINT: http://onehub:8080/api
+      ONEHUB_ENDPOINT: http://onehub:9080/api
       ONEHUB_GRPC_ENDPOINT: onehub:9090
     ports:
       - 5080:5000
       - 9092:9091
+
+  onehub:
+    depends_on:
+      - basegoimage
+      - postgres
+    build:
+      context: .
+      dockerfile: ./Dockerfile.backend
+    volumes:
+      # - ./.air.toml:/app/.air.toml:ro
+      # - ./go.mod:/app/go.mod:ro
+      # - ./go.sum:/app/go.sum:ro
+      - ./cmd:/app/cmd
+      - ./gen:/app/gen
+      - ./datastore:/app/datastore
+      - ./protos:/app/protos
+      - ./services:/app/services
+    command: ["air", "-c", "cmd/backend/.air.toml"]
+    environment:
+      POSTGRES_HOST: ${POSTGRES_HOST}
+      POSTGRES_PORT: ${POSTGRES_PORT}
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
+    ports:
+      - 9080:9080
+      - 9000:9000
+      - 9091:9091
+

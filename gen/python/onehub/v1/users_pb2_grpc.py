@@ -20,32 +20,32 @@ class UserServiceStub(object):
                 '/onehub.v1.UserService/CreateUser',
                 request_serializer=onehub_dot_v1_dot_users__pb2.CreateUserRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_users__pb2.CreateUserResponse.FromString,
-                )
+                _registered_method=True)
         self.ListUsers = channel.unary_unary(
                 '/onehub.v1.UserService/ListUsers',
                 request_serializer=onehub_dot_v1_dot_users__pb2.ListUsersRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_users__pb2.ListUsersResponse.FromString,
-                )
+                _registered_method=True)
         self.GetUser = channel.unary_unary(
                 '/onehub.v1.UserService/GetUser',
                 request_serializer=onehub_dot_v1_dot_users__pb2.GetUserRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_users__pb2.GetUserResponse.FromString,
-                )
+                _registered_method=True)
         self.GetUsers = channel.unary_unary(
                 '/onehub.v1.UserService/GetUsers',
                 request_serializer=onehub_dot_v1_dot_users__pb2.GetUsersRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_users__pb2.GetUsersResponse.FromString,
-                )
+                _registered_method=True)
         self.DeleteUser = channel.unary_unary(
                 '/onehub.v1.UserService/DeleteUser',
                 request_serializer=onehub_dot_v1_dot_users__pb2.DeleteUserRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_users__pb2.DeleteUserResponse.FromString,
-                )
+                _registered_method=True)
         self.UpdateUser = channel.unary_unary(
                 '/onehub.v1.UserService/UpdateUser',
                 request_serializer=onehub_dot_v1_dot_users__pb2.UpdateUserRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_users__pb2.UpdateUserResponse.FromString,
-                )
+                _registered_method=True)
 
 
 class UserServiceServicer(object):
@@ -138,6 +138,7 @@ def add_UserServiceServicer_to_server(servicer, server):
     generic_handler = grpc.method_handlers_generic_handler(
             'onehub.v1.UserService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('onehub.v1.UserService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -157,11 +158,21 @@ class UserService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.UserService/CreateUser',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.UserService/CreateUser',
             onehub_dot_v1_dot_users__pb2.CreateUserRequest.SerializeToString,
             onehub_dot_v1_dot_users__pb2.CreateUserResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def ListUsers(request,
@@ -174,11 +185,21 @@ class UserService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.UserService/ListUsers',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.UserService/ListUsers',
             onehub_dot_v1_dot_users__pb2.ListUsersRequest.SerializeToString,
             onehub_dot_v1_dot_users__pb2.ListUsersResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetUser(request,
@@ -191,11 +212,21 @@ class UserService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.UserService/GetUser',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.UserService/GetUser',
             onehub_dot_v1_dot_users__pb2.GetUserRequest.SerializeToString,
             onehub_dot_v1_dot_users__pb2.GetUserResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetUsers(request,
@@ -208,11 +239,21 @@ class UserService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.UserService/GetUsers',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.UserService/GetUsers',
             onehub_dot_v1_dot_users__pb2.GetUsersRequest.SerializeToString,
             onehub_dot_v1_dot_users__pb2.GetUsersResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def DeleteUser(request,
@@ -225,11 +266,21 @@ class UserService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.UserService/DeleteUser',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.UserService/DeleteUser',
             onehub_dot_v1_dot_users__pb2.DeleteUserRequest.SerializeToString,
             onehub_dot_v1_dot_users__pb2.DeleteUserResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def UpdateUser(request,
@@ -242,8 +293,18 @@ class UserService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.UserService/UpdateUser',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.UserService/UpdateUser',
             onehub_dot_v1_dot_users__pb2.UpdateUserRequest.SerializeToString,
             onehub_dot_v1_dot_users__pb2.UpdateUserResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)

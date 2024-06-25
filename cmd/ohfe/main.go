@@ -30,5 +30,5 @@ func main() {
 			"message": "pong",
 		})
 	})
-	router.Run(":5000") // listen and serve on 0.0.0.0:8080 (for windows "localhost:8080")
+	router.Run(":5000") // listen and serve on 0.0.0.0:9080 (for windows "localhost:9080")
 }

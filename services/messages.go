@@ -3,6 +3,8 @@ package services
 import (
 	"context"
 	"fmt"
+	"log"
+	"time"
 
 	gut "github.com/panyam/goutils/utils"
 	ds "github.com/panyam/onehub/datastore"
@@ -33,34 +35,103 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 }
 
 // Create a new Message
-func (s *MessageService) CreateMessage(ctx context.Context, req *protos.CreateMessageRequest) (resp *protos.CreateMessageResponse, err error) {
-	topic, err := s.DB.GetTopic(req.Message.TopicId)
+func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateMessagesRequest) (resp *protos.CreateMessagesResponse, err error) {
+	topic, err := s.DB.GetTopic(req.TopicId)
 	if topic == nil {
-		return nil, fmt.Errorf("topic not found: %s", req.Message.TopicId)
+		return nil, fmt.Errorf("topic not found: %s", req.TopicId)
 	}
 	if err != nil {
 		return nil, err
 	}
+
 	// Add a new message entity here
-	message := req.Message
-	if message.Id != "" {
-		// see if it already exists
-		curr, _ := s.DB.GetMessage(message.Id)
-		if curr != nil {
-			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Id))
+	numNewIDs := 0
+	authedUser := GetAuthedUser(ctx)
+	for _, message := range req.Messages {
+		// TODO - do this on batch
+		if !req.AllowUserids {
+			message.UserId = authedUser
 		}
-	} else {
-		message.Id = s.DB.NextId("Message")
+		message.TopicId = req.TopicId
+		if message.Id != "" {
+			// see if it already exists
+			curr, _ := s.DB.GetMessage(message.Id)
+			if curr != nil {
+				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Id))
+			}
+		} else {
+			numNewIDs++
+		}
 	}
-	message.UserId = GetAuthedUser(ctx)
-	dbmsg := MessageFromProto(message)
-	if err := s.DB.CreateMessage(dbmsg); err != nil {
+	var dbmsgs []*ds.Message
+	newIDs := s.DB.NewIDs("Message", numNewIDs)
+	for _, message := range req.Messages {
+		// get an ID from the pool
+		if message.Id == "" {
+			numNewIDs--
+			message.Id = newIDs[numNewIDs]
+		}
+		dbmsg := MessageFromProto(message)
+		dbmsgs = append(dbmsgs, dbmsg)
+	}
+
+	// Also set time stamps
+	for _, msg := range dbmsgs {
+		msg.CreatedAt = time.Now()
+		msg.UpdatedAt = time.Now()
+	}
+
+	if err := s.DB.CreateMessages(dbmsgs); err != nil {
 		return nil, err
 	}
 
-	resp = &protos.CreateMessageResponse{
-		Message: MessageToProto(dbmsg),
+	resp = &protos.CreateMessagesResponse{
+		Messages: gut.Map(dbmsgs, MessageToProto),
 	}
+	return
+}
+
+// Create a new Message
+func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportMessagesRequest) (resp *protos.ImportMessagesResponse, err error) {
+	// Add a new message entity here
+	numNewIDs := 0
+	for idx, message := range req.Messages {
+		if message.TopicId == "" {
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("TopicId not set in message %d", idx))
+		}
+		if message.UserId == "" {
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("UserId not set in message %d", idx))
+		}
+		if message.Id != "" {
+			// see if it already exists
+			curr, _ := s.DB.GetMessage(message.Id)
+			if curr != nil {
+				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Id))
+			}
+		} else {
+			numNewIDs++
+		}
+	}
+	var dbmsgs []*ds.Message
+	newIDs := s.DB.NewIDs("Message", numNewIDs)
+	for _, message := range req.Messages {
+		// get an ID from the pool
+		if message.Id == "" {
+			numNewIDs--
+			message.Id = newIDs[numNewIDs]
+		}
+		dbmsg := MessageFromProto(message)
+		dbmsgs = append(dbmsgs, dbmsg)
+	}
+
+	if err := s.DB.CreateMessages(dbmsgs); err != nil {
+		return nil, err
+	}
+
+	resp = &protos.ImportMessagesResponse{
+		Messages: gut.Map(dbmsgs, MessageToProto),
+	}
+	log.Printf("Imported %d messages", len(req.Messages))
 	return
 }
 

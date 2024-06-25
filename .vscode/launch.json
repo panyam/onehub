@@ -5,21 +5,30 @@
     "version": "0.2.0",
     "configurations": [
       {
-          "name": "Launch file",
+          "name": "Launch Onehub Backend",
           "type": "go",
           "request": "launch",
           "mode": "debug",
-          "program": "cmd/server.go",
+          "program": "cmd/backend/main.go",
           "cwd": "${workspaceFolder}",
           "dlvFlags": ["--check-go-version=false"]
       }
         ,
        {
-            "name": "Remote Debugger for OneHub",
+            "name": "Remote Debugger - OneHub Backend",
             "type": "go",
             "request": "attach",
             "mode": "remote",
             "port": 9091,
+            "showLog": true,
+            "host": "127.0.0.1"
+      }
+      ,{
+            "name": "Remote Debugger - OneHub HTMX FE",
+            "type": "go",
+            "request": "attach",
+            "mode": "remote",
+            "port": 9093,
             "showLog": true,
             "host": "127.0.0.1"
       }

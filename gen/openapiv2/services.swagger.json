@@ -209,6 +209,40 @@
         ]
       }
     },
+    "/v1/messages:import": {
+      "post": {
+        "summary": "*\nImport messages in bulk",
+        "operationId": "MessageService_ImportMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ImportMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "description": "*\nBulk importing of messages with very minimal checks.\nHere no validation is performed on the messages (ie checking topic IDS)\nsetting current user id, setting created/updated time stamps etc.\n\nUse this either for recovery (typically you should do DR on the DB) or\nor for testing.",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1ImportMessagesRequest"
+            }
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
     "/v1/topics": {
       "get": {
         "summary": "*\nList all topics from a user.",
@@ -229,14 +263,14 @@
         },
         "parameters": [
           {
-            "name": "pageKey",
+            "name": "pagination.pageKey",
             "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "pagination.pageSize",
             "description": "*\nNumber of results to return.",
             "in": "query",
             "required": false,
@@ -341,86 +375,6 @@
         ],
         "tags": [
           "TopicService"
-        ]
-      }
-    },
-    "/v1/topics/{message.topicId}/messages": {
-      "post": {
-        "summary": "*\nCreate a new sesssion",
-        "operationId": "MessageService_CreateMessage",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1CreateMessageResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "message.topicId",
-            "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified.",
-            "in": "path",
-            "required": true,
-            "type": "string",
-            "pattern": "[^/]+"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "type": "object",
-              "properties": {
-                "message": {
-                  "type": "object",
-                  "properties": {
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "*\nWhen the message was created on the server."
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
-                    },
-                    "id": {
-                      "type": "string",
-                      "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified."
-                    },
-                    "userId": {
-                      "type": "string",
-                      "description": "*\nUser sending this message."
-                    },
-                    "contentType": {
-                      "type": "string",
-                      "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
-                    },
-                    "contentText": {
-                      "type": "string",
-                      "description": "*\nA simple way to just send text."
-                    },
-                    "contentData": {
-                      "type": "object",
-                      "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
-                    }
-                  },
-                  "title": "*\nMessage being updated"
-                }
-              },
-              "title": "*\nMessage creation request object"
-            }
-          }
-        ],
-        "tags": [
-          "MessageService"
         ]
       }
     },
@@ -544,19 +498,73 @@
             "pattern": "[^/]+"
           },
           {
-            "name": "pageKey",
+            "name": "pagination.pageKey",
             "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "pagination.pageSize",
             "description": "*\nNumber of results to return.",
             "in": "query",
             "required": false,
             "type": "integer",
             "format": "int32"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      },
+      "post": {
+        "summary": "*\nCreate a single message or messages in batch",
+        "operationId": "MessageService_CreateMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1CreateMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topicId",
+            "description": "*\nTopic where messages are being created",
+            "in": "path",
+            "required": true,
+            "type": "string",
+            "pattern": "[^/]+"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "messages": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "$ref": "#/definitions/v1Message"
+                  },
+                  "title": "*\nMessage being updated"
+                },
+                "allowUserids": {
+                  "type": "boolean",
+                  "description": "*\nWhether to allow custom user IDs or whether to\nforce user IDs to be overridden to the logged in user.\nIn batch mode we want the option to have diff user IDs\nIn prod - we want to ensure that only Admins can provide\nthis option."
+                }
+              },
+              "title": "*\nMessage creation request object"
+            }
           }
         ],
         "tags": [
@@ -620,14 +628,14 @@
         },
         "parameters": [
           {
-            "name": "pageKey",
+            "name": "pagination.pageKey",
             "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set.",
             "in": "query",
             "required": false,
             "type": "string"
           },
           {
-            "name": "pageSize",
+            "name": "pagination.pageSize",
             "description": "*\nNumber of results to return.",
             "in": "query",
             "required": false,
@@ -798,20 +806,6 @@
                 "updateMask": {
                   "type": "string",
                   "description": "*\nMask of fields being updated in this User to make partial changes."
-                },
-                "addUsers": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "*\nIDs of users to be added to this user."
-                },
-                "removeUsers": {
-                  "type": "array",
-                  "items": {
-                    "type": "string"
-                  },
-                  "description": "*\nIDs of users to be removed from this user."
                 }
               },
               "description": "*\nThe request for (partially) updating an User.",
@@ -877,7 +871,7 @@
         "NULL_VALUE"
       ],
       "default": "NULL_VALUE",
-      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\n The JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
     },
     "rpcStatus": {
       "type": "object",
@@ -898,11 +892,15 @@
         }
       }
     },
-    "v1CreateMessageResponse": {
+    "v1CreateMessagesResponse": {
       "type": "object",
       "properties": {
-        "message": {
-          "$ref": "#/definitions/v1Message",
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
           "title": "*\nMessage being created"
         }
       },
@@ -1023,6 +1021,34 @@
       },
       "title": "*\nUser batch-get response"
     },
+    "v1ImportMessagesRequest": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
+          "title": "*\nMessage being updated"
+        }
+      },
+      "description": "*\nBulk importing of messages with very minimal checks.\nHere no validation is performed on the messages (ie checking topic IDS)\nsetting current user id, setting created/updated time stamps etc.\n\nUse this either for recovery (typically you should do DR on the DB) or\nor for testing."
+    },
+    "v1ImportMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
+          "title": "*\nMessage being created"
+        }
+      },
+      "description": "*\nResponse of an message import."
+    },
     "v1ListMessagesResponse": {
       "type": "object",
       "properties": {
@@ -1034,9 +1060,9 @@
           },
           "description": "*\nThe list of topics found as part of this response."
         },
-        "nextPageKey": {
-          "type": "string",
-          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
         }
       },
       "description": "*\nResponse of a topic search/listing."
@@ -1052,9 +1078,9 @@
           },
           "description": "*\nThe list of topics found as part of this response."
         },
-        "nextPageKey": {
-          "type": "string",
-          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
         }
       },
       "description": "*\nResponse of a topic search/listing."
@@ -1070,9 +1096,9 @@
           },
           "description": "*\nThe list of users found as part of this response."
         },
-        "nextPageKey": {
-          "type": "string",
-          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
         }
       },
       "description": "*\nResponse of a user search/listing."
@@ -1116,6 +1142,40 @@
         }
       },
       "title": "*\nAn individual message in a topic"
+    },
+    "v1Pagination": {
+      "type": "object",
+      "properties": {
+        "pageKey": {
+          "type": "string",
+          "description": "*\nInstead of an offset an abstract  \"page\" key is provided that offers\nan opaque \"pointer\" into some offset in a result set."
+        },
+        "pageSize": {
+          "type": "integer",
+          "format": "int32",
+          "description": "*\nNumber of results to return."
+        }
+      },
+      "description": "*\nGeneral way to handle pagination in all listing resources."
+    },
+    "v1PaginationResponse": {
+      "type": "object",
+      "properties": {
+        "nextPageKey": {
+          "type": "string",
+          "description": "*\nThe key/pointer string that subsequent List requests should pass to\ncontinue the pagination."
+        },
+        "hasMoreResults": {
+          "type": "boolean",
+          "description": "*\nWhether more results exist."
+        },
+        "totalNumResults": {
+          "type": "integer",
+          "format": "int32",
+          "title": "*\nTotal number of results in teh collection if pagination did not exist.\n0 or -1 if unknown"
+        }
+      },
+      "description": "*\nStandard way to pass pagination related responses, eg the next page key\nthat can be passed on a paginated request to get the \"next page\" of results."
     },
     "v1Topic": {
       "type": "object",

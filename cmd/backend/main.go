@@ -29,7 +29,7 @@ const DEFAULT_DB_ENDPOINT = "postgres://postgres:docker@localhost:5432/onehubdb"
 
 var (
 	addr    = flag.String("addr", ":9000", "Address to start the onehub grpc server on.")
-	gw_addr = flag.String("gw_addr", ":8080", "Address to start the grpc gateway server on.")
+	gw_addr = flag.String("gw_addr", ":9080", "Address to start the grpc gateway server on.")
 
 	db_endpoint = flag.String("db_endpoint", "", fmt.Sprintf("Endpoint of DB where all topics/messages state are persisted.  Default value: ONEHUB_DB_ENDPOINT environment variable or %s", DEFAULT_DB_ENDPOINT))
 )
@@ -151,7 +151,8 @@ func ErrorLogger( /* Add configs here */ ) grpc.UnaryServerInterceptor {
 		handler grpc.UnaryHandler) (resp interface{}, err error) {
 
 		onPanic := func() {
-			if r := recover(); r != nil {
+			r := recover()
+			if r != nil {
 				err = status.Errorf(codes.Internal, "panic: %s", r)
 				errmsg := fmt.Sprintf("[PANIC] %s\n\n%s", r, string(debug.Stack()))
 				log.Println(errmsg)
