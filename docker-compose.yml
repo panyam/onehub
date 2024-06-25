@@ -61,8 +61,8 @@ services:
     build:
       context: ./ohfe
     volumes:
-      - ./ohfe/.air.toml:/app/.air.toml:ro
-      - ./ohfe/cmd:/app/cmd
+      - ./ohfe:/app
+    command: ["air", "-c", "ohfe/.air.toml"]
     environment:
       ONEHUB_API_ENDPOINT: http://onehub:9080/api
       ONEHUB_GRPC_ENDPOINT: onehub:9090
