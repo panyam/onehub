@@ -1,0 +1,12 @@
+FROM --platform=linux/amd64 dagmeister/golangdev:latest
+WORKDIR /app
+
+COPY go.mod go.sum .
+COPY Makefile .
+
+RUN go mod download
+
+# COPY .air.debug.toml .
+COPY .air.toml .
+
+CMD ["air"]

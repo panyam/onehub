@@ -1,8 +1,8 @@
 services:
-  basegoimage:
-    build:
-      dockerfile: Dockerfile.base
-    image: basegoimage
+  #  basegoimage:
+  #    build:
+  #      dockerfile: Dockerfile.base
+  #    image: basegoimage
 
 #    pgadmin:
 #      image: dpage/pgadmin4
@@ -56,13 +56,13 @@ services:
 #    stdin_open: true
 
   ohfe:
-    depends_on:
-      - basegoimage
     build:
       context: ./ohfe
+      dockerfile: Dockerfile.debug
+    restart: unless-stopped
     volumes:
       - ./ohfe:/app
-    command: ["air", "-c", "ohfe/.air.toml"]
+    # command: ["air", "-c", ".air.toml"]
     environment:
       ONEHUB_API_ENDPOINT: http://onehub:9080/api
       ONEHUB_GRPC_ENDPOINT: onehub:9090
@@ -72,11 +72,10 @@ services:
 
   onehub:
     depends_on:
-      - basegoimage
       - postgres
     build:
       context: .
-      dockerfile: ./Dockerfile.backend
+      dockerfile: ./Dockerfile.backend.debug
     volumes:
       # - ./.air.toml:/app/.air.toml:ro
       # - ./go.mod:/app/go.mod:ro
@@ -86,7 +85,7 @@ services:
       - ./datastore:/app/datastore
       - ./protos:/app/protos
       - ./services:/app/services
-    command: ["air", "-c", "cmd/backend/.air.toml"]
+        # command: ["air", "-c", "cmd/backend/.air.toml"]
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
