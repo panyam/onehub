@@ -4,11 +4,11 @@ tmp_dir = "tmp"
 
 [build]
   args_bin = []
-  cmd = "go build -o ./tmp/main cmd/dbsync/main.go"
-  bin = "/go/bin/dlv --listen=:9091 --headless=true --log=true --accept-multiclient --api-version=2 exec --continue ./tmp/main"
+  cmd = "go build -o ./tmp/ohfe cmd/main.go"
+  bin = "/go/bin/dlv --listen=:9091 --headless=true --log=true --accept-multiclient --api-version=2 exec --continue ./tmp/ohfe"
 
   delay = 1000
-  exclude_dir = ["assets", "testdata", "tmp", "cli", "vendors", "ohfe"]
+  exclude_dir = ["assets", "testdata", "tmp", "cli", "vendors", "node_modules"]
   exclude_file = []
   exclude_regex = ["_test.go"]
   exclude_unchanged = false

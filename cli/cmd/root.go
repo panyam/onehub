@@ -7,7 +7,7 @@ import (
 	"github.com/spf13/cobra"
 )
 
-const DEFAULT_ONEHUB_HOST = "http://localhost:8080"
+const DEFAULT_ONEHUB_HOST = "http://localhost:9080"
 
 var Client = NewOHClient("")
 
