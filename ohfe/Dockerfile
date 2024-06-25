@@ -2,3 +2,5 @@ FROM basegoimage
 
 WORKDIR /app
 
+# Command to run the executable
+# CMD ["air", "-c", ".air.toml"]

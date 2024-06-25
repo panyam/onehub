@@ -1,20 +1,19 @@
-version: '3.9'
 services:
   basegoimage:
     build:
       dockerfile: Dockerfile.base
     image: basegoimage
 
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
-    environment:
-      PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    volumes:
-      - ./.data/pgadmin:/var/lib/pgadmin
+#    pgadmin:
+#      image: dpage/pgadmin4
+#      ports:
+#        - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
+#      environment:
+#        PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
+#        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+#        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+#      volumes:
+#        - ./.data/pgadmin:/var/lib/pgadmin
 
   postgres:
     image: postgres:15.3
@@ -43,19 +42,18 @@ services:
       - 7080:80
     depends_on:
       - onehub
-      - nextfe 
       - ohfe
 
-  nextfe:
-    build: ./nextfe
-    volumes:
-       - ./nextfe:/app
-       - /app/node_modules
-       - /app/.next
-    restart: always
-    ports:
-      - 4000:4000
-    stdin_open: true
+#  nextfe:
+#    build: ./nextfe
+#    volumes:
+#       - ./nextfe:/app
+#       - /app/node_modules
+#       - /app/.next
+#    restart: always
+#    ports:
+#      - 4000:4000
+#    stdin_open: true
 
   ohfe:
     depends_on:
@@ -64,11 +62,9 @@ services:
       context: ./ohfe
     volumes:
       - ./ohfe/.air.toml:/app/.air.toml:ro
-      - ./ohfe/go.mod:/app/go.mod:ro
-      - ./ohfe/go.sum:/app/go.sum:ro
       - ./ohfe/cmd:/app/cmd
     environment:
-      ONEHUB_ENDPOINT: http://onehub:9080/api
+      ONEHUB_API_ENDPOINT: http://onehub:9080/api
       ONEHUB_GRPC_ENDPOINT: onehub:9090
     ports:
       - 5080:5000
