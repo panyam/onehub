@@ -22,6 +22,16 @@ service MessageService {
   }
 
   /**
+   * Import messages in bulk
+   */
+  rpc ImportMessages(ImportMessagesRequest) returns (ImportMessagesResponse) {
+    option (google.api.http) = {
+      post: "/v1/messages:import",
+      body: "*",
+    };
+  }
+
+  /**
    * List all messages in a topic
    */
   rpc ListMessages(ListMessagesRequest) returns (ListMessagesResponse) { 
@@ -103,24 +113,44 @@ message CreateMessagesResponse {
 }
 
 /**
+ * Bulk importing of messages with very minimal checks.
+ * Here no validation is performed on the messages (ie checking topic IDS)
+ * setting current user id, setting created/updated time stamps etc.
+ * 
+ * Use this either for recovery (typically you should do DR on the DB) or
+ * or for testing.
+ */
+message ImportMessagesRequest {
+  /**
+   * Message being updated
+   */
+  repeated Message messages = 2;
+}
+
+/**
+ * Response of an message import.
+ */
+message ImportMessagesResponse {
+  /**
+   * Message being created
+   */
+  repeated Message messages = 1;
+}
+
+/**
  * A message listing request.  For now only paginations params are provided.
  */
 message ListMessagesRequest {
   /**
-   * Instead of an offset an abstract  "page" key is provided that offers
-   * an opaque "pointer" into some offset in a result set.
-   */
-  string page_key = 1;
-
-  /**
-   * Number of results to return.
-   */
-  int32 page_size = 2;
-
-  /**
    * Topic in which messages are to be listed.  Required.
    */
-  string topic_id = 3;
+  string topic_id = 1;
+
+
+  /**
+   * Pagination prameters.
+   */
+  Pagination pagination = 2;
 }
 
 /**
@@ -133,10 +163,9 @@ message ListMessagesResponse {
   repeated Message messages = 1;
 
   /**
-   * The key/pointer string that subsequent List requests should pass to
-   * continue the pagination.
+   * Pagination response info
    */
-  string next_page_key = 2;
+  PaginationResponse pagination = 2;
 }
 
 /**

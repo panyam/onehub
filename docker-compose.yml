@@ -1,20 +1,19 @@
-version: '3.9'
 services:
-  basegoimage:
-    build:
-      dockerfile: Dockerfile.base
-    image: basegoimage
+  #  basegoimage:
+  #    build:
+  #      dockerfile: Dockerfile.base
+  #    image: basegoimage
 
-  pgadmin:
-    image: dpage/pgadmin4
-    ports:
-      - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
-    environment:
-      PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
-      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-    volumes:
-      - ./.data/pgadmin:/var/lib/pgadmin
+#    pgadmin:
+#      image: dpage/pgadmin4
+#      ports:
+#        - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
+#      environment:
+#        PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
+#        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+#        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+#      volumes:
+#        - ./.data/pgadmin:/var/lib/pgadmin
 
   postgres:
     image: postgres:15.3
@@ -43,8 +42,7 @@ services:
       - 7080:80
     depends_on:
       - onehub
-      - nextfe 
-        # - ohfe
+      - ohfe
 
   typesense:
     image: typesense/typesense:0.25.0
@@ -55,24 +53,38 @@ services:
       - ./.data/typesensedata:/data
     command: '--data-dir /data --api-key=xyz --enable-cors'
 
-  nextfe:
-    build: ./nextfe
+#  nextfe:
+#    build: ./nextfe
+#    volumes:
+#       - ./nextfe:/app
+#       - /app/node_modules
+#       - /app/.next
+#    restart: always
+#    ports:
+#      - 4000:4000
+#    stdin_open: true
+
+  ohfe:
+    build:
+      context: ./ohfe
+      dockerfile: Dockerfile.debug
+    restart: unless-stopped
     volumes:
-       - ./nextfe:/app
-       - /app/node_modules
-       - /app/.next
-    restart: always
+      - ./ohfe:/app
+    # command: ["air", "-c", ".air.toml"]
+    environment:
+      ONEHUB_API_ENDPOINT: http://onehub:9080/api
+      ONEHUB_GRPC_ENDPOINT: onehub:9090
     ports:
-      - 4000:4000
-    stdin_open: true
+      - 5080:5000
+      - 9092:9091
 
   onehub:
     depends_on:
-      - basegoimage
       - postgres
     build:
       context: .
-      dockerfile: ./Dockerfile.backend
+      dockerfile: ./Dockerfile.backend.debug
     volumes:
       # - ./.air.toml:/app/.air.toml:ro
       # - ./go.mod:/app/go.mod:ro
@@ -94,7 +106,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
     ports:
-      - 8080:8080
+      - 9080:9080
       - 9000:9000
       - 9092:9091
 
@@ -128,22 +140,3 @@ services:
       DBSYNC_PUBNAME: ${DBSYNC_PUBNAME}
       DBSYNC_REPLSLOT: ${DBSYNC_REPLSLOT}
 
-#  ohfe:
-#    depends_on:
-#      - basegoimage
-#    build:
-#      context: .
-#      dockerfile: ./Dockerfile.ohfe
-#    volumes:
-#      # - ./ohfe/.air.toml:/app/.air.toml:ro
-#      # - ./ohfe/go.mod:/app/go.mod:ro
-#      # - ./ohfe/go.sum:/app/go.sum:ro
-#      - ./ohfe/cmd:/app/cmd
-#    command: ["air", "-c", "cmd/ohfe/.air.toml"]
-#      # command: ["air", "-c", "cmd/ohfe/.air.debug.toml"]
-#    environment:
-#      ONEHUB_ENDPOINT: http://onehub:8080/api
-#      ONEHUB_GRPC_ENDPOINT: onehub:9090
-#    ports:
-#      - 5080:5000
-#      - 9092:9091
