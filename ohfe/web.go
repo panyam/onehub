@@ -76,11 +76,6 @@ func (web *Web) setupSite() {
 		web.RenderView(view, w, r)
 	})
 
-	router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
-		view := &ChatPage{}
-		web.RenderView(view, w, r)
-	})
-
 	views := router.PathPrefix("/views").Subrouter()
 	topics := views.PathPrefix("/topics").Subrouter()
 	topics.HandleFunc("/list", web.onTopicsListView).Methods("GET")

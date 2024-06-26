@@ -9,7 +9,3 @@ type HomePage struct {
 type LoginPage struct {
 	s3gen.BaseView
 }
-
-type ChatPage struct {
-	s3gen.BaseView
-}
