@@ -18,8 +18,11 @@ all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 build: down
 	BUILDKIT_PROGRESS=plain docker compose build --no-cache
 
-up: down
+upd: down
 	docker compose up --remove-orphans -d
+
+up: down
+	docker compose up --remove-orphans
 
 logs:
 	docker compose logs -f

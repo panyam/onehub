@@ -4,12 +4,15 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/felixge/httpsnoop"
 	"github.com/gorilla/mux"
 	"github.com/panyam/s3gen"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Web struct {
@@ -25,15 +28,15 @@ func (w *Web) Start(addr string) {
 	w.site = &s3gen.Site{
 		ContentRoot:   "./content",
 		OutputDir:     "./output",
-		HtmlTemplates: []string{"templates/*/**"},
+		HtmlTemplates: []string{"./templates/*.html"},
 		StaticFolders: []string{
 			"/static/", "static",
 		},
 	}
 
 	// setup static routes
-	w.router.PathPrefix(w.site.PathPrefix).Handler(http.StripPrefix(w.site.PathPrefix, w.site))
 	w.setupSite()
+	w.router.PathPrefix(w.site.PathPrefix).Handler(http.StripPrefix(w.site.PathPrefix, w.site))
 
 	w.session = scs.New()
 	srv := &http.Server{
@@ -45,6 +48,7 @@ func (w *Web) Start(addr string) {
 	}
 	log.Printf("Serving Gateway endpoint on %s:", addr)
 	log.Fatal(srv.ListenAndServe())
+	log.Printf("Finished Serving Gateway endpoint on %s:", addr)
 }
 
 func withLogger(handler http.Handler) http.Handler {
@@ -57,10 +61,10 @@ func withLogger(handler http.Handler) http.Handler {
 	})
 }
 
-func (w *Web) setupSite() {
+func (web *Web) setupSite() {
 	// Specific functions for our site
-	site := w.site
-	router := w.router
+	site := web.site
+	router := web.router
 	site.CommonFuncMap = template.FuncMap{
 		"renderMenuItem": func(title string, link string) string {
 			return fmt.Sprintf("<li><a href=%s>%s</a></li>", link, title)
@@ -69,15 +73,35 @@ func (w *Web) setupSite() {
 
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		view := &HomePage{}
-		site.RenderView(w, view, "")
+		web.RenderView(view, w, r)
 	})
 
 	router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
 		view := &ChatPage{}
-		site.RenderView(w, view, "")
+		web.RenderView(view, w, r)
 	})
 
 	views := router.PathPrefix("/views").Subrouter()
 	topics := views.PathPrefix("/topics").Subrouter()
-	topics.HandleFunc("/list", w.onTopicsListView).Methods("GET")
+	topics.HandleFunc("/list", web.onTopicsListView).Methods("GET")
+}
+
+func (web *Web) RenderView(v s3gen.View, w http.ResponseWriter, r *http.Request) {
+	// w.WriteHeader(http.StatusOK)
+	v.InitView(web.site, nil)
+	err := v.ValidateRequest(w, r)
+	if err == nil {
+		err = web.site.RenderView(w, v, "")
+	}
+	if err != nil {
+		slog.Error("Render Error: ", "err", err)
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				w.WriteHeader(http.StatusNotFound)
+			}
+		}
+
+		http.Error(w, err.Error(), 500)
+		// c.Abort()
+	}
 }
