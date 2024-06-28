@@ -10,22 +10,29 @@ import (
 	"github.com/alexedwards/scs/v2"
 	"github.com/felixge/httpsnoop"
 	"github.com/gorilla/mux"
+	gauth "github.com/panyam/goutils/auth"
+	ghttp "github.com/panyam/goutils/http"
 	"github.com/panyam/s3gen"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type Web struct {
-	GrpcEndpoint string
-	ApiEndpoint  string
-	router       *mux.Router
-	session      *scs.SessionManager
-	site         *s3gen.Site
+	GrpcEndpoint    string
+	router          *mux.Router
+	session         *scs.SessionManager
+	Site            *s3gen.Site
+	loginAuthConfig gauth.AuthConfig
+	reqVarMap       ghttp.RequestVarMap
+	clientMgr       *ClientMgr
 }
 
 func (w *Web) Start(addr string) {
+	w.clientMgr = NewClientMgr(w.GrpcEndpoint)
+	w.loginAuthConfig.SessionGetter = w.SessionGet
+	w.loginAuthConfig.RequestVars = &w.reqVarMap
 	w.router = mux.NewRouter()
-	w.site = &s3gen.Site{
+	w.Site = &s3gen.Site{
 		ContentRoot:   "./content",
 		OutputDir:     "./output",
 		HtmlTemplates: []string{"./templates/*.html"},
@@ -36,9 +43,10 @@ func (w *Web) Start(addr string) {
 
 	// setup static routes
 	w.setupSite()
-	w.router.PathPrefix(w.site.PathPrefix).Handler(http.StripPrefix(w.site.PathPrefix, w.site))
+	w.router.PathPrefix(w.Site.PathPrefix).Handler(http.StripPrefix(w.Site.PathPrefix, w.Site))
 
 	w.session = scs.New()
+	// w.session.Store = NewGCDSessionStore(0)
 	srv := &http.Server{
 		Handler: withLogger(w.session.LoadAndSave(w.router)),
 		Addr:    addr,
@@ -49,6 +57,10 @@ func (w *Web) Start(addr string) {
 	log.Printf("Serving Gateway endpoint on %s:", addr)
 	log.Fatal(srv.ListenAndServe())
 	log.Printf("Finished Serving Gateway endpoint on %s:", addr)
+}
+
+func (web *Web) SessionGet(r *http.Request, key string) any {
+	return web.session.GetString(r.Context(), key)
 }
 
 func withLogger(handler http.Handler) http.Handler {
@@ -63,7 +75,7 @@ func withLogger(handler http.Handler) http.Handler {
 
 func (web *Web) setupSite() {
 	// Specific functions for our site
-	site := web.site
+	site := web.Site
 	router := web.router
 	site.CommonFuncMap = template.FuncMap{
 		"renderMenuItem": func(title string, link string) string {
@@ -71,7 +83,12 @@ func (web *Web) setupSite() {
 		},
 	}
 
+	router.HandleFunc("/login", web.onLogin).Methods("GET", "POST")
+
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if false && !web.loginAuthConfig.EnsureLogin(w, r) {
+			return
+		}
 		view := &HomePage{}
 		web.RenderView(view, w, r)
 	})
@@ -81,12 +98,12 @@ func (web *Web) setupSite() {
 	topics.HandleFunc("/list", web.onTopicsListView).Methods("GET")
 }
 
-func (web *Web) RenderView(v s3gen.View, w http.ResponseWriter, r *http.Request) {
+func (web *Web) RenderView(v SiteView, w http.ResponseWriter, r *http.Request) {
 	// w.WriteHeader(http.StatusOK)
-	v.InitView(web.site, nil)
+	v.InitView(web, nil)
 	err := v.ValidateRequest(w, r)
 	if err == nil {
-		err = web.site.RenderView(w, v, "")
+		err = web.Site.RenderView(w, v, "")
 	}
 	if err != nil {
 		slog.Error("Render Error: ", "err", err)

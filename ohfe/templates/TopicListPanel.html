@@ -1,0 +1,18 @@
+{{ define "TopicListPanel" }}
+  <div class="header">
+    <h3>Topics</h3>
+    <div class="TopicsHeaderPanel">
+      <button onClick="onSearchTopics(event); return false"
+          class="headerButton">Search</button>
+      <button onClick="onNewTopic(event); return false"
+          class="headerButton">New</button>
+    </div>
+  </div>
+  <div class="topiclist">
+    {{ range $topicView := .TopicViews }}
+      {{ RenderView $topicView }}
+    {{ end }}
+  </div>
+  <div class="footer">
+  </div>
+{{ end }}

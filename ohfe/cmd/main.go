@@ -8,7 +8,10 @@ import (
 )
 
 func main() {
-	web := ohfe.Web{GrpcEndpoint: os.Getenv("ONEHUB_GRPC_ENDPOINT"),
-		ApiEndpoint: os.Getenv("ONEHUB_API_ENDPOINT")}
+	grpcEndpoint := os.Getenv("ONEHUB_GRPC_ENDPOINT")
+	if grpcEndpoint == "" {
+		grpcEndpoint = ":9000"
+	}
+	web := ohfe.Web{GrpcEndpoint: grpcEndpoint}
 	web.Start(":5050")
 }

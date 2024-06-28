@@ -32,13 +32,16 @@
     <script src="https://cdn.tailwindcss.com"> </script>
     <script> tailwind.config = { darkMode: 'class', } </script> 
     -->
-    <link href="https://unpkg.com/tailwindcss@0.3.0/dist/tailwind.min.css" rel="stylesheet">
-    {{ if false }} {{/* load locally */}}
+    {{ if false }}
+    {{ if true }} {{/* load locally */}}
       <link rel="stylesheet" href="{{.Site.PathPrefix}}/static/css/tailwind.css" />
       <style> .dark-mode { background-color: yellow; color: white; } </style>
     {{ else }}
       <link href="https://unpkg.com/tailwindcss@0.3.0/dist/tailwind.min.css" rel="stylesheet">
-      <script> tailwind.config = { darkMode: 'class', } </script> 
+      <script> tailwind.config = {
+        darkMode: 'class',
+      } </script> 
+    {{ end }}
     {{ end }}
 
     <!-- Font Awesome -->
