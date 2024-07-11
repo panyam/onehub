@@ -20,37 +20,37 @@ class MessageServiceStub(object):
                 '/onehub.v1.MessageService/CreateMessages',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.FromString,
-                )
+                _registered_method=True)
         self.ImportMessages = channel.unary_unary(
                 '/onehub.v1.MessageService/ImportMessages',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.ImportMessagesRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.ImportMessagesResponse.FromString,
-                )
+                _registered_method=True)
         self.ListMessages = channel.unary_unary(
                 '/onehub.v1.MessageService/ListMessages',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.ListMessagesRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.ListMessagesResponse.FromString,
-                )
+                _registered_method=True)
         self.GetMessage = channel.unary_unary(
                 '/onehub.v1.MessageService/GetMessage',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.GetMessageRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.GetMessageResponse.FromString,
-                )
+                _registered_method=True)
         self.GetMessages = channel.unary_unary(
                 '/onehub.v1.MessageService/GetMessages',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.GetMessagesRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.GetMessagesResponse.FromString,
-                )
+                _registered_method=True)
         self.DeleteMessage = channel.unary_unary(
                 '/onehub.v1.MessageService/DeleteMessage',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.DeleteMessageRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.DeleteMessageResponse.FromString,
-                )
+                _registered_method=True)
         self.UpdateMessage = channel.unary_unary(
                 '/onehub.v1.MessageService/UpdateMessage',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.UpdateMessageRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.UpdateMessageResponse.FromString,
-                )
+                _registered_method=True)
 
 
 class MessageServiceServicer(object):
@@ -156,6 +156,7 @@ def add_MessageServiceServicer_to_server(servicer, server):
     generic_handler = grpc.method_handlers_generic_handler(
             'onehub.v1.MessageService', rpc_method_handlers)
     server.add_generic_rpc_handlers((generic_handler,))
+    server.add_registered_method_handlers('onehub.v1.MessageService', rpc_method_handlers)
 
 
  # This class is part of an EXPERIMENTAL API.
@@ -175,11 +176,21 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/CreateMessages',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/CreateMessages',
             onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def ImportMessages(request,
@@ -192,11 +203,21 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/ImportMessages',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/ImportMessages',
             onehub_dot_v1_dot_messages__pb2.ImportMessagesRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.ImportMessagesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def ListMessages(request,
@@ -209,11 +230,21 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/ListMessages',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/ListMessages',
             onehub_dot_v1_dot_messages__pb2.ListMessagesRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.ListMessagesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetMessage(request,
@@ -226,11 +257,21 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/GetMessage',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/GetMessage',
             onehub_dot_v1_dot_messages__pb2.GetMessageRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.GetMessageResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def GetMessages(request,
@@ -243,11 +284,21 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/GetMessages',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/GetMessages',
             onehub_dot_v1_dot_messages__pb2.GetMessagesRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.GetMessagesResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def DeleteMessage(request,
@@ -260,11 +311,21 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/DeleteMessage',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/DeleteMessage',
             onehub_dot_v1_dot_messages__pb2.DeleteMessageRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.DeleteMessageResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
 
     @staticmethod
     def UpdateMessage(request,
@@ -277,8 +338,18 @@ class MessageService(object):
             wait_for_ready=None,
             timeout=None,
             metadata=None):
-        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/UpdateMessage',
+        return grpc.experimental.unary_unary(
+            request,
+            target,
+            '/onehub.v1.MessageService/UpdateMessage',
             onehub_dot_v1_dot_messages__pb2.UpdateMessageRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.UpdateMessageResponse.FromString,
-            options, channel_credentials,
-            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+            options,
+            channel_credentials,
+            insecure,
+            call_credentials,
+            compression,
+            wait_for_ready,
+            timeout,
+            metadata,
+            _registered_method=True)
