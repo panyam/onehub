@@ -2,6 +2,7 @@
 """Client and server classes corresponding to protobuf-defined services."""
 import grpc
 
+from onehub.v1 import search_pb2 as onehub_dot_v1_dot_search__pb2
 
 
 class SearchServiceStub(object):
@@ -15,6 +16,11 @@ class SearchServiceStub(object):
         Args:
             channel: A grpc.Channel.
         """
+        self.SearchTopics = channel.unary_unary(
+                '/onehub.v1.SearchService/SearchTopics',
+                request_serializer=onehub_dot_v1_dot_search__pb2.SearchTopicsRequest.SerializeToString,
+                response_deserializer=onehub_dot_v1_dot_search__pb2.SearchTopicsRequest.FromString,
+                )
 
 
 class SearchServiceServicer(object):
@@ -22,9 +28,22 @@ class SearchServiceServicer(object):
     Search related queries
     """
 
+    def SearchTopics(self, request, context):
+        """*
+        Searches for topics given a certain criteria
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
 
 def add_SearchServiceServicer_to_server(servicer, server):
     rpc_method_handlers = {
+            'SearchTopics': grpc.unary_unary_rpc_method_handler(
+                    servicer.SearchTopics,
+                    request_deserializer=onehub_dot_v1_dot_search__pb2.SearchTopicsRequest.FromString,
+                    response_serializer=onehub_dot_v1_dot_search__pb2.SearchTopicsRequest.SerializeToString,
+            ),
     }
     generic_handler = grpc.method_handlers_generic_handler(
             'onehub.v1.SearchService', rpc_method_handlers)
@@ -36,3 +55,20 @@ class SearchService(object):
     """*
     Search related queries
     """
+
+    @staticmethod
+    def SearchTopics(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/onehub.v1.SearchService/SearchTopics',
+            onehub_dot_v1_dot_search__pb2.SearchTopicsRequest.SerializeToString,
+            onehub_dot_v1_dot_search__pb2.SearchTopicsRequest.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)

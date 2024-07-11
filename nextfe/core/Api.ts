@@ -5,7 +5,7 @@ import Auth from './Auth'
 export class Api {
   auth = new Auth()
 
-  basicAuthParamsFor(username) {
+  basicAuthParamsFor(username: string) {
     return {
       username: username,
       password: username + "123",

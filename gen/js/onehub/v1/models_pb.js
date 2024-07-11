@@ -57,3 +57,33 @@ export const Message = proto3.makeMessageType(
   ],
 );
 
+/**
+ * *
+ * General way to handle pagination in all listing resources.
+ *
+ * @generated from message onehub.v1.Pagination
+ */
+export const Pagination = proto3.makeMessageType(
+  "onehub.v1.Pagination",
+  () => [
+    { no: 1, name: "page_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+
+/**
+ * *
+ * Standard way to pass pagination related responses, eg the next page key
+ * that can be passed on a paginated request to get the "next page" of results.
+ *
+ * @generated from message onehub.v1.PaginationResponse
+ */
+export const PaginationResponse = proto3.makeMessageType(
+  "onehub.v1.PaginationResponse",
+  () => [
+    { no: 1, name: "next_page_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "has_more_results", kind: "scalar", T: 8 /* ScalarType.BOOL */ },
+    { no: 3, name: "total_num_results", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+  ],
+);
+

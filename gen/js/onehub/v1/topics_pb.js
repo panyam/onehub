@@ -4,7 +4,7 @@
 // @ts-nocheck
 
 import { FieldMask, proto3 } from "@bufbuild/protobuf";
-import { Topic } from "./models_pb.js";
+import { Pagination, PaginationResponse, Topic } from "./models_pb.js";
 
 /**
  * *
@@ -41,8 +41,7 @@ export const CreateTopicResponse = proto3.makeMessageType(
 export const ListTopicsRequest = proto3.makeMessageType(
   "onehub.v1.ListTopicsRequest",
   () => [
-    { no: 1, name: "page_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
-    { no: 2, name: "page_size", kind: "scalar", T: 5 /* ScalarType.INT32 */ },
+    { no: 1, name: "pagination", kind: "message", T: Pagination },
   ],
 );
 
@@ -56,7 +55,7 @@ export const ListTopicsResponse = proto3.makeMessageType(
   "onehub.v1.ListTopicsResponse",
   () => [
     { no: 1, name: "topics", kind: "message", T: Topic, repeated: true },
-    { no: 2, name: "next_page_key", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
   ],
 );
 

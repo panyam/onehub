@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ListMessagesRequest, ListMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
+import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ImportMessagesRequest, ImportMessagesResponse, ListMessagesRequest, ListMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -25,6 +25,18 @@ export declare const MessageService: {
       readonly name: "CreateMessages",
       readonly I: typeof CreateMessagesRequest,
       readonly O: typeof CreateMessagesResponse,
+      readonly kind: MethodKind.Unary,
+    },
+    /**
+     * *
+     * Import messages in bulk
+     *
+     * @generated from rpc onehub.v1.MessageService.ImportMessages
+     */
+    readonly importMessages: {
+      readonly name: "ImportMessages",
+      readonly I: typeof ImportMessagesRequest,
+      readonly O: typeof ImportMessagesResponse,
       readonly kind: MethodKind.Unary,
     },
     /**

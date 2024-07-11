@@ -29,14 +29,14 @@ type PGMSGHandler struct {
 	relnCache             map[uint32]*pglogrepl.RelationMessage
 }
 
-func (p *PGMSGHandler) AddRelation(reln *pglogrepl.RelationMessage) *PGTableInfo {
+func (p *PGMSGHandler) UpdateRelation(reln *pglogrepl.RelationMessage) *PGTableInfo {
 	if p.relnCache == nil {
 		p.relnCache = make(map[uint32]*pglogrepl.RelationMessage)
 	}
 	p.relnCache[reln.RelationID] = reln
 
 	// Query to get info on pkeys
-	tableInfo, _ := p.DB.SetTableInfo(reln.RelationID, reln.Namespace, reln.RelationName)
+	tableInfo, _ := p.DB.RefreshTableInfo(reln.RelationID, reln.Namespace, reln.RelationName)
 	return tableInfo
 
 	/*
@@ -69,7 +69,7 @@ func (p *PGMSGHandler) HandleMessage(idx int, rawmsg *PGMSG) (err error) {
 			msg.Decode(rawmsg.Data[1:])
 			return p.HandleBeginMessage(p, idx, &msg)
 		} else {
-			log.Println("Begin Transaction: ", rawmsg)
+			// log.Println("Begin Transaction: ", rawmsg)
 		}
 	case 'C':
 		p.LastCommit = idx
@@ -78,13 +78,14 @@ func (p *PGMSGHandler) HandleMessage(idx int, rawmsg *PGMSG) (err error) {
 			msg.Decode(rawmsg.Data[1:])
 			return p.HandleCommitMessage(p, idx, &msg)
 		} else {
-			log.Println("Commit Transaction: ", p.LastBegin, rawmsg)
+			// log.Println("Commit Transaction: ", p.LastBegin, rawmsg)
 		}
 	case 'R':
 		if p.HandleRelationMessage != nil {
 			var msg pglogrepl.RelationMessage
 			msg.Decode(rawmsg.Data[1:])
-			tableInfo := p.AddRelation(&msg)
+			// TODO - Cache this so we arent doing this again and again
+			tableInfo := p.UpdateRelation(&msg)
 			return p.HandleRelationMessage(p, idx, &msg, tableInfo)
 		}
 	case 'I':

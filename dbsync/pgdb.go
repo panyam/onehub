@@ -100,7 +100,10 @@ func (p *PGDB) GetTableInfo(relationID uint32) *PGTableInfo {
 	return tableinfo
 }
 
-func (p *PGDB) SetTableInfo(relationID uint32, namespace string, table_name string) (tableInfo *PGTableInfo, err error) {
+/**
+ * Queries the DB for the latest schema of a given relation and stores it
+ */
+func (p *PGDB) RefreshTableInfo(relationID uint32, namespace string, table_name string) (tableInfo *PGTableInfo, err error) {
 	field_info_query := fmt.Sprintf(`SELECT table_schema, table_name, column_name, ordinal_position, data_type, table_catalog from information_schema.columns WHERE table_schema = '%s' and table_name = '%s' ;`, namespace, table_name)
 	log.Println("Query for field types: ", field_info_query)
 	rows, err := p.db.Query(field_info_query)

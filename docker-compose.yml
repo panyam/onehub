@@ -53,16 +53,16 @@ services:
       - ./.data/typesensedata:/data
     command: '--data-dir /data --api-key=xyz --enable-cors'
 
-#  nextfe:
-#    build: ./nextfe
-#    volumes:
-#       - ./nextfe:/app
-#       - /app/node_modules
-#       - /app/.next
-#    restart: always
-#    ports:
-#      - 4000:4000
-#    stdin_open: true
+  nextfe:
+    build: ./nextfe
+    volumes:
+       - ./nextfe:/app
+       - /app/node_modules
+       - /app/.next
+    restart: always
+    ports:
+      - 4000:4000
+    stdin_open: true
 
   ohfe:
     build:
@@ -97,7 +97,6 @@ services:
       - ./protos:/app/protos
       - ./services:/app/services
     command: ["air", "-c", "cmd/backend/.air.toml"]
-      # command: ["air", "-c", ".air.debug.toml"]
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -127,7 +126,7 @@ services:
 #      # command: ["air", "-c", "cmd/dbsync/.air.debug.toml"]
     ports:
       - 3333:3333
-      - 9093:9091
+      - 9092:9091
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -139,4 +138,4 @@ services:
       DBSYNC_WM_TABLENAME: ${DBSYNC_WM_TABLENAME}
       DBSYNC_PUBNAME: ${DBSYNC_PUBNAME}
       DBSYNC_REPLSLOT: ${DBSYNC_REPLSLOT}
-
+      TYPESENSE_API_KEY: xyz

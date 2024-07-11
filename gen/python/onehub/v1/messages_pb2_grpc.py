@@ -21,6 +21,11 @@ class MessageServiceStub(object):
                 request_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.SerializeToString,
                 response_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.FromString,
                 )
+        self.ImportMessages = channel.unary_unary(
+                '/onehub.v1.MessageService/ImportMessages',
+                request_serializer=onehub_dot_v1_dot_messages__pb2.ImportMessagesRequest.SerializeToString,
+                response_deserializer=onehub_dot_v1_dot_messages__pb2.ImportMessagesResponse.FromString,
+                )
         self.ListMessages = channel.unary_unary(
                 '/onehub.v1.MessageService/ListMessages',
                 request_serializer=onehub_dot_v1_dot_messages__pb2.ListMessagesRequest.SerializeToString,
@@ -56,6 +61,14 @@ class MessageServiceServicer(object):
     def CreateMessages(self, request, context):
         """*
         Create a single message or messages in batch
+        """
+        context.set_code(grpc.StatusCode.UNIMPLEMENTED)
+        context.set_details('Method not implemented!')
+        raise NotImplementedError('Method not implemented!')
+
+    def ImportMessages(self, request, context):
+        """*
+        Import messages in bulk
         """
         context.set_code(grpc.StatusCode.UNIMPLEMENTED)
         context.set_details('Method not implemented!')
@@ -109,6 +122,11 @@ def add_MessageServiceServicer_to_server(servicer, server):
                     request_deserializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.FromString,
                     response_serializer=onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.SerializeToString,
             ),
+            'ImportMessages': grpc.unary_unary_rpc_method_handler(
+                    servicer.ImportMessages,
+                    request_deserializer=onehub_dot_v1_dot_messages__pb2.ImportMessagesRequest.FromString,
+                    response_serializer=onehub_dot_v1_dot_messages__pb2.ImportMessagesResponse.SerializeToString,
+            ),
             'ListMessages': grpc.unary_unary_rpc_method_handler(
                     servicer.ListMessages,
                     request_deserializer=onehub_dot_v1_dot_messages__pb2.ListMessagesRequest.FromString,
@@ -160,6 +178,23 @@ class MessageService(object):
         return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/CreateMessages',
             onehub_dot_v1_dot_messages__pb2.CreateMessagesRequest.SerializeToString,
             onehub_dot_v1_dot_messages__pb2.CreateMessagesResponse.FromString,
+            options, channel_credentials,
+            insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
+
+    @staticmethod
+    def ImportMessages(request,
+            target,
+            options=(),
+            channel_credentials=None,
+            call_credentials=None,
+            insecure=False,
+            compression=None,
+            wait_for_ready=None,
+            timeout=None,
+            metadata=None):
+        return grpc.experimental.unary_unary(request, target, '/onehub.v1.MessageService/ImportMessages',
+            onehub_dot_v1_dot_messages__pb2.ImportMessagesRequest.SerializeToString,
+            onehub_dot_v1_dot_messages__pb2.ImportMessagesResponse.FromString,
             options, channel_credentials,
             insecure, call_credentials, compression, wait_for_ready, timeout, metadata)
 

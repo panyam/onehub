@@ -22,7 +22,10 @@ upd: down
 	docker compose up --remove-orphans -d
 
 up: down
-	docker compose up --remove-orphans
+	docker compose up --remove-orphans -d
+
+logs:
+	docker compose logs -f
 
 logs:
 	docker compose logs -f

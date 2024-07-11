@@ -5,7 +5,7 @@
 
 import type { BinaryReadOptions, FieldList, FieldMask, JsonReadOptions, JsonValue, PartialMessage, PlainMessage } from "@bufbuild/protobuf";
 import { Message, proto3 } from "@bufbuild/protobuf";
-import type { Message as Message$1 } from "./models_pb.js";
+import type { Message as Message$1, Pagination, PaginationResponse } from "./models_pb.js";
 
 /**
  * *
@@ -89,6 +89,71 @@ export declare class CreateMessagesResponse extends Message<CreateMessagesRespon
 
 /**
  * *
+ * Bulk importing of messages with very minimal checks.
+ * Here no validation is performed on the messages (ie checking topic IDS)
+ * setting current user id, setting created/updated time stamps etc.
+ *
+ * Use this either for recovery (typically you should do DR on the DB) or
+ * or for testing.
+ *
+ * @generated from message onehub.v1.ImportMessagesRequest
+ */
+export declare class ImportMessagesRequest extends Message<ImportMessagesRequest> {
+  /**
+   * *
+   * Message being updated
+   *
+   * @generated from field: repeated onehub.v1.Message messages = 2;
+   */
+  messages: Message$1[];
+
+  constructor(data?: PartialMessage<ImportMessagesRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.ImportMessagesRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImportMessagesRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImportMessagesRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImportMessagesRequest;
+
+  static equals(a: ImportMessagesRequest | PlainMessage<ImportMessagesRequest> | undefined, b: ImportMessagesRequest | PlainMessage<ImportMessagesRequest> | undefined): boolean;
+}
+
+/**
+ * *
+ * Response of an message import.
+ *
+ * @generated from message onehub.v1.ImportMessagesResponse
+ */
+export declare class ImportMessagesResponse extends Message<ImportMessagesResponse> {
+  /**
+   * *
+   * Message being created
+   *
+   * @generated from field: repeated onehub.v1.Message messages = 1;
+   */
+  messages: Message$1[];
+
+  constructor(data?: PartialMessage<ImportMessagesResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.ImportMessagesResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ImportMessagesResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ImportMessagesResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ImportMessagesResponse;
+
+  static equals(a: ImportMessagesResponse | PlainMessage<ImportMessagesResponse> | undefined, b: ImportMessagesResponse | PlainMessage<ImportMessagesResponse> | undefined): boolean;
+}
+
+/**
+ * *
  * A message listing request.  For now only paginations params are provided.
  *
  * @generated from message onehub.v1.ListMessagesRequest
@@ -96,28 +161,19 @@ export declare class CreateMessagesResponse extends Message<CreateMessagesRespon
 export declare class ListMessagesRequest extends Message<ListMessagesRequest> {
   /**
    * *
-   * Instead of an offset an abstract  "page" key is provided that offers
-   * an opaque "pointer" into some offset in a result set.
-   *
-   * @generated from field: string page_key = 1;
-   */
-  pageKey: string;
-
-  /**
-   * *
-   * Number of results to return.
-   *
-   * @generated from field: int32 page_size = 2;
-   */
-  pageSize: number;
-
-  /**
-   * *
    * Topic in which messages are to be listed.  Required.
    *
-   * @generated from field: string topic_id = 3;
+   * @generated from field: string topic_id = 1;
    */
   topicId: string;
+
+  /**
+   * *
+   * Pagination prameters.
+   *
+   * @generated from field: onehub.v1.Pagination pagination = 2;
+   */
+  pagination?: Pagination;
 
   constructor(data?: PartialMessage<ListMessagesRequest>);
 
@@ -151,12 +207,11 @@ export declare class ListMessagesResponse extends Message<ListMessagesResponse> 
 
   /**
    * *
-   * The key/pointer string that subsequent List requests should pass to
-   * continue the pagination.
+   * Pagination response info
    *
-   * @generated from field: string next_page_key = 2;
+   * @generated from field: onehub.v1.PaginationResponse pagination = 2;
    */
-  nextPageKey: string;
+  pagination?: PaginationResponse;
 
   constructor(data?: PartialMessage<ListMessagesResponse>);
 

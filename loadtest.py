@@ -1,10 +1,27 @@
-import ipdb
+from ipdb import set_trace
+from datetime import datetime
 from collections import defaultdict
 import itertools
+import typesense as ts
 import time
 import random
 import csv
 import requests
+
+tsclient = ts.Client({"api_key": "xyz", "nodes": [{"host": "localhost", "port": 8108, "protocol": "http"}]})
+
+def tsreq(path, method="GET", body=None):
+    methfunc = getattr(requests, method.lower().strip())
+    headers = { "X-TYPESENSE-API-KEY": "xyz" }
+    json=False
+    if body is None or type(body) is dict:
+        json=True
+        headers["Content-Type"] = "application/json"
+    url = f"http://localhost:8108/{path}"
+    if json:
+        return methfunc(url, headers=headers, json=body)
+    else:
+        return methfunc(url, headers=headers, data=body)
 
 def sendmsg(users, tid, msg):
     creator = random.choice(users)["id"]
@@ -19,6 +36,8 @@ def sendmsg(users, tid, msg):
     resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
     rj = resp.json()
     return rj["messages"]
+
+MSG_START_TIME = time.time() - (3600*24*7)
 
 def sendmsgs(users, tid, msgs):
     auth = f"admin:admin123"
@@ -53,6 +72,19 @@ def ensure_users(nusers=100):
             print("Created User: ", user)
     return out
 
+def extract_topic_title(msg, max_length=40):
+    parts = [m.strip() for m in msg.replace("\t", " ").split(" ") if m.strip()]
+    if len(parts) == 1:
+        return parts[0][:max_length]
+    else:
+        out = []
+        for i,part in enumerate(parts):
+            out.append(part)
+            if len(" ".join(out)) > max_length:
+                out.pop()
+                break
+        return " ".join(out)
+
 def ensure_topics(users, ntopics=100):
     lines = list(csv.reader(open("./chatmessages.csv")))
     topics = {}
@@ -65,7 +97,7 @@ def ensure_topics(users, ntopics=100):
             currtid = tid
             # create new topic
             tid = f"lt{tid}"
-            topicname = msg
+            topicname = extract_topic_title(msg)
             topic = {"topic": { "id": tid, "name": topicname, }}
             resp = requests.get(f"http://{auth}@localhost:7080/api/v1/topics/{tid}")
             if resp.status_code == 200:
@@ -88,23 +120,68 @@ def grouped_messages():
     grouped.sort()
     return grouped
 
-def generate_batch_messages(users, topics, start=0, ngroups=100):
+def to_datetime(t):
+    # tmfmt = "{year}-{month}-{day}T{hour}:{min}:{sec}[.{frac_sec}]Z"
+    dt = datetime.fromtimestamp(t)
+    return dt.isoformat() + "Z"
+
+def create_random_messages(users, tid, msgs):
+    time_between_messages = random.random() * 300
+    num_users = 10 + int(random.random() * 90)
+    topic_users = random.sample(users, num_users)
+    start_time = MSG_START_TIME + (random.random() * 3600)
+    messages = [{
+        "topic_id": tid,
+        "user_id": random.choice(topic_users)["id"],
+        "content_type": "text/plain",
+        "content_text": msg,
+        "created_at": to_datetime(start_time + (time_between_messages * i)),
+        "updated_at": to_datetime(start_time + (time_between_messages * i)),
+    } for i,msg in enumerate(msgs)]
+    return messages
+
+def importmsgs(msgs):
+    print(f"Importing {len(msgs)} Messages")
+    auth = f"admin:admin123"
+    payload = { "messages": msgs }
+    resp = requests.post(f"http://{auth}@localhost:7080/api/v1/messages:import", json= payload)
+    rj = resp.json()
+    return rj["messages"]
+
+def generate_batch_messages(users, topics):
     grouped = grouped_messages() 
     starttime = time.time()
     count = 0
-    for tid, msgs in grouped[start:ngroups]:
+    batch = []
+    MAX_BATCH_SIZE = 5000
+    for tid, msgs in grouped:
+        print(f"Generating {len(msgs)} messages for topic: {tid}")
+        # find a random time between messages ssay within 5 minutes
         tid = 1 + (int(tid) % len(topics))
-        sendmsgs(users, f"lt{tid}", msgs)
+        topic_id = f"lt{tid}"
+        messages = create_random_messages(users, topic_id, msgs)
+        batch.extend(messages)
+        if len(batch) > MAX_BATCH_SIZE:
+            importmsgs(batch)
+            batch = []
+        # sendmsgs(users, topic_id, msgs)
         count += len(msgs)
+    if batch:
+        importmsgs(batch)
+        batch = []
     endtime = time.time()
     print(f"Generated {count} messages in {endtime - starttime} seconds")
 
 def generate_messages(users, topics, start=0, count=1000):
     lines = list(csv.reader(open("./chatmessages.csv")))
     starttime = time.time()
+    lasttid = None
     for tid, msg in lines[start:count]:
         tid = 1 + (int(tid) % len(topics))
+        if tid is not lasttid:
+            print(f"Generating messages for topic: {tid}")
         sendmsg(users, f"lt{tid}", msg)
+        lasttid = tid
     endtime = time.time()
     print(f"Generated {count} messages in {endtime - starttime} seconds")
 
