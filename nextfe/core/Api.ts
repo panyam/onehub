@@ -45,6 +45,13 @@ export class Api {
     return resp.data
   }
 
+  async getUserInfos(userids: string[]): Promise<any> {
+    const userIds = userids.map(uid => "ids=" + uid)
+    const path = this.getApiPath(`users:batchGet?${userIds.join('&')}`)
+    const resp = await axios.get(path, {auth: this.basicAuthParamsFor("admin")})
+    return resp.data
+  }
+
   async getUserInfo(userid: string): Promise<any> {
     const resp = await axios.get(this.getApiPath(`users/${userid}`), {auth: this.basicAuthParamsFor(userid)})
     return resp.data
@@ -76,7 +83,8 @@ export class Api {
   }
 
   async createMessage(topicId: string, message: any): Promise<any> {
-    const resp = await axios.post(this.getApiPath(`topics/${topicId}/messages`), message, {auth: this.basicAuthParams})
-    return resp.data
+    const path = this.getApiPath(`topics/${topicId}/messages`)
+    const resp = await axios.post(path, {"messages": [message]}, {auth: this.basicAuthParams})
+    return resp.data["messages"][0]
   }
 }

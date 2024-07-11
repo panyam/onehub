@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="en">
+<head>
+    {{ template "CommonPageHeader" dict "Site" .Context.Site }}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons" />
+    <link href="/static/css/global.css" rel="stylesheet">
+    <link href="/static/css/HomePage.css" rel="stylesheet">
+    <title>Topics</title>
+</head>
+<body>
+  <div class="main">
+    <div class="header">
+      <h2>OneHub Playground</h2>
+      <div class="headerRightToolbar">
+          <span class="headerLoggedInUser">{fullname}</span>
+      </div>
+    </div>
+    <div class="left">
+      {{ RenderView .TopicListPanel }}
+    </div>
+    <div class="centerpanel">
+      {{ RenderView .TopicPanel }}
+    </div>
+    <div class="footer"></div>
+  </div>
+</body>
+</html>

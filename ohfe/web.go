@@ -4,38 +4,49 @@ import (
 	"fmt"
 	"html/template"
 	"log"
+	"log/slog"
 	"net/http"
 
 	"github.com/alexedwards/scs/v2"
 	"github.com/felixge/httpsnoop"
 	"github.com/gorilla/mux"
+	gauth "github.com/panyam/goutils/auth"
+	ghttp "github.com/panyam/goutils/http"
 	"github.com/panyam/s3gen"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
 type Web struct {
-	GrpcEndpoint string
-	ApiEndpoint  string
-	router       *mux.Router
-	session      *scs.SessionManager
-	site         *s3gen.Site
+	GrpcEndpoint    string
+	router          *mux.Router
+	session         *scs.SessionManager
+	Site            *s3gen.Site
+	loginAuthConfig gauth.AuthConfig
+	reqVarMap       ghttp.RequestVarMap
+	clientMgr       *ClientMgr
 }
 
 func (w *Web) Start(addr string) {
+	w.clientMgr = NewClientMgr(w.GrpcEndpoint)
+	w.loginAuthConfig.SessionGetter = w.SessionGet
+	w.loginAuthConfig.RequestVars = &w.reqVarMap
 	w.router = mux.NewRouter()
-	w.site = &s3gen.Site{
+	w.Site = &s3gen.Site{
 		ContentRoot:   "./content",
 		OutputDir:     "./output",
-		HtmlTemplates: []string{"templates/*/**"},
+		HtmlTemplates: []string{"./templates/*.html"},
 		StaticFolders: []string{
 			"/static/", "static",
 		},
 	}
 
 	// setup static routes
-	w.router.PathPrefix(w.site.PathPrefix).Handler(http.StripPrefix(w.site.PathPrefix, w.site))
 	w.setupSite()
+	w.router.PathPrefix(w.Site.PathPrefix).Handler(http.StripPrefix(w.Site.PathPrefix, w.Site))
 
 	w.session = scs.New()
+	// w.session.Store = NewGCDSessionStore(0)
 	srv := &http.Server{
 		Handler: withLogger(w.session.LoadAndSave(w.router)),
 		Addr:    addr,
@@ -45,6 +56,11 @@ func (w *Web) Start(addr string) {
 	}
 	log.Printf("Serving Gateway endpoint on %s:", addr)
 	log.Fatal(srv.ListenAndServe())
+	log.Printf("Finished Serving Gateway endpoint on %s:", addr)
+}
+
+func (web *Web) SessionGet(r *http.Request, key string) any {
+	return web.session.GetString(r.Context(), key)
 }
 
 func withLogger(handler http.Handler) http.Handler {
@@ -57,27 +73,47 @@ func withLogger(handler http.Handler) http.Handler {
 	})
 }
 
-func (w *Web) setupSite() {
+func (web *Web) setupSite() {
 	// Specific functions for our site
-	site := w.site
-	router := w.router
+	site := web.Site
+	router := web.router
 	site.CommonFuncMap = template.FuncMap{
 		"renderMenuItem": func(title string, link string) string {
 			return fmt.Sprintf("<li><a href=%s>%s</a></li>", link, title)
 		},
 	}
 
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		view := &HomePage{}
-		site.RenderView(w, view, "")
-	})
+	router.HandleFunc("/login", web.onLogin).Methods("GET", "POST")
 
-	router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
-		view := &ChatPage{}
-		site.RenderView(w, view, "")
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		if false && !web.loginAuthConfig.EnsureLogin(w, r) {
+			return
+		}
+		view := &HomePage{}
+		web.RenderView(view, w, r)
 	})
 
 	views := router.PathPrefix("/views").Subrouter()
 	topics := views.PathPrefix("/topics").Subrouter()
-	topics.HandleFunc("/list", w.onTopicsListView).Methods("GET")
+	topics.HandleFunc("/list", web.onTopicsListView).Methods("GET")
+}
+
+func (web *Web) RenderView(v SiteView, w http.ResponseWriter, r *http.Request) {
+	// w.WriteHeader(http.StatusOK)
+	v.InitView(web, nil)
+	err := v.ValidateRequest(w, r)
+	if err == nil {
+		err = web.Site.RenderView(w, v, "")
+	}
+	if err != nil {
+		slog.Error("Render Error: ", "err", err)
+		if st, ok := status.FromError(err); ok {
+			if st.Code() == codes.NotFound {
+				w.WriteHeader(http.StatusNotFound)
+			}
+		}
+
+		http.Error(w, err.Error(), 500)
+		// c.Abort()
+	}
 }

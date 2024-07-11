@@ -108,7 +108,7 @@ services:
     ports:
       - 9080:9080
       - 9000:9000
-      - 9092:9091
+      - 9091:9091
 
   dbsync:
     depends_on:

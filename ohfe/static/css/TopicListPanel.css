@@ -1,0 +1,54 @@
+
+.container {
+}
+
+TopicListPanel .header {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  top: 0px;
+  height: 30px;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+TopicListPanel .topiclist {
+  position:absolute;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  top: 50px;
+  overflow: scroll;
+  /* border: solid 2px red; */
+}
+
+TopicListPanel .topicListItem {
+  padding-top: 0px;
+  padding-bottom: 0px;
+}
+
+TopicListPanel .topicListItemButton.Mui-selected * {
+  background-color: red;
+}
+
+TopicListPanel .footer {
+  position:absolute;
+  padding: 10px;
+  left: 0px;
+  right: 0px;
+  bottom: 0px;
+  height: 0px;
+}
+
+TopicListPanel .headerButton {
+  padding:2px;
+  margin: 2px;
+  font-size: smaller;
+}
+
+TopicListPanel .TopicCellDiv {
+  display: flex;
+  flex-direction: column;
+}

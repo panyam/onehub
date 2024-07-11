@@ -1,0 +1,12 @@
+{{ define "TopicDetailView" }}
+<div class="topicContainer">
+  <div class="topicDivContents">
+    <span class="topicNameSpan">
+      <a class="topicNameLink" href="/topics/{{.Topic.Id}}/view"> {{.Topic.Name}} </a>
+    </span>
+  </div>
+  <button class="topicDeleteButton" onClick="alert('Not yet implemented')">
+    <img width="12" height="12" src="/static/icons/DeleteIcon.png" alt="Delete Topic" />
+  </button>
+</div>
+{{ end }}
