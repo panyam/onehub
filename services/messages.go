@@ -25,7 +25,13 @@ func NewMessageService(db *ds.OneHubDB) *MessageService {
 }
 
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
-	results, err := s.DB.GetMessages(req.TopicId, "", req.Pagination.PageKey, int(req.Pagination.PageSize))
+	pageKey := ""
+	pageSize := 100
+	if req.Pagination != nil {
+		pageKey = req.Pagination.PageKey
+		pageSize = int(req.Pagination.PageSize)
+	}
+	results, err := s.DB.GetMessages(req.TopicId, "", pageKey, pageSize)
 	if err != nil {
 		return nil, err
 	}

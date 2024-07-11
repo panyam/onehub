@@ -42,7 +42,7 @@ export default function Container(props: any) {
   useEffect(() => {
     api.getTopics().then(response => {
       const out = new ResultList<any>(response.topics)
-      out.hasNext = response.nextPageKey.trim() != ""
+      out.hasNext = ((response.pagination || {}).nextPageKey || "").trim() != ""
       setTopicList(out)
     }).catch(error => {
       const out = new ResultList<any>([])
