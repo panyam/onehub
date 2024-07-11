@@ -12,7 +12,7 @@ import (
 	_ "github.com/lib/pq"
 	gut "github.com/panyam/goutils/utils"
 	ohds "github.com/panyam/onehub/clients"
-	dbsync "github.com/panyam/onehub/dbsync"
+	"github.com/panyam/onehub/dbsync"
 	// "github.com/typesense/typesense-go/typesense"
 )
 

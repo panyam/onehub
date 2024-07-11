@@ -1,9 +1,4 @@
 services:
-  #  basegoimage:
-  #    build:
-  #      dockerfile: Dockerfile.base
-  #    image: basegoimage
-
 #    pgadmin:
 #      image: dpage/pgadmin4
 #      ports:
@@ -71,20 +66,19 @@ services:
     restart: unless-stopped
     volumes:
       - ./ohfe:/app
-    # command: ["air", "-c", ".air.toml"]
     environment:
       ONEHUB_API_ENDPOINT: http://onehub:9080/api
       ONEHUB_GRPC_ENDPOINT: onehub:9090
     ports:
       - 5080:5000
-      - 9092:9091
+      - 9091:9091
 
   onehub:
     depends_on:
       - postgres
     build:
       context: .
-      dockerfile: ./Dockerfile.backend.debug
+      dockerfile: ./Dockerfile.debug
     volumes:
       # - ./.air.toml:/app/.air.toml:ro
       # - ./go.mod:/app/go.mod:ro
@@ -96,7 +90,7 @@ services:
       - ./datastore:/app/datastore
       - ./protos:/app/protos
       - ./services:/app/services
-    command: ["air", "-c", "cmd/backend/.air.toml"]
+        # command: ["air", "-c", "cmd/backend/.air.toml"]
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}
@@ -107,14 +101,12 @@ services:
     ports:
       - 9080:9080
       - 9000:9000
-      - 9091:9091
+      - 9092:9091
 
   dbsync:
-    depends_on:
-      - basegoimage
     build:
-      context: .
-      dockerfile: ./Dockerfile.dbsync
+      context: ./dbsync
+      dockerfile: ./Dockerfile.debug
     volumes:
       # - ./ohfe/.air.toml:/app/.air.toml:ro
       # - ./ohfe/go.mod:/app/go.mod:ro
@@ -126,7 +118,7 @@ services:
 #      # command: ["air", "-c", "cmd/dbsync/.air.debug.toml"]
     ports:
       - 3333:3333
-      - 9092:9091
+      - 9093:9091
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
       POSTGRES_PORT: ${POSTGRES_PORT}

@@ -13,7 +13,9 @@ PROTO_DIR:=$(SRC_DIR)/protos
 # where we want to generate server stubs, clients etc
 OUT_DIR:=$(SRC_DIR)/gen/go
 
-all: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
+all: build
+
+oldway: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
 build: down
 	BUILDKIT_PROGRESS=plain docker compose build --no-cache
@@ -22,7 +24,7 @@ upd: down
 	docker compose up --remove-orphans -d
 
 up: down
-	docker compose up --remove-orphans -d
+	docker compose up --remove-orphans
 
 logs:
 	docker compose logs -f
