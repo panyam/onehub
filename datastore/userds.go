@@ -39,6 +39,7 @@ func (tdb *OneHubDB) GetUsers(ids []string) (out []*User, err error) {
 	if err != nil {
 		log.Println("GetUsers Error: ", ids, err)
 	}
+	log.Println("Here......", out, ids)
 
 	return
 }

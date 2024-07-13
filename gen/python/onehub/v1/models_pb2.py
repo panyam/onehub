@@ -26,7 +26,7 @@ from google.protobuf import timestamp_pb2 as google_dot_protobuf_dot_timestamp__
 from google.protobuf import struct_pb2 as google_dot_protobuf_dot_struct__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16onehub/v1/models.proto\x12\tonehub.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x8a\x02\n\x04User\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\x12\x16\n\x06\x61vatar\x18\x05 \x01(\tR\x06\x61vatar\x12?\n\x0cprofile_data\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructH\x00R\x0bprofileData\x88\x01\x01\x42\x0f\n\r_profile_data\"\xad\x02\n\x05Topic\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x1d\n\ncreator_id\x18\x04 \x01(\tR\tcreatorId\x12\x12\n\x04name\x18\x05 \x01(\tR\x04name\x12\x31\n\x05users\x18\x06 \x03(\x0b\x32\x1b.onehub.v1.Topic.UsersEntryR\x05users\x1a\x38\n\nUsersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\x08R\x05value:\x02\x38\x01\"\xc5\x02\n\x07Message\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x17\n\x07user_id\x18\x04 \x01(\tR\x06userId\x12\x19\n\x08topic_id\x18\x05 \x01(\tR\x07topicId\x12!\n\x0c\x63ontent_type\x18\x06 \x01(\tR\x0b\x63ontentType\x12!\n\x0c\x63ontent_text\x18\x07 \x01(\tR\x0b\x63ontentText\x12:\n\x0c\x63ontent_data\x18\x08 \x01(\x0b\x32\x17.google.protobuf.StructR\x0b\x63ontentData\"D\n\nPagination\x12\x19\n\x08page_key\x18\x01 \x01(\tR\x07pageKey\x12\x1b\n\tpage_size\x18\x02 \x01(\x05R\x08pageSize\"\x8e\x01\n\x12PaginationResponse\x12\"\n\rnext_page_key\x18\x01 \x01(\tR\x0bnextPageKey\x12(\n\x10has_more_results\x18\x02 \x01(\x08R\x0ehasMoreResults\x12*\n\x11total_num_results\x18\x03 \x01(\x05R\x0ftotalNumResultsB{\n\rcom.onehub.v1B\x0bModelsProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x16onehub/v1/models.proto\x12\tonehub.v1\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1cgoogle/protobuf/struct.proto\"\x8a\x02\n\x04User\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x12\n\x04name\x18\x04 \x01(\tR\x04name\x12\x16\n\x06\x61vatar\x18\x05 \x01(\tR\x06\x61vatar\x12?\n\x0cprofile_data\x18\x06 \x01(\x0b\x32\x17.google.protobuf.StructH\x00R\x0bprofileData\x88\x01\x01\x42\x0f\n\r_profile_data\"\xb2\x01\n\x0bMessageBase\x12\x39\n\ncreated_at\x18\x01 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x39\n\nupdated_at\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x0e\n\x02id\x18\x03 \x01(\tR\x02id\x12\x1d\n\ncreator_id\x18\x04 \x01(\tR\tcreatorId\"\xb4\x01\n\x05Topic\x12*\n\x04\x62\x61se\x18\x01 \x01(\x0b\x32\x16.onehub.v1.MessageBaseR\x04\x62\x61se\x12\x12\n\x04name\x18\x02 \x01(\tR\x04name\x12\x31\n\x05users\x18\x03 \x03(\x0b\x32\x1b.onehub.v1.Topic.UsersEntryR\x05users\x1a\x38\n\nUsersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\x08R\x05value:\x02\x38\x01\"\x8f\x01\n\x0b\x43ontentBase\x12!\n\x0c\x63ontent_type\x18\x01 \x01(\tR\x0b\x63ontentType\x12!\n\x0c\x63ontent_text\x18\x02 \x01(\tR\x0b\x63ontentText\x12:\n\x0c\x63ontent_data\x18\x03 \x01(\x0b\x32\x17.google.protobuf.StructR\x0b\x63ontentData\"\xb7\x01\n\x07Message\x12*\n\x04\x62\x61se\x18\x01 \x01(\x0b\x32\x16.onehub.v1.MessageBaseR\x04\x62\x61se\x12\x39\n\x0c\x63ontent_base\x18\x02 \x01(\x0b\x32\x16.onehub.v1.ContentBaseR\x0b\x63ontentBase\x12\x19\n\x08topic_id\x18\x03 \x01(\tR\x07topicId\x12*\n\x11parent_message_id\x18\x04 \x01(\tR\x0fparentMessageId\"\x88\x01\n\x04Node\x12*\n\x04\x62\x61se\x18\x01 \x01(\x0b\x32\x16.onehub.v1.MessageBaseR\x04\x62\x61se\x12\x39\n\x0c\x63ontent_base\x18\x02 \x01(\x0b\x32\x16.onehub.v1.ContentBaseR\x0b\x63ontentBase\x12\x19\n\x08topic_id\x18\x03 \x01(\tR\x07topicId\"\xc7\x01\n\x04\x45\x64ge\x12*\n\x04\x62\x61se\x18\x01 \x01(\x0b\x32\x16.onehub.v1.MessageBaseR\x04\x62\x61se\x12\x39\n\x0c\x63ontent_base\x18\x02 \x01(\x0b\x32\x16.onehub.v1.ContentBaseR\x0b\x63ontentBase\x12\x1b\n\tsource_id\x18\x03 \x01(\tR\x08sourceId\x12\x1b\n\ttarget_id\x18\x04 \x01(\tR\x08targetId\x12\x1e\n\nundirected\x18\x05 \x01(\tR\nundirected\"D\n\nPagination\x12\x19\n\x08page_key\x18\x01 \x01(\tR\x07pageKey\x12\x1b\n\tpage_size\x18\x02 \x01(\x05R\x08pageSize\"\x8e\x01\n\x12PaginationResponse\x12\"\n\rnext_page_key\x18\x01 \x01(\tR\x0bnextPageKey\x12(\n\x10has_more_results\x18\x02 \x01(\x08R\x0ehasMoreResults\x12*\n\x11total_num_results\x18\x03 \x01(\x05R\x0ftotalNumResultsB{\n\rcom.onehub.v1B\x0bModelsProtoP\x01Z\x18github.com/onehub/protos\xa2\x02\x03OXX\xaa\x02\tOnehub.V1\xca\x02\tOnehub\\V1\xe2\x02\x15Onehub\\V1\\GPBMetadata\xea\x02\nOnehub::V1b\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -38,14 +38,22 @@ if not _descriptor._USE_C_DESCRIPTORS:
   _globals['_TOPIC_USERSENTRY']._serialized_options = b'8\001'
   _globals['_USER']._serialized_start=101
   _globals['_USER']._serialized_end=367
-  _globals['_TOPIC']._serialized_start=370
-  _globals['_TOPIC']._serialized_end=671
-  _globals['_TOPIC_USERSENTRY']._serialized_start=615
-  _globals['_TOPIC_USERSENTRY']._serialized_end=671
-  _globals['_MESSAGE']._serialized_start=674
-  _globals['_MESSAGE']._serialized_end=999
-  _globals['_PAGINATION']._serialized_start=1001
-  _globals['_PAGINATION']._serialized_end=1069
-  _globals['_PAGINATIONRESPONSE']._serialized_start=1072
-  _globals['_PAGINATIONRESPONSE']._serialized_end=1214
+  _globals['_MESSAGEBASE']._serialized_start=370
+  _globals['_MESSAGEBASE']._serialized_end=548
+  _globals['_TOPIC']._serialized_start=551
+  _globals['_TOPIC']._serialized_end=731
+  _globals['_TOPIC_USERSENTRY']._serialized_start=675
+  _globals['_TOPIC_USERSENTRY']._serialized_end=731
+  _globals['_CONTENTBASE']._serialized_start=734
+  _globals['_CONTENTBASE']._serialized_end=877
+  _globals['_MESSAGE']._serialized_start=880
+  _globals['_MESSAGE']._serialized_end=1063
+  _globals['_NODE']._serialized_start=1066
+  _globals['_NODE']._serialized_end=1202
+  _globals['_EDGE']._serialized_start=1205
+  _globals['_EDGE']._serialized_end=1404
+  _globals['_PAGINATION']._serialized_start=1406
+  _globals['_PAGINATION']._serialized_end=1474
+  _globals['_PAGINATIONRESPONSE']._serialized_start=1477
+  _globals['_PAGINATIONRESPONSE']._serialized_end=1619
 # @@protoc_insertion_point(module_scope)

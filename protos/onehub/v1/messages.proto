@@ -72,7 +72,7 @@ service MessageService {
    */
   rpc UpdateMessage(UpdateMessageRequest) returns (UpdateMessageResponse) {
       option (google.api.http) = {
-          patch: "/v1/messages/{message.id=*}"
+          patch: "/v1/messages/{message.base.id=*}"
           body: "*"
       };
   }

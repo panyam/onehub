@@ -63,7 +63,7 @@ service TopicService {
    */
   rpc UpdateTopic(UpdateTopicRequest) returns (UpdateTopicResponse) {
     option (google.api.http) = {
-      patch: "/v1/topics/{topic.id=*}"
+      patch: "/v1/topics/{topic.base.id=*}"
       body: "*"
     };
   }

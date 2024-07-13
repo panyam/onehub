@@ -34,7 +34,7 @@ export default function Container(props: any) {
       // get all suers in this list of messages
       const userids = new Set<string>()
       for (const msg of resp.messages) {
-        userids.add(msg.userId)
+        userids.add(msg.creatorId)
       }
       const messages = resp.messages
       const newUserMap = new Map(userMap)
@@ -91,7 +91,7 @@ export default function Container(props: any) {
       <div ref={setMsgScrollerElem} className={styles.msgscroller}>{
               messageList.items.map((message, index) => {
                 return <MessageView
-                          user = {userMap.get(message.userId)}
+                          user = {userMap.get(message.creatorId)}
                           message={message}
                           key={message.id} />
               })

@@ -18,12 +18,14 @@ func TopicToProto(input *ds.Topic) (out *protos.Topic) {
 	}
 
 	out = &protos.Topic{
-		CreatedAt: tspb.New(input.BaseModel.CreatedAt),
-		UpdatedAt: tspb.New(input.BaseModel.UpdatedAt),
-		Name:      input.Name,
-		Id:        input.BaseModel.Id,
-		CreatorId: input.CreatorId,
-		Users:     userIds,
+		Base: &protos.MessageBase{
+			CreatedAt: tspb.New(input.BaseModel.CreatedAt),
+			UpdatedAt: tspb.New(input.BaseModel.UpdatedAt),
+			Id:        input.BaseModel.Id,
+			CreatorId: input.CreatorId,
+		},
+		Name:  input.Name,
+		Users: userIds,
 	}
 	return
 }
@@ -31,12 +33,12 @@ func TopicToProto(input *ds.Topic) (out *protos.Topic) {
 func TopicFromProto(input *protos.Topic) (out *ds.Topic) {
 	out = &ds.Topic{
 		BaseModel: ds.BaseModel{
-			CreatedAt: input.CreatedAt.AsTime(),
-			UpdatedAt: input.UpdatedAt.AsTime(),
-			Id:        input.Id,
+			CreatedAt: input.Base.CreatedAt.AsTime(),
+			UpdatedAt: input.Base.UpdatedAt.AsTime(),
+			Id:        input.Base.Id,
+			CreatorId: input.Base.CreatorId,
 		},
-		Name:      input.Name,
-		CreatorId: input.CreatorId,
+		Name: input.Name,
 	}
 	if input.Users != nil {
 		var userIds []string
@@ -51,19 +53,23 @@ func TopicFromProto(input *protos.Topic) (out *ds.Topic) {
 
 func MessageToProto(input *ds.Message) (out *protos.Message) {
 	out = &protos.Message{
-		CreatedAt:   tspb.New(input.CreatedAt),
-		UpdatedAt:   tspb.New(input.BaseModel.UpdatedAt),
-		Id:          input.BaseModel.Id,
-		UserId:      input.UserId,
-		TopicId:     input.TopicId,
-		ContentType: input.ContentType,
-		ContentText: input.ContentText,
+		Base: &protos.MessageBase{
+			CreatedAt: tspb.New(input.CreatedAt),
+			UpdatedAt: tspb.New(input.BaseModel.UpdatedAt),
+			Id:        input.BaseModel.Id,
+			CreatorId: input.CreatorId,
+		},
+		ContentBase: &protos.ContentBase{
+			ContentType: input.ContentType,
+			ContentText: input.ContentText,
+		},
+		TopicId: input.TopicId,
 	}
 	if input.ContentData != nil {
 		if data, err := structpb.NewStruct(input.ContentData); err != nil {
 			log.Println("Error converting ContentData: ", err)
 		} else {
-			out.ContentData = data
+			out.ContentBase.ContentData = data
 		}
 	}
 	return
@@ -72,18 +78,17 @@ func MessageToProto(input *ds.Message) (out *protos.Message) {
 func MessageFromProto(input *protos.Message) (out *ds.Message) {
 	out = &ds.Message{
 		BaseModel: ds.BaseModel{
-			CreatedAt: input.CreatedAt.AsTime(),
-			UpdatedAt: input.UpdatedAt.AsTime(),
-			Id:        input.Id,
+			CreatedAt: input.Base.CreatedAt.AsTime(),
+			UpdatedAt: input.Base.UpdatedAt.AsTime(),
+			Id:        input.Base.Id,
+			CreatorId: input.Base.CreatorId,
 		},
-		UserId:      input.UserId,
+		ContentType: input.ContentBase.ContentType,
+		ContentText: input.ContentBase.ContentText,
 		TopicId:     input.TopicId,
-		CreatedAt:   input.CreatedAt.AsTime(),
-		ContentType: input.ContentType,
-		ContentText: input.ContentText,
 	}
-	if input.ContentData != nil {
-		out.ContentData = input.ContentData.AsMap()
+	if input.ContentBase.ContentData != nil {
+		out.ContentData = input.ContentBase.ContentData.AsMap()
 	}
 	return
 }

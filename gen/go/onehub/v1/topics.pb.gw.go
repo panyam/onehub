@@ -260,14 +260,14 @@ func request_TopicService_UpdateTopic_0(ctx context.Context, marshaler runtime.M
 		_   = err
 	)
 
-	val, ok = pathParams["topic.id"]
+	val, ok = pathParams["topic.base.id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic.id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic.base.id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "topic.id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "topic.base.id", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic.id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic.base.id", err)
 	}
 
 	msg, err := client.UpdateTopic(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -294,14 +294,14 @@ func local_request_TopicService_UpdateTopic_0(ctx context.Context, marshaler run
 		_   = err
 	)
 
-	val, ok = pathParams["topic.id"]
+	val, ok = pathParams["topic.base.id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic.id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "topic.base.id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "topic.id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "topic.base.id", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic.id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "topic.base.id", err)
 	}
 
 	msg, err := server.UpdateTopic(ctx, &protoReq)
@@ -448,7 +448,7 @@ func RegisterTopicServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/onehub.v1.TopicService/UpdateTopic", runtime.WithHTTPPathPattern("/v1/topics/{topic.id=*}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/onehub.v1.TopicService/UpdateTopic", runtime.WithHTTPPathPattern("/v1/topics/{topic.base.id=*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -622,7 +622,7 @@ func RegisterTopicServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/onehub.v1.TopicService/UpdateTopic", runtime.WithHTTPPathPattern("/v1/topics/{topic.id=*}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/onehub.v1.TopicService/UpdateTopic", runtime.WithHTTPPathPattern("/v1/topics/{topic.base.id=*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -652,7 +652,7 @@ var (
 
 	pattern_TopicService_DeleteTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "topics", "id"}, ""))
 
-	pattern_TopicService_UpdateTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "topics", "topic.id"}, ""))
+	pattern_TopicService_UpdateTopic_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "topics", "topic.base.id"}, ""))
 )
 
 var (

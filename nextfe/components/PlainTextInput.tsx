@@ -13,8 +13,10 @@ export default function Container(props: any) {
       if (contenttext.length > 0) {
         console.log(evt, evt.target)
         if (await props.onNewMessage({
+          "content_base": {
             "content_text": contenttext,
             "content_type": "text/plain",
+          },
         })) {
           if (textAreaRef.current != null) {
             textAreaRef.current.value = ""

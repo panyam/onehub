@@ -10,7 +10,8 @@ type BaseModel struct {
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	Id        string `gorm:"primaryKey"`
-	Version   int    // used for optimistic locking
+	CreatorId string
+	Version   int // used for optimistic locking
 }
 
 type User struct {
@@ -22,9 +23,8 @@ type User struct {
 
 type Topic struct {
 	BaseModel
-	CreatorId string
-	Name      string         `gorm:"index:SortedByName"`
-	Users     pq.StringArray `gorm:"type:text[]"`
+	Name  string         `gorm:"index:SortedByName"`
+	Users pq.StringArray `gorm:"type:text[]"`
 }
 
 type Message struct {
@@ -34,7 +34,6 @@ type Message struct {
 	TopicId     string    `gorm:"index:SortedByTopicAndCreation,priority:1"`
 	CreatedAt   time.Time `gorm:"index:SortedByTopicAndCreation,priority:2"`
 	SourceId    string
-	UserId      string
 	ContentType string
 	ContentText string
 	ContentData map[string]interface{} `gorm:"type:json"`

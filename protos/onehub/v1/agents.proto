@@ -1,0 +1,56 @@
+syntax = "proto3";
+import "google/protobuf/field_mask.proto";
+
+option go_package = "github.com/onehub/protos";
+package onehub.v1;
+
+import "onehub/v1/models.proto";
+import "google/api/annotations.proto";
+
+message Tool {
+  // A unique ID for this tool
+  string id = 1;
+
+  // A readable name for this tool - as understood by an LLM
+  string name = 2;
+
+  // Description of this tool as understood by an LLM
+  string description = 3;
+
+  // Info about input parameters
+  repeated ParamInfo input_params = 4;
+
+  // Info about output params
+  repeated ParamInfo output_params = 5;
+}
+
+message ParamInfo {
+  // Name of the parameter
+  string name = 1;
+
+  // Description of the parameter.
+  string description = 2;
+
+  // A string notation of the type
+  string param_type = 3;
+}
+
+message Agent {
+  string class = 1;
+
+  string name = 2;
+
+  string description = 3;
+}
+
+/**
+ * The control plane service that manages the lifecycle of multiple agents
+ */
+service AgentPlaneService {
+}
+
+/**
+ * The agent control plane
+ */
+service AgentsService {
+}

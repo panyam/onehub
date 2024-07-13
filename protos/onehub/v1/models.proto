@@ -22,8 +22,7 @@ message User {
   optional google.protobuf.Struct profile_data = 6;
 }
 
-// Artists perform/play/sing songs
-message Topic {
+message MessageBase {
   google.protobuf.Timestamp created_at = 1;
   google.protobuf.Timestamp updated_at = 2;
 
@@ -32,62 +31,89 @@ message Topic {
 
   // ID of the user that created this topic
   string creator_id = 4;
+}
+
+// Artists perform/play/sing songs
+message Topic {
+  MessageBase base = 1;
   
   // A unique name of the topic that users can use to connect to
-  string name = 5;
+  string name = 2;
 
   // IDs of users in this topic.   Right now no information about
   // their participation is kept.
-  map<string, bool> users = 6;
+  map<string, bool> users = 3;
+}
+
+/**
+ * Base message type of entities that have custom "content" in them.
+ */
+message ContentBase {
+  /**
+   * Content type of the message. Can be like a ContentType http
+   * header or something custom like shell/command
+   */
+  string content_type = 1;
+
+  /**
+   * A simple way to just send text.
+   */
+  string content_text = 2;
+
+  // Raw contents for data stored locally as JSON
+  // Note we can have a combination of text, url and data
+  // to show different things in the View/UI
+  google.protobuf.Struct content_data = 3;
 }
 
 /**
  * An individual message in a topic
  */
 message Message {
-  /**
-   * When the message was created on the server.
-   */
-  google.protobuf.Timestamp created_at = 1;
+  MessageBase base = 1;
 
-  /**
-   * When the message or its body were last modified (if modifications are
-   * possible).
-   */
-  google.protobuf.Timestamp updated_at = 2;
-
-  /**
-   * ID of the message guaranteed to be unique within a topic.
-   * Set only by the server and cannot be modified.
-   */
-  string id = 3;
-
-  /**
-   * User sending this message.
-   */
-  string user_id = 4;
+  ContentBase content_base = 2;
 
   /**
    * Topic the message is part of.  This is only set by the server
    * and cannot be modified.
    */
-  string topic_id = 5;
+  string topic_id = 3;
 
   /**
-   * Content type of the message. Can be like a ContentType http
-   * header or something custom like shell/command
+   * ID of the parent message for threading a Topic
    */
-  string content_type = 6;
+  string parent_message_id = 4;
+}
 
-  /**
-   * A simple way to just send text.
-   */
-  string content_text = 7;
+/**
+ * Nodes are blocks inside a graph.
+ */
+message Node {
+  MessageBase base = 1;
 
-  // Raw contents for data stored locally as JSON
-  // Note we can have a combination of text, url and data
-  // to show different things in the View/UI
-  google.protobuf.Struct content_data = 8;
+  ContentBase content_base = 2;
+
+  // Others to follow
+  string topic_id = 3;
+}
+
+/**
+ * Edges between two nodes in a graph.
+ */
+message Edge {
+  MessageBase base = 1;
+
+  ContentBase content_base = 2;
+
+  // ID of the source node
+  string source_id = 3;
+
+  // ID of the destination node
+  string target_id = 4;
+
+  // Whether edge id undirected (edges are directed by default)
+  string undirected = 5;
 }
 
 /**

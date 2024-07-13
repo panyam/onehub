@@ -24,6 +24,16 @@ func NewMessageService(db *ds.OneHubDB) *MessageService {
 	}
 }
 
+func ensureMessageBase(msg *protos.Message) *protos.Message {
+	if msg.ContentBase == nil {
+		msg.ContentBase = &protos.ContentBase{}
+	}
+	if msg.Base == nil {
+		msg.Base = &protos.MessageBase{}
+	}
+	return msg
+}
+
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
 	pageKey := ""
 	pageSize := 100
@@ -55,15 +65,16 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 	authedUser := GetAuthedUser(ctx)
 	for _, message := range req.Messages {
 		// TODO - do this on batch
+		ensureMessageBase(message)
 		if !req.AllowUserids {
-			message.UserId = authedUser
+			message.Base.CreatorId = authedUser
 		}
 		message.TopicId = req.TopicId
-		if message.Id != "" {
+		if message.Base.Id != "" {
 			// see if it already exists
-			curr, _ := s.DB.GetMessage(message.Id)
+			curr, _ := s.DB.GetMessage(message.Base.Id)
 			if curr != nil {
-				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Id))
+				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
 		} else {
 			numNewIDs++
@@ -73,9 +84,9 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 	newIDs := s.DB.NewIDs("Message", numNewIDs)
 	for _, message := range req.Messages {
 		// get an ID from the pool
-		if message.Id == "" {
+		if message.Base.Id == "" {
 			numNewIDs--
-			message.Id = newIDs[numNewIDs]
+			message.Base.Id = newIDs[numNewIDs]
 		}
 		dbmsg := MessageFromProto(message)
 		dbmsgs = append(dbmsgs, dbmsg)
@@ -102,17 +113,18 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 	// Add a new message entity here
 	numNewIDs := 0
 	for idx, message := range req.Messages {
+		ensureMessageBase(message)
 		if message.TopicId == "" {
 			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("TopicId not set in message %d", idx))
 		}
-		if message.UserId == "" {
-			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("UserId not set in message %d", idx))
+		if message.Base.CreatorId == "" {
+			return nil, status.Error(codes.InvalidArgument, fmt.Sprintf("CreatorId not set in message %d", idx))
 		}
-		if message.Id != "" {
+		if message.Base.Id != "" {
 			// see if it already exists
-			curr, _ := s.DB.GetMessage(message.Id)
+			curr, _ := s.DB.GetMessage(message.Base.Id)
 			if curr != nil {
-				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Id))
+				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
 		} else {
 			numNewIDs++
@@ -122,9 +134,9 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 	newIDs := s.DB.NewIDs("Message", numNewIDs)
 	for _, message := range req.Messages {
 		// get an ID from the pool
-		if message.Id == "" {
+		if message.Base.Id == "" {
 			numNewIDs--
-			message.Id = newIDs[numNewIDs]
+			message.Base.Id = newIDs[numNewIDs]
 		}
 		dbmsg := MessageFromProto(message)
 		dbmsgs = append(dbmsgs, dbmsg)
@@ -142,9 +154,10 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 }
 
 func (s *MessageService) UpdateMessage(ctx context.Context, req *protos.UpdateMessageRequest) (resp *protos.UpdateMessageResponse, err error) {
-	msg, err := s.DB.GetMessage(req.Message.Id)
+	ensureMessageBase(req.Message)
+	msg, err := s.DB.GetMessage(req.Message.Base.Id)
 	if msg == nil {
-		return nil, fmt.Errorf("message not found: %s", req.Message.Id)
+		return nil, fmt.Errorf("message not found: %s", req.Message.Base.Id)
 	}
 	dbmsg := MessageFromProto(req.Message)
 	if err := s.DB.SaveMessage(dbmsg); err != nil {

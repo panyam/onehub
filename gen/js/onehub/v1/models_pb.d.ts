@@ -64,11 +64,9 @@ export declare class User extends Message$1<User> {
 }
 
 /**
- * Artists perform/play/sing songs
- *
- * @generated from message onehub.v1.Topic
+ * @generated from message onehub.v1.MessageBase
  */
-export declare class Topic extends Message$1<Topic> {
+export declare class MessageBase extends Message$1<MessageBase> {
   /**
    * @generated from field: google.protobuf.Timestamp created_at = 1;
    */
@@ -93,10 +91,36 @@ export declare class Topic extends Message$1<Topic> {
    */
   creatorId: string;
 
+  constructor(data?: PartialMessage<MessageBase>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.MessageBase";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): MessageBase;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): MessageBase;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): MessageBase;
+
+  static equals(a: MessageBase | PlainMessage<MessageBase> | undefined, b: MessageBase | PlainMessage<MessageBase> | undefined): boolean;
+}
+
+/**
+ * Artists perform/play/sing songs
+ *
+ * @generated from message onehub.v1.Topic
+ */
+export declare class Topic extends Message$1<Topic> {
+  /**
+   * @generated from field: onehub.v1.MessageBase base = 1;
+   */
+  base?: MessageBase;
+
   /**
    * A unique name of the topic that users can use to connect to
    *
-   * @generated from field: string name = 5;
+   * @generated from field: string name = 2;
    */
   name: string;
 
@@ -104,7 +128,7 @@ export declare class Topic extends Message$1<Topic> {
    * IDs of users in this topic.   Right now no information about
    * their participation is kept.
    *
-   * @generated from field: map<string, bool> users = 6;
+   * @generated from field: map<string, bool> users = 3;
    */
   users: { [key: string]: boolean };
 
@@ -125,60 +149,17 @@ export declare class Topic extends Message$1<Topic> {
 
 /**
  * *
- * An individual message in a topic
+ * Base message type of entities that have custom "content" in them.
  *
- * @generated from message onehub.v1.Message
+ * @generated from message onehub.v1.ContentBase
  */
-export declare class Message extends Message$1<Message> {
-  /**
-   * *
-   * When the message was created on the server.
-   *
-   * @generated from field: google.protobuf.Timestamp created_at = 1;
-   */
-  createdAt?: Timestamp;
-
-  /**
-   * *
-   * When the message or its body were last modified (if modifications are
-   * possible).
-   *
-   * @generated from field: google.protobuf.Timestamp updated_at = 2;
-   */
-  updatedAt?: Timestamp;
-
-  /**
-   * *
-   * ID of the message guaranteed to be unique within a topic.
-   * Set only by the server and cannot be modified.
-   *
-   * @generated from field: string id = 3;
-   */
-  id: string;
-
-  /**
-   * *
-   * User sending this message.
-   *
-   * @generated from field: string user_id = 4;
-   */
-  userId: string;
-
-  /**
-   * *
-   * Topic the message is part of.  This is only set by the server
-   * and cannot be modified.
-   *
-   * @generated from field: string topic_id = 5;
-   */
-  topicId: string;
-
+export declare class ContentBase extends Message$1<ContentBase> {
   /**
    * *
    * Content type of the message. Can be like a ContentType http
    * header or something custom like shell/command
    *
-   * @generated from field: string content_type = 6;
+   * @generated from field: string content_type = 1;
    */
   contentType: string;
 
@@ -186,7 +167,7 @@ export declare class Message extends Message$1<Message> {
    * *
    * A simple way to just send text.
    *
-   * @generated from field: string content_text = 7;
+   * @generated from field: string content_text = 2;
    */
   contentText: string;
 
@@ -195,9 +176,58 @@ export declare class Message extends Message$1<Message> {
    * Note we can have a combination of text, url and data
    * to show different things in the View/UI
    *
-   * @generated from field: google.protobuf.Struct content_data = 8;
+   * @generated from field: google.protobuf.Struct content_data = 3;
    */
   contentData?: Struct;
+
+  constructor(data?: PartialMessage<ContentBase>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.ContentBase";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): ContentBase;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): ContentBase;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): ContentBase;
+
+  static equals(a: ContentBase | PlainMessage<ContentBase> | undefined, b: ContentBase | PlainMessage<ContentBase> | undefined): boolean;
+}
+
+/**
+ * *
+ * An individual message in a topic
+ *
+ * @generated from message onehub.v1.Message
+ */
+export declare class Message extends Message$1<Message> {
+  /**
+   * @generated from field: onehub.v1.MessageBase base = 1;
+   */
+  base?: MessageBase;
+
+  /**
+   * @generated from field: onehub.v1.ContentBase content_base = 2;
+   */
+  contentBase?: ContentBase;
+
+  /**
+   * *
+   * Topic the message is part of.  This is only set by the server
+   * and cannot be modified.
+   *
+   * @generated from field: string topic_id = 3;
+   */
+  topicId: string;
+
+  /**
+   * *
+   * ID of the parent message for threading a Topic
+   *
+   * @generated from field: string parent_message_id = 4;
+   */
+  parentMessageId: string;
 
   constructor(data?: PartialMessage<Message>);
 
@@ -212,6 +242,98 @@ export declare class Message extends Message$1<Message> {
   static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Message;
 
   static equals(a: Message | PlainMessage<Message> | undefined, b: Message | PlainMessage<Message> | undefined): boolean;
+}
+
+/**
+ * *
+ * Nodes are blocks inside a graph.
+ *
+ * @generated from message onehub.v1.Node
+ */
+export declare class Node extends Message$1<Node> {
+  /**
+   * @generated from field: onehub.v1.MessageBase base = 1;
+   */
+  base?: MessageBase;
+
+  /**
+   * @generated from field: onehub.v1.ContentBase content_base = 2;
+   */
+  contentBase?: ContentBase;
+
+  /**
+   * Others to follow
+   *
+   * @generated from field: string topic_id = 3;
+   */
+  topicId: string;
+
+  constructor(data?: PartialMessage<Node>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.Node";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Node;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Node;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Node;
+
+  static equals(a: Node | PlainMessage<Node> | undefined, b: Node | PlainMessage<Node> | undefined): boolean;
+}
+
+/**
+ * *
+ * Edges between two nodes in a graph.
+ *
+ * @generated from message onehub.v1.Edge
+ */
+export declare class Edge extends Message$1<Edge> {
+  /**
+   * @generated from field: onehub.v1.MessageBase base = 1;
+   */
+  base?: MessageBase;
+
+  /**
+   * @generated from field: onehub.v1.ContentBase content_base = 2;
+   */
+  contentBase?: ContentBase;
+
+  /**
+   * ID of the source node
+   *
+   * @generated from field: string source_id = 3;
+   */
+  sourceId: string;
+
+  /**
+   * ID of the destination node
+   *
+   * @generated from field: string target_id = 4;
+   */
+  targetId: string;
+
+  /**
+   * Whether edge id undirected (edges are directed by default)
+   *
+   * @generated from field: string undirected = 5;
+   */
+  undirected: string;
+
+  constructor(data?: PartialMessage<Edge>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.Edge";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): Edge;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): Edge;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): Edge;
+
+  static equals(a: Edge | PlainMessage<Edge> | undefined, b: Edge | PlainMessage<Edge> | undefined): boolean;
 }
 
 /**

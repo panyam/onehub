@@ -23,21 +23,29 @@ func NewTopicService(db *ds.OneHubDB) *TopicService {
 	}
 }
 
+func ensureTopicBase(topic *protos.Topic) *protos.Topic {
+	if topic.Base == nil {
+		topic.Base = &protos.MessageBase{}
+	}
+	return topic
+}
+
 // Create a new Topic
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
-	req.Topic.CreatorId = GetAuthedUser(ctx)
-	if req.Topic.CreatorId == "" {
+	ensureTopicBase(req.Topic)
+	req.Topic.Base.CreatorId = GetAuthedUser(ctx)
+	if req.Topic.Base.CreatorId == "" {
 		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic.")
 	}
 	topic := req.Topic
-	if topic.Id != "" {
+	if topic.Base.Id != "" {
 		// see if it already exists
-		curr, _ := s.DB.GetTopic(topic.Id)
+		curr, _ := s.DB.GetTopic(topic.Base.Id)
 		if curr != nil {
-			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Topic with id '%s' already exists", topic.Id))
+			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Topic with id '%s' already exists", topic.Base.Id))
 		}
 	} else {
-		topic.Id = s.DB.NewID("Topic")
+		topic.Base.Id = s.DB.NewID("Topic")
 	}
 	if topic.Name == "" {
 		return nil, status.Error(codes.InvalidArgument, "Name not found")
@@ -97,7 +105,7 @@ func (s *TopicService) GetTopics(ctx context.Context, req *protos.GetTopicsReque
 
 // Update a new Topic
 func (s *TopicService) UpdateTopic(ctx context.Context, req *protos.UpdateTopicRequest) (resp *protos.UpdateTopicResponse, err error) {
-	currtopic, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: req.Topic.Id})
+	currtopic, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: req.Topic.Base.Id})
 	if err != nil {
 		return nil, err
 	}

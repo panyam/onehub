@@ -89,7 +89,7 @@
         ]
       }
     },
-    "/v1/messages/{message.id}": {
+    "/v1/messages/{message.base.id}": {
       "patch": {
         "summary": "*\nUpdate a message within a topic.",
         "operationId": "MessageService_UpdateMessage",
@@ -109,8 +109,8 @@
         },
         "parameters": [
           {
-            "name": "message.id",
-            "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified.",
+            "name": "message.base.id",
+            "description": "ID of the topic",
             "in": "path",
             "required": true,
             "type": "string",
@@ -126,35 +126,33 @@
                 "message": {
                   "type": "object",
                   "properties": {
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "*\nWhen the message was created on the server."
+                    "base": {
+                      "type": "object",
+                      "properties": {
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "creatorId": {
+                          "type": "string",
+                          "title": "ID of the user that created this topic"
+                        }
+                      }
                     },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time",
-                      "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
-                    },
-                    "userId": {
-                      "type": "string",
-                      "description": "*\nUser sending this message."
+                    "contentBase": {
+                      "$ref": "#/definitions/v1ContentBase"
                     },
                     "topicId": {
                       "type": "string",
                       "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified."
                     },
-                    "contentType": {
+                    "parentMessageId": {
                       "type": "string",
-                      "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
-                    },
-                    "contentText": {
-                      "type": "string",
-                      "description": "*\nA simple way to just send text."
-                    },
-                    "contentData": {
-                      "type": "object",
-                      "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
+                      "title": "*\nID of the parent message for threading a Topic"
                     }
                   },
                   "title": "The message being updated.  The topic ID AND message ID fields *must*\nbe specified in this message object.  How other fields are used is\ndetermined by the update_mask parameter enabling partial updates"
@@ -404,7 +402,7 @@
         ]
       }
     },
-    "/v1/topics/{topic.id}": {
+    "/v1/topics/{topic.base.id}": {
       "patch": {
         "summary": "*\nUpdates specific fields of a topic",
         "operationId": "TopicService_UpdateTopic",
@@ -424,7 +422,7 @@
         },
         "parameters": [
           {
-            "name": "topic.id",
+            "name": "topic.base.id",
             "description": "ID of the topic",
             "in": "path",
             "required": true,
@@ -441,17 +439,22 @@
                 "topic": {
                   "type": "object",
                   "properties": {
-                    "createdAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "updatedAt": {
-                      "type": "string",
-                      "format": "date-time"
-                    },
-                    "creatorId": {
-                      "type": "string",
-                      "title": "ID of the user that created this topic"
+                    "base": {
+                      "type": "object",
+                      "properties": {
+                        "createdAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "updatedAt": {
+                          "type": "string",
+                          "format": "date-time"
+                        },
+                        "creatorId": {
+                          "type": "string",
+                          "title": "ID of the user that created this topic"
+                        }
+                      }
                     },
                     "name": {
                       "type": "string",
@@ -918,6 +921,24 @@
         }
       }
     },
+    "v1ContentBase": {
+      "type": "object",
+      "properties": {
+        "contentType": {
+          "type": "string",
+          "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
+        },
+        "contentText": {
+          "type": "string",
+          "description": "*\nA simple way to just send text."
+        },
+        "contentData": {
+          "type": "object",
+          "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
+        }
+      },
+      "description": "*\nBase message type of entities that have custom \"content\" in them."
+    },
     "v1CreateMessagesResponse": {
       "type": "object",
       "properties": {
@@ -1132,42 +1153,43 @@
     "v1Message": {
       "type": "object",
       "properties": {
-        "createdAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "*\nWhen the message was created on the server."
+        "base": {
+          "$ref": "#/definitions/v1MessageBase"
         },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time",
-          "description": "*\nWhen the message or its body were last modified (if modifications are\npossible)."
-        },
-        "id": {
-          "type": "string",
-          "description": "*\nID of the message guaranteed to be unique within a topic.\nSet only by the server and cannot be modified."
-        },
-        "userId": {
-          "type": "string",
-          "description": "*\nUser sending this message."
+        "contentBase": {
+          "$ref": "#/definitions/v1ContentBase"
         },
         "topicId": {
           "type": "string",
           "description": "*\nTopic the message is part of.  This is only set by the server\nand cannot be modified."
         },
-        "contentType": {
+        "parentMessageId": {
           "type": "string",
-          "title": "*\nContent type of the message. Can be like a ContentType http\nheader or something custom like shell/command"
-        },
-        "contentText": {
-          "type": "string",
-          "description": "*\nA simple way to just send text."
-        },
-        "contentData": {
-          "type": "object",
-          "title": "Raw contents for data stored locally as JSON\nNote we can have a combination of text, url and data\nto show different things in the View/UI"
+          "title": "*\nID of the parent message for threading a Topic"
         }
       },
       "title": "*\nAn individual message in a topic"
+    },
+    "v1MessageBase": {
+      "type": "object",
+      "properties": {
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "title": "ID of the topic"
+        },
+        "creatorId": {
+          "type": "string",
+          "title": "ID of the user that created this topic"
+        }
+      }
     },
     "v1Pagination": {
       "type": "object",
@@ -1209,21 +1231,8 @@
     "v1Topic": {
       "type": "object",
       "properties": {
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "updatedAt": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "id": {
-          "type": "string",
-          "title": "ID of the topic"
-        },
-        "creatorId": {
-          "type": "string",
-          "title": "ID of the user that created this topic"
+        "base": {
+          "$ref": "#/definitions/v1MessageBase"
         },
         "name": {
           "type": "string",

@@ -24,7 +24,7 @@ export default function Container(props: any) {
       return false
     }
     msg["topic_id"] = props.topicId 
-    msg["user_id"] = user.id
+    msg["base"] = {"creator_id": user.id}
     const resp = await api.createMessage(props.topicId, msg );
     if (props.onNewMessage != null) {
       props.onNewMessage(resp)

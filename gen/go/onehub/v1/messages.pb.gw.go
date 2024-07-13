@@ -362,14 +362,14 @@ func request_MessageService_UpdateMessage_0(ctx context.Context, marshaler runti
 		_   = err
 	)
 
-	val, ok = pathParams["message.id"]
+	val, ok = pathParams["message.base.id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "message.id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "message.base.id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "message.id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "message.base.id", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "message.id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "message.base.id", err)
 	}
 
 	msg, err := client.UpdateMessage(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
@@ -396,14 +396,14 @@ func local_request_MessageService_UpdateMessage_0(ctx context.Context, marshaler
 		_   = err
 	)
 
-	val, ok = pathParams["message.id"]
+	val, ok = pathParams["message.base.id"]
 	if !ok {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "message.id")
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "missing parameter %s", "message.base.id")
 	}
 
-	err = runtime.PopulateFieldFromPath(&protoReq, "message.id", val)
+	err = runtime.PopulateFieldFromPath(&protoReq, "message.base.id", val)
 	if err != nil {
-		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "message.id", err)
+		return nil, metadata, status.Errorf(codes.InvalidArgument, "type mismatch, parameter: %s, error: %v", "message.base.id", err)
 	}
 
 	msg, err := server.UpdateMessage(ctx, &protoReq)
@@ -575,7 +575,7 @@ func RegisterMessageServiceHandlerServer(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/onehub.v1.MessageService/UpdateMessage", runtime.WithHTTPPathPattern("/v1/messages/{message.id=*}"))
+		annotatedContext, err = runtime.AnnotateIncomingContext(ctx, mux, req, "/onehub.v1.MessageService/UpdateMessage", runtime.WithHTTPPathPattern("/v1/messages/{message.base.id=*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -771,7 +771,7 @@ func RegisterMessageServiceHandlerClient(ctx context.Context, mux *runtime.Serve
 		inboundMarshaler, outboundMarshaler := runtime.MarshalerForRequest(mux, req)
 		var err error
 		var annotatedContext context.Context
-		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/onehub.v1.MessageService/UpdateMessage", runtime.WithHTTPPathPattern("/v1/messages/{message.id=*}"))
+		annotatedContext, err = runtime.AnnotateContext(ctx, mux, req, "/onehub.v1.MessageService/UpdateMessage", runtime.WithHTTPPathPattern("/v1/messages/{message.base.id=*}"))
 		if err != nil {
 			runtime.HTTPError(ctx, mux, outboundMarshaler, w, req, err)
 			return
@@ -803,7 +803,7 @@ var (
 
 	pattern_MessageService_DeleteMessage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "messages", "id"}, ""))
 
-	pattern_MessageService_UpdateMessage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "messages", "message.id"}, ""))
+	pattern_MessageService_UpdateMessage_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 1, 0, 4, 1, 5, 2}, []string{"v1", "messages", "message.base.id"}, ""))
 )
 
 var (

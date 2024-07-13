@@ -8,18 +8,18 @@ import (
 	"gorm.io/gorm"
 )
 
-func (tdb *OneHubDB) GetMessages(topic_id string, user_id string, pageKey string, pageSize int) (out []*Message, err error) {
-	user_id = strings.Trim(user_id, " ")
+func (tdb *OneHubDB) GetMessages(topic_id string, creator_id string, pageKey string, pageSize int) (out []*Message, err error) {
+	creator_id = strings.Trim(creator_id, " ")
 	topic_id = strings.Trim(topic_id, " ")
-	if user_id == "" && topic_id == "" {
-		return nil, errors.New("Either topic_id or user_id or both must be provided")
+	if creator_id == "" && topic_id == "" {
+		return nil, errors.New("Either topic_id or creator_id or both must be provided")
 	}
 	query := tdb.storage
 	if topic_id != "" {
 		query = query.Where("topic_id = ?", topic_id)
 	}
-	if user_id != "" {
-		query = query.Where("user_id = ?", user_id)
+	if creator_id != "" {
+		query = query.Where("creator_id = ?", creator_id)
 	}
 	if pageKey != "" {
 		offset := 0
@@ -95,7 +95,7 @@ func (tdb *OneHubDB) SaveMessage(msg *Message) (err error) {
 		"content_type": msg.ContentType,
 		"content_text": msg.ContentText,
 		"content_data": msg.ContentData,
-		"user_id":      msg.SourceId,
+		"creator_id":   msg.SourceId,
 		"source_id":    msg.SourceId,
 		"parent_id":    msg.ParentId,
 		"version":      msg.Version + 1,

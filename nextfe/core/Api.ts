@@ -2,6 +2,20 @@ import axios from "axios";
 
 import Auth from './Auth'
 
+function toTopic(topic: any): any {
+  const base = topic.base
+  delete(topic["base"])
+  return {...topic, ...base}
+}
+
+function toMessage(message: any): any {
+  const contbase = message.contentBase
+  const msgbase = message.base
+  delete(message["base"])
+  delete(message["contentBase"])
+  return {...message, ...contbase, ...msgbase}
+}
+
 export class Api {
   auth = new Auth()
 
@@ -59,11 +73,15 @@ export class Api {
 
   async getTopicInfo(topicid: string): Promise<any> {
     const resp = await axios.get(this.getApiPath(`topics/${topicid}`), {auth: this.basicAuthParams})
+    resp.data.topic = toTopic(resp.data.topic)
     return resp.data
   }
 
   async getTopics(): Promise<any> {
     const resp = await axios.get(this.getApiPath(`topics`), {auth: this.basicAuthParams})
+    resp.data.topics.forEach((topic: any, index: number) => {
+      resp.data.topics[index] = toTopic(topic)
+    })
     return resp.data
   }
 
@@ -79,12 +97,15 @@ export class Api {
 
   async getMessages(topicId: string): Promise<any> {
     const resp = await axios.get(this.getApiPath(`topics/${topicId}/messages`), {auth: this.basicAuthParams})
+    resp.data.messages.forEach((message: any, index: number) => {
+      resp.data.messages[index] = toMessage(message)
+    })
     return resp.data
   }
 
   async createMessage(topicId: string, message: any): Promise<any> {
     const path = this.getApiPath(`topics/${topicId}/messages`)
     const resp = await axios.post(path, {"messages": [message]}, {auth: this.basicAuthParams})
-    return resp.data["messages"][0]
+    return toMessage(resp.data.messages[0])
   }
 }
