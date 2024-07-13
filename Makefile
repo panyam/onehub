@@ -1,25 +1,8 @@
 
-# Some vars to detemrine go locations etc
-GOROOT=$(which go)
-GOPATH=$(HOME)/go
-GOBIN=$(GOPATH)/bin
-
-# Evaluates the abs path of the directory where this Makefile resides
-SRC_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-
-# Where the protos exist
-PROTO_DIR:=$(SRC_DIR)/protos
-
-# where we want to generate server stubs, clients etc
-OUT_DIR:=$(SRC_DIR)/gen/go
-
 all: build
 
 build: down
 	BUILDKIT_PROGRESS=plain docker compose build --no-cache
-
-buildprod: down
-	BUILDKIT_PROGRESS=plain docker compose -f docker-compose-prod.yaml build --no-cache
 
 upd: down
 	docker compose up --remove-orphans -d
@@ -37,6 +20,20 @@ down:
 	docker compose down --remove-orphans
 
 #### Deprecated - only used in earlier versions before buf
+
+# Some vars to detemrine go locations etc
+GOROOT=$(which go)
+GOPATH=$(HOME)/go
+GOBIN=$(GOPATH)/bin
+
+# Evaluates the abs path of the directory where this Makefile resides
+SRC_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
+# Where the protos exist
+PROTO_DIR:=$(SRC_DIR)/protos
+
+# where we want to generate server stubs, clients etc
+OUT_DIR:=$(SRC_DIR)/gen/go
 
 oldway: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
