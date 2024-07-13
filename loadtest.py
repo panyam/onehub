@@ -8,11 +8,11 @@ import random
 import csv
 import requests
 
-tsclient = ts.Client({"api_key": "xyz", "nodes": [{"host": "localhost", "port": 8108, "protocol": "http"}]})
+tsclient = ts.Client({"api_key": "my_api_key", "nodes": [{"host": "localhost", "port": 8108, "protocol": "http"}]})
 
 def tsreq(path, method="GET", body=None):
     methfunc = getattr(requests, method.lower().strip())
-    headers = { "X-TYPESENSE-API-KEY": "xyz" }
+    headers = { "X-TYPESENSE-API-KEY": "my_api_key" }
     json=False
     if body is None or type(body) is dict:
         json=True
@@ -29,9 +29,13 @@ def sendmsg(users, tid, msg):
     payload = {
             "messages": [{
                 "topic_id": tid,
-                "user_id": creator,
-                "content_type": "text/plain",
-                "content_text": msg,
+                "base": {
+                    "creator_id": creator
+                },
+                "content_base": {
+                    "content_type": "text/plain",
+                    "content_text": msg,
+                },
             } for msg in msgs]}
     resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
     rj = resp.json()
@@ -45,9 +49,13 @@ def sendmsgs(users, tid, msgs):
             "allow_userids": True,
             "messages": [{
                 "topic_id": tid,
-                "user_id": random.choice(users)["id"],
-                "content_type": "text/plain",
-                "content_text": msg,
+                "base": {
+                    "creator_id": random.choice(users)["id"],
+                },
+                "content_base": {
+                    "content_type": "text/plain",
+                    "content_text": msg,
+                },
             } for msg in msgs]}
     resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
     rj = resp.json()
@@ -132,11 +140,15 @@ def create_random_messages(users, tid, msgs):
     start_time = MSG_START_TIME + (random.random() * 3600)
     messages = [{
         "topic_id": tid,
-        "user_id": random.choice(topic_users)["id"],
-        "content_type": "text/plain",
-        "content_text": msg,
-        "created_at": to_datetime(start_time + (time_between_messages * i)),
-        "updated_at": to_datetime(start_time + (time_between_messages * i)),
+        "base": {
+            "creator_id": random.choice(topic_users)["id"],
+            "created_at": to_datetime(start_time + (time_between_messages * i)),
+            "updated_at": to_datetime(start_time + (time_between_messages * i)),
+        },
+        "content_base": {
+            "content_type": "text/plain",
+            "content_text": msg,
+        },
     } for i,msg in enumerate(msgs)]
     return messages
 

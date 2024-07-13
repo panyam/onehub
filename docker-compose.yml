@@ -46,7 +46,7 @@ services:
       - 8108:8108
     volumes:
       - ./.data/typesensedata:/data
-    command: '--data-dir /data --api-key=xyz --enable-cors'
+    command: '--data-dir /data --api-key=my_api_key --enable-cors'
 
   nextfe:
     build: ./nextfe
