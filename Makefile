@@ -15,10 +15,11 @@ OUT_DIR:=$(SRC_DIR)/gen/go
 
 all: build
 
-oldway: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
-
 build: down
 	BUILDKIT_PROGRESS=plain docker compose build --no-cache
+
+buildprod: down
+	BUILDKIT_PROGRESS=plain docker compose -f docker-compose-prod.yaml build --no-cache
 
 upd: down
 	docker compose up --remove-orphans -d
@@ -34,6 +35,10 @@ logs:
 
 down:
 	docker compose down --remove-orphans
+
+#### Deprecated - only used in earlier versions before buf
+
+oldway: createdirs printenv goprotos gwprotos openapiv2 cleanvendors
 
 goprotos:
 	echo "Generating GO bindings"

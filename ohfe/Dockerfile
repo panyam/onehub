@@ -13,4 +13,4 @@ FROM alpine:latest
 WORKDIR /app
 COPY --from=BuildStage /app/main /app/main
 
-CMD ["./main"]
+CMD ["/app/main"]
