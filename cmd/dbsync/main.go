@@ -133,7 +133,7 @@ func (p *PG2TS) NewLogQueue() *dbsync.LogQueue {
 			}
 		}
 		for doctype, docs := range p.deletions {
-			docids := gut.MapKeys[string](docs)
+			docids := gut.MapKeys(docs)
 			if len(docids) > 0 {
 				res, err := p.tsclient.BatchDelete(doctype, docids)
 				if err != nil {
@@ -145,7 +145,7 @@ func (p *PG2TS) NewLogQueue() *dbsync.LogQueue {
 		// And batch inserts too
 		for doctype, docmaps := range p.upserts {
 			if len(docmaps) > 0 {
-				docs := gut.MapValues[gut.StringMap](docmaps)
+				docs := gut.MapValues(docmaps)
 				res, err := p.tsclient.BatchUpsert(doctype, docs)
 				if err != nil {
 					log.Println("Batch Upsert Error: ", doctype, err, res)
