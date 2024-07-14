@@ -2,11 +2,16 @@
 
 FROM golang:latest AS BuildStage
 WORKDIR /app
-# COPY go.mod go.sum ./
-COPY . .
 
-# RUN go build -o ./main cmd/main.go
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./main cmd/main.go
+COPY locallinks ./locallinks
+COPY Makefile go.mod go.sum ./
+RUN mkdir cmd clients
+COPY cmd ./cmd
+COPY clients ./clients
+RUN ls -al
+
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o ./main cmd/dbsync/main.go
 
 # Deploy Stage
 FROM alpine:latest

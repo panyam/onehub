@@ -78,17 +78,17 @@ services:
       - postgres
     build:
       context: .
-      dockerfile: ./Dockerfile.debug
+      dockerfile: ./cmd/backend/Dockerfile.debug
     volumes:
       # - ./.air.toml:/app/.air.toml:ro
       # - ./go.mod:/app/go.mod:ro
       # - ./go.sum:/app/go.sum:ro
       - ./cmd/backend:/app/cmd/backend
-      - ./gen:/app/gen
       - ./clients:/app/clients
       - ./datastore:/app/datastore
       - ./protos:/app/protos
       - ./services:/app/services
+      - ./gen:/app/gen
         # command: ["air", "-c", "cmd/backend/.air.toml"]
     environment:
       POSTGRES_HOST: ${POSTGRES_HOST}
@@ -104,13 +104,14 @@ services:
 
   dbsync:
     build:
-      context: ./dbsync
-      dockerfile: ./Dockerfile.debug
+      context: ./
+      dockerfile: ./cmd/dbsync/Dockerfile.debug
     volumes:
       # - ./ohfe/.air.toml:/app/.air.toml:ro
       # - ./ohfe/go.mod:/app/go.mod:ro
       # - ./ohfe/go.sum:/app/go.sum:ro
       - ./cmd/dbsync:/app/cmd/dbsync
+      - ../dbsync:/app/locallinks/dbsync
       - ./clients:/app/clients
     ports:
       - 3333:3333
@@ -126,4 +127,4 @@ services:
       DBSYNC_WM_TABLENAME: ${DBSYNC_WM_TABLENAME}
       DBSYNC_PUBNAME: ${DBSYNC_PUBNAME}
       DBSYNC_REPLSLOT: ${DBSYNC_REPLSLOT}
-      TYPESENSE_API_KEY: xyz
+      TYPESENSE_API_KEY: my_api_key

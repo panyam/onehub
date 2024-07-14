@@ -1,6 +1,7 @@
 node_modules
 .data
 tmp
+locallinks
 ohserve
 .DS_Store
 __debug_bin*

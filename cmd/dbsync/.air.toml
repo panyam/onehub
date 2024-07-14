@@ -1,11 +1,11 @@
-root = "."
+root = "../../"
 testdata_dir = "testdata"
 tmp_dir = "/tmp"
 
 [build]
   args_bin = []
-  cmd = "go build -o /tmp/backendmain cmd/backend/main.go"
-  bin = "/tmp/backendmain"
+  cmd = "go build -o /tmp/dbsyncmain main.go"
+  bin = "/tmp/dbsyncmain"
   # bin = "/go/bin/dlv --listen=:9091 --headless=true --log=true --accept-multiclient --api-version=2 exec --continue ./tmp/main"
 
   delay = 1000
@@ -15,7 +15,7 @@ tmp_dir = "/tmp"
   exclude_unchanged = false
   follow_symlink = false
   full_bin = ""
-  include_dir = []
+  include_dir = ["locallinks", "services", "gen", "datastore", "cmd", "clients"]
   include_ext = ["go", "tpl", "tmpl", "html"]
   include_file = []
   kill_delay = "0s"

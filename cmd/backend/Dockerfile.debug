@@ -1,10 +1,23 @@
 FROM --platform=linux/amd64 dagmeister/golangdev:latest
+
 WORKDIR /app
 
+COPY locallinks ./locallinks
 COPY Makefile go.mod go.sum ./
+RUN mkdir cmd clients datastore services gen
+COPY cmd ./cmd
+COPY clients ./clients
+COPY datastore ./datastore
+COPY services ./services
+COPY gen ./gen
+RUN ls -al
+
 RUN go mod download
 
-# COPY .air.debug.toml .
-COPY .air.toml .
+WORKDIR /app/cmd/backend
+
+# Uncomment below line to eee if the build works as a test
+# Usually this will be useful if you have added or removed folders
+# RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /tmp/main main.go
 
 CMD ["air"]

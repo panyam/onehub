@@ -22,7 +22,7 @@ require (
 	gorm.io/gorm v1.25.2
 )
 
-replace github.com/panyam/dbsync v0.0.1 => ../dbsync
+replace github.com/panyam/dbsync v0.0.1 => ./locallinks/dbsync
 
 // replace github.com/panyam/goutils v0.0.37 => ../goutils/
 // replace github.com/panyam/slicer v0.0.1 => ../slicer/
