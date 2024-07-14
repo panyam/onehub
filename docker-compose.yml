@@ -83,9 +83,8 @@ services:
       # - ./.air.toml:/app/.air.toml:ro
       # - ./go.mod:/app/go.mod:ro
       # - ./go.sum:/app/go.sum:ro
-      - ./cmd:/app/cmd
+      - ./cmd/backend:/app/cmd/backend
       - ./gen:/app/gen
-      - ./dbsync:/app/dbsync
       - ./clients:/app/clients
       - ./datastore:/app/datastore
       - ./protos:/app/protos
@@ -111,7 +110,7 @@ services:
       # - ./ohfe/.air.toml:/app/.air.toml:ro
       # - ./ohfe/go.mod:/app/go.mod:ro
       # - ./ohfe/go.sum:/app/go.sum:ro
-      - ./dbsync:/app/dbsync
+      - ./cmd/dbsync:/app/cmd/dbsync
       - ./clients:/app/clients
     ports:
       - 3333:3333

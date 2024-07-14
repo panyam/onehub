@@ -10,9 +10,9 @@ import (
 
 	"github.com/jackc/pglogrepl"
 	_ "github.com/lib/pq"
+	"github.com/panyam/dbsync"
 	gut "github.com/panyam/goutils/utils"
 	ohds "github.com/panyam/onehub/clients"
-	"github.com/panyam/onehub/dbsync"
 	// "github.com/typesense/typesense-go/typesense"
 )
 
@@ -200,7 +200,7 @@ func main() {
 		{"name": "version", "type": "int64"},
 		{"name": "created_at", "type": "int64"},
 		{"name": "updated_at", "type": "int64"},
-		{"name": "user_id", "type": "string"},
+		{"name": "creator_id", "type": "string"},
 		{"name": "topic_id", "type": "string"},
 		{"name": "parent_id", "type": "string", "optional": true},
 		{"name": "source_id", "type": "string", "optional": true},
