@@ -111,11 +111,8 @@ services:
       # - ./ohfe/.air.toml:/app/.air.toml:ro
       # - ./ohfe/go.mod:/app/go.mod:ro
       # - ./ohfe/go.sum:/app/go.sum:ro
-      - ./cmd:/app/cmd
       - ./dbsync:/app/dbsync
       - ./clients:/app/clients
-#    command: ["air", "-c", "cmd/dbsync/.air.toml"]
-#      # command: ["air", "-c", "cmd/dbsync/.air.debug.toml"]
     ports:
       - 3333:3333
       - 9093:9091
