@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ImportMessagesRequest, ImportMessagesResponse, ListMessagesRequest, ListMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
+import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ImportMessagesRequest, ImportMessagesResponse, ListMessagesRequest, ListMessagesResponse, SearchMessagesRequest, SearchMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -25,6 +25,18 @@ export const MessageService = {
       name: "CreateMessages",
       I: CreateMessagesRequest,
       O: CreateMessagesResponse,
+      kind: MethodKind.Unary,
+    },
+    /**
+     * *
+     * Search for messages across all topics
+     *
+     * @generated from rpc onehub.v1.MessageService.SearchMessages
+     */
+    searchMessages: {
+      name: "SearchMessages",
+      I: SearchMessagesRequest,
+      O: SearchMessagesResponse,
       kind: MethodKind.Unary,
     },
     /**

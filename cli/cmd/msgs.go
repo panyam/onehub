@@ -16,6 +16,7 @@ func messagesCommand() *cobra.Command {
 	}
 
 	out.AddCommand(getMessagesCommand())
+	out.AddCommand(searchMessagesCommand())
 	out.AddCommand(listMessagesCommand())
 	out.AddCommand(deleteMessagesCommand())
 	out.AddCommand(sendMessageCommand())
@@ -69,6 +70,25 @@ func sendMessageCommand() *cobra.Command {
 	out.Flags().StringP("type", "t", "text", "Content type to assign to the content")
 	out.Flags().StringP("file", "f", "", "Load message content from the given file if message not passed as a command line arg")
 	out.Flags().StringP("data", "d", "", "Extra JSON data to save as part of the content")
+	return out
+}
+
+func searchMessagesCommand() *cobra.Command {
+	out := &cobra.Command{
+		Use:   "search TEXT",
+		Short: "Search for messages",
+		Long:  "Search for messages containing the given text",
+		PreRunE: func(cmd *cobra.Command, args []string) error {
+			if len(args) != 1 {
+				return errors.New("Search phrase for messages must be provided")
+			}
+			return nil
+		},
+		Run: func(cmd *cobra.Command, args []string) {
+			path := fmt.Sprintf("/v1/messages")
+			Client.Call("GET", path, nil, nil, nil)
+		},
+	}
 	return out
 }
 

@@ -3,7 +3,7 @@
 /* eslint-disable */
 // @ts-nocheck
 
-import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ImportMessagesRequest, ImportMessagesResponse, ListMessagesRequest, ListMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
+import { CreateMessagesRequest, CreateMessagesResponse, DeleteMessageRequest, DeleteMessageResponse, GetMessageRequest, GetMessageResponse, GetMessagesRequest, GetMessagesResponse, ImportMessagesRequest, ImportMessagesResponse, ListMessagesRequest, ListMessagesResponse, SearchMessagesRequest, SearchMessagesResponse, UpdateMessageRequest, UpdateMessageResponse } from "./messages_pb.js";
 import { MethodKind } from "@bufbuild/protobuf";
 
 /**
@@ -25,6 +25,18 @@ export declare const MessageService: {
       readonly name: "CreateMessages",
       readonly I: typeof CreateMessagesRequest,
       readonly O: typeof CreateMessagesResponse,
+      readonly kind: MethodKind.Unary,
+    },
+    /**
+     * *
+     * Search for messages across all topics
+     *
+     * @generated from rpc onehub.v1.MessageService.SearchMessages
+     */
+    readonly searchMessages: {
+      readonly name: "SearchMessages",
+      readonly I: typeof SearchMessagesRequest,
+      readonly O: typeof SearchMessagesResponse,
       readonly kind: MethodKind.Unary,
     },
     /**

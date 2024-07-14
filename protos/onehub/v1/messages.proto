@@ -22,6 +22,15 @@ service MessageService {
   }
 
   /**
+   * Search for messages across all topics
+   */
+  rpc SearchMessages(SearchMessagesRequest) returns (SearchMessagesResponse) {
+    option (google.api.http) = {
+      get: "/v1/messages",
+    };
+  }
+
+  /**
    * Import messages in bulk
    */
   rpc ImportMessages(ImportMessagesRequest) returns (ImportMessagesResponse) {
@@ -157,6 +166,39 @@ message ListMessagesRequest {
  * Response of a topic search/listing.
  */
 message ListMessagesResponse {
+  /**
+   * The list of topics found as part of this response.
+   */
+  repeated Message messages = 1;
+
+  /**
+   * Pagination response info
+   */
+  PaginationResponse pagination = 2;
+}
+
+/**
+ * Unified API for message search.  Searches across all messages with a bunch of filters.
+ */
+message SearchMessagesRequest {
+  // Optional - Filter by search phrase
+  string search_phrase = 1;
+
+  // Optional - Filter by sender of the message
+  string sender_id = 2;
+
+  // Optional - Filter by topic ID
+  string topic_id = 3;
+
+  // Order by strings.  Can have multiple so we have a secondary filter.  Also prefix by "-" for descending
+  // eg ["created_at", "-topic"]
+  repeated string order_by = 4;
+}
+
+/**
+ * Response of an message import.
+ */
+message SearchMessagesResponse {
   /**
    * The list of topics found as part of this response.
    */

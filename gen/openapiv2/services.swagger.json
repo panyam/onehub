@@ -25,6 +25,63 @@
     "application/json"
   ],
   "paths": {
+    "/v1/messages": {
+      "get": {
+        "summary": "*\nSearch for messages across all topics",
+        "operationId": "MessageService_SearchMessages",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1SearchMessagesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "searchPhrase",
+            "description": "Optional - Filter by search phrase",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "senderId",
+            "description": "Optional - Filter by sender of the message",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "topicId",
+            "description": "Optional - Filter by topic ID",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "orderBy",
+            "description": "Order by strings.  Can have multiple so we have a secondary filter.  Also prefix by \"-\" for descending\neg [\"created_at\", \"-topic\"]",
+            "in": "query",
+            "required": false,
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "collectionFormat": "multi"
+          }
+        ],
+        "tags": [
+          "MessageService"
+        ]
+      }
+    },
     "/v1/messages/{id}": {
       "get": {
         "summary": "*\nGet a particular message",
@@ -1224,6 +1281,24 @@
         }
       },
       "description": "*\nStandard way to pass pagination related responses, eg the next page key\nthat can be passed on a paginated request to get the \"next page\" of results."
+    },
+    "v1SearchMessagesResponse": {
+      "type": "object",
+      "properties": {
+        "messages": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1Message"
+          },
+          "description": "*\nThe list of topics found as part of this response."
+        },
+        "pagination": {
+          "$ref": "#/definitions/v1PaginationResponse",
+          "title": "*\nPagination response info"
+        }
+      },
+      "description": "*\nResponse of an message import."
     },
     "v1SearchTopicsRequest": {
       "type": "object"

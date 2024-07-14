@@ -95,6 +95,36 @@ export const ListMessagesResponse = /*@__PURE__*/ proto3.makeMessageType(
 
 /**
  * *
+ * Unified API for message search.  Searches across all messages with a bunch of filters.
+ *
+ * @generated from message onehub.v1.SearchMessagesRequest
+ */
+export const SearchMessagesRequest = /*@__PURE__*/ proto3.makeMessageType(
+  "onehub.v1.SearchMessagesRequest",
+  () => [
+    { no: 1, name: "search_phrase", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 2, name: "sender_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 3, name: "topic_id", kind: "scalar", T: 9 /* ScalarType.STRING */ },
+    { no: 4, name: "order_by", kind: "scalar", T: 9 /* ScalarType.STRING */, repeated: true },
+  ],
+);
+
+/**
+ * *
+ * Response of an message import.
+ *
+ * @generated from message onehub.v1.SearchMessagesResponse
+ */
+export const SearchMessagesResponse = /*@__PURE__*/ proto3.makeMessageType(
+  "onehub.v1.SearchMessagesResponse",
+  () => [
+    { no: 1, name: "messages", kind: "message", T: Message, repeated: true },
+    { no: 2, name: "pagination", kind: "message", T: PaginationResponse },
+  ],
+);
+
+/**
+ * *
  * Request to get a single message.
  *
  * @generated from message onehub.v1.GetMessageRequest

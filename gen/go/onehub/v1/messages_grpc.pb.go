@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	MessageService_CreateMessages_FullMethodName = "/onehub.v1.MessageService/CreateMessages"
+	MessageService_SearchMessages_FullMethodName = "/onehub.v1.MessageService/SearchMessages"
 	MessageService_ImportMessages_FullMethodName = "/onehub.v1.MessageService/ImportMessages"
 	MessageService_ListMessages_FullMethodName   = "/onehub.v1.MessageService/ListMessages"
 	MessageService_GetMessage_FullMethodName     = "/onehub.v1.MessageService/GetMessage"
@@ -35,6 +36,9 @@ type MessageServiceClient interface {
 	// *
 	// Create a single message or messages in batch
 	CreateMessages(ctx context.Context, in *CreateMessagesRequest, opts ...grpc.CallOption) (*CreateMessagesResponse, error)
+	// *
+	// Search for messages across all topics
+	SearchMessages(ctx context.Context, in *SearchMessagesRequest, opts ...grpc.CallOption) (*SearchMessagesResponse, error)
 	// *
 	// Import messages in bulk
 	ImportMessages(ctx context.Context, in *ImportMessagesRequest, opts ...grpc.CallOption) (*ImportMessagesResponse, error)
@@ -66,6 +70,15 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 func (c *messageServiceClient) CreateMessages(ctx context.Context, in *CreateMessagesRequest, opts ...grpc.CallOption) (*CreateMessagesResponse, error) {
 	out := new(CreateMessagesResponse)
 	err := c.cc.Invoke(ctx, MessageService_CreateMessages_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageServiceClient) SearchMessages(ctx context.Context, in *SearchMessagesRequest, opts ...grpc.CallOption) (*SearchMessagesResponse, error) {
+	out := new(SearchMessagesResponse)
+	err := c.cc.Invoke(ctx, MessageService_SearchMessages_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -134,6 +147,9 @@ type MessageServiceServer interface {
 	// Create a single message or messages in batch
 	CreateMessages(context.Context, *CreateMessagesRequest) (*CreateMessagesResponse, error)
 	// *
+	// Search for messages across all topics
+	SearchMessages(context.Context, *SearchMessagesRequest) (*SearchMessagesResponse, error)
+	// *
 	// Import messages in bulk
 	ImportMessages(context.Context, *ImportMessagesRequest) (*ImportMessagesResponse, error)
 	// *
@@ -159,6 +175,9 @@ type UnimplementedMessageServiceServer struct {
 
 func (UnimplementedMessageServiceServer) CreateMessages(context.Context, *CreateMessagesRequest) (*CreateMessagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreateMessages not implemented")
+}
+func (UnimplementedMessageServiceServer) SearchMessages(context.Context, *SearchMessagesRequest) (*SearchMessagesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SearchMessages not implemented")
 }
 func (UnimplementedMessageServiceServer) ImportMessages(context.Context, *ImportMessagesRequest) (*ImportMessagesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ImportMessages not implemented")
@@ -204,6 +223,24 @@ func _MessageService_CreateMessages_Handler(srv interface{}, ctx context.Context
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MessageServiceServer).CreateMessages(ctx, req.(*CreateMessagesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MessageService_SearchMessages_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchMessagesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServiceServer).SearchMessages(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MessageService_SearchMessages_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServiceServer).SearchMessages(ctx, req.(*SearchMessagesRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -326,6 +363,10 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateMessages",
 			Handler:    _MessageService_CreateMessages_Handler,
+		},
+		{
+			MethodName: "SearchMessages",
+			Handler:    _MessageService_SearchMessages_Handler,
 		},
 		{
 			MethodName: "ImportMessages",

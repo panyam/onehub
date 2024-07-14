@@ -185,3 +185,9 @@ func (s *MessageService) DeleteMessage(ctx context.Context, req *protos.DeleteMe
 	s.DB.DeleteMessage(req.Id)
 	return
 }
+
+// Search a new Message
+func (s *MessageService) SearchMessages(ctx context.Context, req *protos.SearchMessagesRequest) (resp *protos.SearchMessagesResponse, err error) {
+	resp = &protos.SearchMessagesResponse{}
+	return
+}

@@ -230,6 +230,95 @@ export declare class ListMessagesResponse extends Message<ListMessagesResponse> 
 
 /**
  * *
+ * Unified API for message search.  Searches across all messages with a bunch of filters.
+ *
+ * @generated from message onehub.v1.SearchMessagesRequest
+ */
+export declare class SearchMessagesRequest extends Message<SearchMessagesRequest> {
+  /**
+   * Optional - Filter by search phrase
+   *
+   * @generated from field: string search_phrase = 1;
+   */
+  searchPhrase: string;
+
+  /**
+   * Optional - Filter by sender of the message
+   *
+   * @generated from field: string sender_id = 2;
+   */
+  senderId: string;
+
+  /**
+   * Optional - Filter by topic ID
+   *
+   * @generated from field: string topic_id = 3;
+   */
+  topicId: string;
+
+  /**
+   * Order by strings.  Can have multiple so we have a secondary filter.  Also prefix by "-" for descending
+   * eg ["created_at", "-topic"]
+   *
+   * @generated from field: repeated string order_by = 4;
+   */
+  orderBy: string[];
+
+  constructor(data?: PartialMessage<SearchMessagesRequest>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.SearchMessagesRequest";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SearchMessagesRequest;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SearchMessagesRequest;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SearchMessagesRequest;
+
+  static equals(a: SearchMessagesRequest | PlainMessage<SearchMessagesRequest> | undefined, b: SearchMessagesRequest | PlainMessage<SearchMessagesRequest> | undefined): boolean;
+}
+
+/**
+ * *
+ * Response of an message import.
+ *
+ * @generated from message onehub.v1.SearchMessagesResponse
+ */
+export declare class SearchMessagesResponse extends Message<SearchMessagesResponse> {
+  /**
+   * *
+   * The list of topics found as part of this response.
+   *
+   * @generated from field: repeated onehub.v1.Message messages = 1;
+   */
+  messages: Message$1[];
+
+  /**
+   * *
+   * Pagination response info
+   *
+   * @generated from field: onehub.v1.PaginationResponse pagination = 2;
+   */
+  pagination?: PaginationResponse;
+
+  constructor(data?: PartialMessage<SearchMessagesResponse>);
+
+  static readonly runtime: typeof proto3;
+  static readonly typeName = "onehub.v1.SearchMessagesResponse";
+  static readonly fields: FieldList;
+
+  static fromBinary(bytes: Uint8Array, options?: Partial<BinaryReadOptions>): SearchMessagesResponse;
+
+  static fromJson(jsonValue: JsonValue, options?: Partial<JsonReadOptions>): SearchMessagesResponse;
+
+  static fromJsonString(jsonString: string, options?: Partial<JsonReadOptions>): SearchMessagesResponse;
+
+  static equals(a: SearchMessagesResponse | PlainMessage<SearchMessagesResponse> | undefined, b: SearchMessagesResponse | PlainMessage<SearchMessagesResponse> | undefined): boolean;
+}
+
+/**
+ * *
  * Request to get a single message.
  *
  * @generated from message onehub.v1.GetMessageRequest
