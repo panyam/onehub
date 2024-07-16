@@ -36,6 +36,17 @@ services:
       timeout: 5s
       retries: 5
 
+  # Make sure before you run this you have done the following, In *some* folder:
+  # git clone https://github.com/bfritscher/typesense-dashboard.git
+  # cd typesense-dashboard
+  # docker build -t typesense-dashboard .
+  typesense-dashboard:
+    image: typesense-dashboard
+    volumes:
+      - ./configs/tsdash.config:/srv/config.json
+    ports:
+      - 8180:80
+
   typesense:
     networks:
       - onehubnetwork
