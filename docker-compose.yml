@@ -7,7 +7,6 @@ services:
     networks:
       - onehubnetwork
     image: nginx:latest
-    platform: linux/amd64
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/server.key:/root/ssl/server.key
