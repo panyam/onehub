@@ -19,7 +19,7 @@ services:
   postgres:
     networks:
       - onehubnetwork
-    image: arm64v8/postgres
+    image: arm64v8/postgres:16.3
       # image: postgres:15.3
     environment:
       POSTGRES_DB: ${POSTGRES_DB}
@@ -27,7 +27,7 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     volumes:
       - ./.data/pgdata:/var/lib/postgresql/data
-      - ./configs/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro
+        # - ./configs/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro
     ports:
       - 54321:5432
     healthcheck:

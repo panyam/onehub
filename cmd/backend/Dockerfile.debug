@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 dagmeister/golangdev:latest
+FROM panyam/golangdev:latest
 
 WORKDIR /app
 
