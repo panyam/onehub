@@ -26,11 +26,11 @@ services:
     build: ./nextfe
     volumes:
        - ./nextfe:/app
-         # - /app/node_modules
-         # - /app/.next
+       - /app/node_modules
+       - /app/.next
     restart: always
-    ports:
-      - 4000:4000
+      # ports:
+      # - 4000:4000
     stdin_open: true
 
   ohfe:
@@ -46,7 +46,7 @@ services:
       ONEHUB_API_ENDPOINT: http://onehub:9080/api
       ONEHUB_GRPC_ENDPOINT: onehub:9090
     ports:
-      - 5080:5000
+      # - 5080:5000
       - 9091:9091
 
   onehub:
