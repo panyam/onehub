@@ -188,9 +188,9 @@ def generate_batch_messages(users, topics):
 def load_chat_messages_dataset():
     # Obtained from https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat
     chatset_url = "https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat"
-    if not os.path.isfile("./chatmessages.csv"):
+    if not os.path.isfile("./configs/chatmessages.csv"):
         raise Exception(f"Download the dataset from {chatset_url}")
-    return list(csv.reader(open("./chatmessages.csv")))
+    return list(csv.reader(open("./configs/chatmessages.csv")))
 
 def generate_messages(users, topics, start=0, count=1000):
     lines = load_chat_messages_dataset()
