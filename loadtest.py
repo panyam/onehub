@@ -37,9 +37,10 @@ def sendmsg(users, tid, msg):
                     "content_type": "text/plain",
                     "content_text": msg,
                 },
-            } for msg in msgs]}
+            }]}
     resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics/{tid}/messages", json= payload)
     rj = resp.json()
+    set_trace()
     return rj["messages"]
 
 MSG_START_TIME = time.time() - (3600*24*7)
@@ -98,6 +99,8 @@ def ensure_topics(users, ntopics=100):
     lines = load_chat_messages_dataset()
     topics = {}
     currtid = None
+    topic_titles = {}
+    all_topic_titles = [l.strip() for l in open("./configs/topic_names.txt").read().split("\n") if l.strip()]
     for tid, msg, _ in lines:
         if len(topics) >= ntopics: break
         creator = random.choice(users)["id"]
@@ -106,8 +109,10 @@ def ensure_topics(users, ntopics=100):
             currtid = tid
             # create new topic
             tid = f"lt{tid}"
-            topicname = extract_topic_title(msg)
-            topic = {"topic": { "id": tid, "name": topicname, }}
+            if tid not in topic_titles:
+                topic_titles[tid] = random.choice(all_topic_titles)
+            topicname = topic_titles[tid] # extract_topic_title(msg)
+            topic = {"topic": { "base": {"id": tid}, "name": topicname, }}
             resp = requests.get(f"http://{auth}@localhost:7080/api/v1/topics/{tid}")
             if resp.status_code == 200:
                 topic = resp.json()["topic"]
@@ -123,7 +128,7 @@ def grouped_messages():
     # should use groupby but cant get it to work
     grouped = defaultdict(list)
     lines = load_chat_messages_dataset()
-    for tid, msg in lines:
+    for tid, msg, _ in lines:
         grouped[tid].append(msg)
     grouped = list(grouped.items())
     grouped.sort()
@@ -196,7 +201,7 @@ def generate_messages(users, topics, start=0, count=1000):
     lines = load_chat_messages_dataset()
     starttime = time.time()
     lasttid = None
-    for tid, msg in lines[start:count]:
+    for tid, msg, _ in lines[start:count]:
         tid = 1 + (int(tid) % len(topics))
         if tid is not lasttid:
             print(f"Generating messages for topic: {tid}")
