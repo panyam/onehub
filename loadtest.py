@@ -1,3 +1,4 @@
+import os
 from ipdb import set_trace
 from datetime import datetime
 from collections import defaultdict
@@ -94,10 +95,10 @@ def extract_topic_title(msg, max_length=40):
         return " ".join(out)
 
 def ensure_topics(users, ntopics=100):
-    lines = list(csv.reader(open("./chatmessages.csv")))
+    lines = load_chat_messages_dataset()
     topics = {}
     currtid = None
-    for tid, msg in lines:
+    for tid, msg, _ in lines:
         if len(topics) >= ntopics: break
         creator = random.choice(users)["id"]
         auth = f"{creator}:{creator}123"
@@ -115,13 +116,13 @@ def ensure_topics(users, ntopics=100):
                 resp = requests.post(f"http://{auth}@localhost:7080/api/v1/topics", json = topic)
                 topic = resp.json()["topic"]
                 print("Created Topic: ", topic)
-            topics[topic["id"]] = topic
+            topics[topic["base"]["id"]] = topic
     return topics
 
 def grouped_messages():
     # should use groupby but cant get it to work
     grouped = defaultdict(list)
-    lines = list(csv.reader(open("./chatmessages.csv")))
+    lines = load_chat_messages_dataset()
     for tid, msg in lines:
         grouped[tid].append(msg)
     grouped = list(grouped.items())
@@ -184,8 +185,15 @@ def generate_batch_messages(users, topics):
     endtime = time.time()
     print(f"Generated {count} messages in {endtime - starttime} seconds")
 
+def load_chat_messages_dataset():
+    # Obtained from https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat
+    chatset_url = "https://www.kaggle.com/datasets/arnavsharmaas/chatbot-dataset-topical-chat"
+    if not os.path.isfile("./chatmessages.csv"):
+        raise Exception(f"Download the dataset from {chatset_url}")
+    return list(csv.reader(open("./chatmessages.csv")))
+
 def generate_messages(users, topics, start=0, count=1000):
-    lines = list(csv.reader(open("./chatmessages.csv")))
+    lines = load_chat_messages_dataset()
     starttime = time.time()
     lasttid = None
     for tid, msg in lines[start:count]:
