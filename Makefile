@@ -30,7 +30,7 @@ down:
 
 # Bring up DB - only brings down DB containers from before
 updb: dbdirs ensurenetworks
-	BUILDKIT_PROGRESS=plain docker compose -f db-docker-compose.yml down
+	BUILDKIT_PROGRESS=plain docker compose -f db-docker-compose.yml down --remove-orphans
 	BUILDKIT_PROGRESS=plain docker compose -f db-docker-compose.yml up -d
 
 dblogs:

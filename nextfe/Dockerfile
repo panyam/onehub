@@ -5,7 +5,7 @@ WORKDIR /app
 
 COPY next.config.js package*.json /app
 
-RUN npm install
+# RUN npm install
 
 # Finally, we run the NextJS app
 CMD ["npm", "run", "dev"]

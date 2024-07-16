@@ -25,7 +25,8 @@ services:
     build: ./nextfe
     volumes:
        - ./nextfe:/app
-       - /app/node_modules
+       - ./nextfe/node_modules:/app/node_modules
+         # - /app/node_modules
        - /app/.next
     restart: always
       # ports:
