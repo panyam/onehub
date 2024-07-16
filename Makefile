@@ -16,20 +16,31 @@ resymlink:
 	cd locallinks && ln -s ../../dbsync
 	cd locallinks && ln -s ../../goutils
 
-upf: down
-	docker compose up --remove-orphans
-
-up: down
-	docker compose up --remove-orphans  -d
+up: ensurenetworks
+	docker compose -f docker-compose.yml down
+	BUILDKIT_PROGRESS=plain docker compose -f docker-compose.yml up -d
 
 logs:
-	docker compose logs -f
+	docker compose -f docker-compose.yml logs -f
 
-logs:
-	docker compose logs -f
-
+# Bring everything down
 down:
-	docker compose down --remove-orphans
+	docker compose -f docker-compose.yml down --remove-orphans
+	docker compose -f db-docker-compose.yml down --remove-orphans
+
+# Bring up DB - only brings down DB containers from before
+updb: dbdirs ensurenetworks
+	BUILDKIT_PROGRESS=plain docker compose -f db-docker-compose.yml down
+	BUILDKIT_PROGRESS=plain docker compose -f db-docker-compose.yml up
+
+dblogs:
+	docker compose -f db-docker-compose.yml logs -f --tail 100
+
+ensurenetworks:
+	-docker network create onehubnetwork
+
+dbdirs:
+	mkdir -p ./data/pgdata ./data/typesensedata
 
 #### Deprecated - only used in earlier versions before buf
 

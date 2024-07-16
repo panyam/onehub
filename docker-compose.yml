@@ -1,34 +1,13 @@
+networks:
+  onehubnetwork:
+    external: true
+
 services:
-#    pgadmin:
-#      image: dpage/pgadmin4
-#      ports:
-#        - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
-#      environment:
-#        PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
-#        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
-#        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
-#      volumes:
-#        - ./.data/pgadmin:/var/lib/pgadmin
-
-  postgres:
-    image: postgres:15.3
-    environment:
-      POSTGRES_DB: ${POSTGRES_DB}
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-    volumes:
-      - ./.data/pgdata:/var/lib/postgresql/data
-      - ./configs/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro
-    ports:
-      - 54321:5432
-    healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres"]
-      interval: 5s
-      timeout: 5s
-      retries: 5
-
   nginx:
+    networks:
+      - onehubnetwork
     image: nginx:latest
+    platform: linux/amd64
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/server.key:/root/ssl/server.key
@@ -39,17 +18,11 @@ services:
     depends_on:
       - onehub
       - ohfe
-
-  typesense:
-    image: typesense/typesense:0.25.0
-    restart: on-failure
-    ports:
-      - 8108:8108
-    volumes:
-      - ./.data/typesensedata:/data
-    command: '--data-dir /data --api-key=my_api_key --enable-cors'
+      - nextfe
 
   nextfe:
+    networks:
+      - onehubnetwork
     build: ./nextfe
     volumes:
        - ./nextfe:/app
@@ -61,6 +34,8 @@ services:
     stdin_open: true
 
   ohfe:
+    networks:
+      - onehubnetwork
     build:
       context: ./ohfe
       dockerfile: Dockerfile.debug
@@ -75,8 +50,8 @@ services:
       - 9091:9091
 
   onehub:
-    depends_on:
-      - postgres
+    networks:
+      - onehubnetwork
     build:
       context: .
       dockerfile: ./cmd/backend/Dockerfile.debug
@@ -104,6 +79,8 @@ services:
       - 9092:9091
 
   dbsync:
+    networks:
+      - onehubnetwork
     build:
       context: ./
       dockerfile: ./cmd/dbsync/Dockerfile.debug

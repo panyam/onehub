@@ -32,10 +32,12 @@ export class Api {
   }
 
   getApiPath(path: string): string {
+    // const base = "http://localhost:7080"
+    const base = ""
     if (path.startsWith("/")) {
-      return `/api/v1{path}`
+      return `${base}/api/v1{path}`
     } else {
-      return `/api/v1/${path}`
+      return `${base}/api/v1/${path}`
     }
   }
 

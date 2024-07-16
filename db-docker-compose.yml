@@ -1,0 +1,49 @@
+networks:
+  onehubnetwork:
+    external: true
+
+services:
+#    pgadmin:
+#    networks:
+#      - onehubnetwork
+#      image: dpage/pgadmin4
+#      ports:
+#        - ${PGADMIN_LISTEN_PORT}:${PGADMIN_LISTEN_PORT}
+#      environment:
+#        PGADMIN_LISTEN_PORT: ${PGADMIN_LISTEN_PORT}
+#        PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+#        PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+#      volumes:
+#        - ./.data/pgadmin:/var/lib/pgadmin
+
+  postgres:
+    networks:
+      - onehubnetwork
+    image: postgres:15.3
+    platform: linux/amd64
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    volumes:
+      - ./.data/pgdata:/var/lib/postgresql/data
+      - ./configs/postgresql.conf:/var/lib/postgresql/data/postgresql.conf:ro
+    ports:
+      - 54321:5432
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  typesense:
+    networks:
+      - onehubnetwork
+    image: typesense/typesense:0.25.0
+    platform: linux/amd64
+    restart: on-failure
+    ports:
+      - 8108:8108
+    volumes:
+      - ./.data/typesensedata:/data
+    command: '--data-dir /data --api-key=my_api_key --enable-cors'
