@@ -55,9 +55,7 @@ Bowling Blazers
 Boxing Battlers
 Brain Cells
 Brain Trust
-Brain Trust
 Brainiac Brigade
-Brainiacs
 Brainiacs
 Brainpower Battalion
 Brainstorm Battalion
@@ -89,7 +87,6 @@ Capitalists
 Captivating Contessas
 Cash Flow Commandos
 Cash Flow Conjurers
-Challenge Champions
 Challenge Champions
 Charismatic Charmers
 Charlie’s Angels
@@ -177,9 +174,7 @@ Electric Ensemble
 Electronic Echoes
 Elite Empresses
 Elite Enforcers
-Elite Enforcers
 Elite Executers
-Elite Executives
 Elite Executives
 Eloquent Empresses
 Email Banditos
@@ -233,17 +228,13 @@ Funky Freshness
 Funky Fusion
 Game Beasts
 Game Changers
-Game Changers
 Game Chieftains
 Game Commandos
 Game Conquerors
 Game Dominators
 Game Guardians
 Game Gurus
-Game Gurus
-Game Gurus
 Game Influencers
-Game Masters
 Game Masters
 Gantt Chart Gangsters
 Gardeners
@@ -323,7 +314,6 @@ Jazz Jukebox
 Jewel Jesters
 Juggernaut Jokers
 Jumping Jacks
-Jumping Jacks
 Jungle Kings
 Just Another Team in the Office
 Keyboard Kung Fu Masters
@@ -366,7 +356,6 @@ Meeting Mayhem Makers
 Meeting Mischief Makers
 Melody Masters
 Meme Team
-Meme Team
 Men of Mettle
 Mermaid Squad
 Metal Mavericks
@@ -393,7 +382,6 @@ Nutty Crew
 Office Alchemists
 Office Allstars
 Office Architects
-Office Architects
 Office Aristocrats
 Office Ascendants
 Office Catalysts
@@ -407,8 +395,6 @@ Office Elite
 Office Empire
 Office Foodies
 Office Gladiators
-Office Gladiators
-Office Heroes
 Office Heroes
 Office Hive
 Office Innovators
@@ -427,18 +413,11 @@ Office Oddsmakers
 Office Olympians
 Office Opportunists
 Office Oracles
-Office Oracles
 Office Outlasters
 Office Outlaws
-Office Outlaws
 Office Outliers
-Office Outliers
-Office Outliers
-Office Overachievers
 Office Overachievers
 Office Overcomers
-Office Overlords
-Office Overlords
 Office Overlords
 Office Pathfinders
 Office Phenoms
@@ -447,15 +426,12 @@ Office Prank Patriots
 Office Prospects
 Office Queens
 Office Rebels
-Office Rebels
 Office Renegades
 Office Revolutionaries
 Office Royalty
 Office Sages
 Office Sovereigns
 Office Titans
-Office Titans
-Office Tornadoes
 Office Tornadoes
 Office Troublemakers
 Office Vikings
@@ -472,7 +448,6 @@ Paddle Pioneers
 Pancake Mafia
 Paper Pushing Pioneers
 Peak Performers
-Peak Performers
 Penalty Kick Prodigies
 Perfectionists
 Pickle Pack
@@ -481,7 +456,6 @@ Pie Pioneers
 Pink Panthers
 Pinnacle Players
 Pinnacle Protégés
-Pioneers
 Pioneers
 Pita Patriots
 Pitch Powerhouses
@@ -528,7 +502,6 @@ Reggaeton Rhythms
 Reigning Rulers
 Relay Rebels
 Relentless Royals
-Relentless Rulers
 Relentless Rulers
 Renegade Rockstars
 Resilient Renegades
@@ -602,9 +575,6 @@ Staple Soldiers
 Stellar Sisters
 Strategic Commanders
 Strategy Sages
-Strategy Sages
-Strategy Sages
-Strategy Sages
 Strategy Savants
 Strategy Saviors
 Strategy Sentinels
@@ -614,7 +584,6 @@ Strategy Sovereigns
 Strategy Squad
 Strategy Stalwarts
 Strategy Stars
-Strategy Strikers
 Strategy Strikers
 Strategy Sultans
 Strategy Superiors
@@ -627,10 +596,8 @@ Sultans of Sales
 Super Humans
 Supreme Sages
 Supreme Strategists
-Supreme Strategists
 Supreme Strategy Squad
 Supreme Successors
-Supreme Syndicate
 Supreme Syndicate
 Sushi Sensation
 Sweet Tooth Tribe
@@ -680,7 +647,6 @@ Unfailing Force
 Unfailures
 Unhinged
 Unrelenting United
-Unstoppable Force
 Unstoppable Force
 Unstoppable Synergy
 Unstoppable Union
