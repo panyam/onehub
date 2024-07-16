@@ -6,7 +6,7 @@ services:
   nginx:
     networks:
       - onehubnetwork
-    image: nginx:latest
+    image: arm64v8/nginx:latest
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/server.key:/root/ssl/server.key
