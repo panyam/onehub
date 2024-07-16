@@ -3,7 +3,7 @@ FROM node:18-alpine as npm_base
 
 WORKDIR /app
 
-COPY package*.json /app
+COPY next.config.js package*.json /app
 
 RUN npm install
 

@@ -53,8 +53,8 @@ services:
     build: ./nextfe
     volumes:
        - ./nextfe:/app
-       - /app/node_modules
-       - /app/.next
+         # - /app/node_modules
+         # - /app/.next
     restart: always
     ports:
       - 4000:4000

@@ -16,11 +16,11 @@ resymlink:
 	cd locallinks && ln -s ../../dbsync
 	cd locallinks && ln -s ../../goutils
 
-upd: down
-	docker compose up --remove-orphans -d
+upf: down
+	docker compose up --remove-orphans
 
 up: down
-	docker compose up --remove-orphans
+	docker compose up --remove-orphans  -d
 
 logs:
 	docker compose logs -f
