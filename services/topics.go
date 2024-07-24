@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	gut "github.com/panyam/goutils/utils"
+	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
 	"google.golang.org/grpc/codes"
@@ -75,7 +75,7 @@ func (s *TopicService) ListTopics(ctx context.Context, req *protos.ListTopicsReq
 		return nil, err
 	}
 	log.Println("Found Topics: ", results)
-	resp = &protos.ListTopicsResponse{Topics: gut.Map(results, TopicToProto)}
+	resp = &protos.ListTopicsResponse{Topics: gfn.Map(results, TopicToProto)}
 	return
 }
 
@@ -90,7 +90,7 @@ func (s *TopicService) GetTopic(ctx context.Context, req *protos.GetTopicRequest
 }
 
 func (s *TopicService) GetTopics(ctx context.Context, req *protos.GetTopicsRequest) (resp *protos.GetTopicsResponse, err error) {
-	topics := gut.BatchGet(req.Ids, func(id string) (out *protos.Topic, err error) {
+	topics := gfn.BatchGet(req.Ids, func(id string) (out *protos.Topic, err error) {
 		resp, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: id})
 		if err != nil {
 			return nil, err

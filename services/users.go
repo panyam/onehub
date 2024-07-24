@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 
-	gut "github.com/panyam/goutils/utils"
+	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
 	"google.golang.org/grpc/codes"
@@ -63,7 +63,7 @@ func (s *UserService) ListUsers(ctx context.Context, req *protos.ListUsersReques
 		return nil, err
 	}
 	log.Println("Found Users: ", results)
-	resp = &protos.ListUsersResponse{Users: gut.Map(results, UserToProto)}
+	resp = &protos.ListUsersResponse{Users: gfn.Map(results, UserToProto)}
 	return
 }
 
@@ -81,7 +81,7 @@ func (s *UserService) GetUsers(ctx context.Context, req *protos.GetUsersRequest)
 	log.Println("Batch Getting Users: ", req.Ids, len(req.Ids))
 	users, err := s.DB.GetUsers(req.Ids)
 	/*
-		users := gut.BatchGet(req.Ids, func(id string) (out *protos.User, err error) {
+		users := gfn.BatchGet(req.Ids, func(id string) (out *protos.User, err error) {
 			resp, err := s.GetUser(ctx, &protos.GetUserRequest{Id: id})
 			if err != nil {
 				return nil, err

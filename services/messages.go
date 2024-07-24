@@ -6,7 +6,7 @@ import (
 	"log"
 	"time"
 
-	gut "github.com/panyam/goutils/utils"
+	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
 	"google.golang.org/grpc/codes"
@@ -46,7 +46,7 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 		return nil, err
 	}
 
-	resp = &protos.ListMessagesResponse{Messages: gut.Map(results, MessageToProto)}
+	resp = &protos.ListMessagesResponse{Messages: gfn.Map(results, MessageToProto)}
 	return
 }
 
@@ -103,7 +103,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 	}
 
 	resp = &protos.CreateMessagesResponse{
-		Messages: gut.Map(dbmsgs, MessageToProto),
+		Messages: gfn.Map(dbmsgs, MessageToProto),
 	}
 	return
 }
@@ -147,7 +147,7 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 	}
 
 	resp = &protos.ImportMessagesResponse{
-		Messages: gut.Map(dbmsgs, MessageToProto),
+		Messages: gfn.Map(dbmsgs, MessageToProto),
 	}
 	log.Printf("Imported %d messages", len(req.Messages))
 	return

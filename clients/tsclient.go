@@ -12,8 +12,10 @@ import (
 	"strings"
 	"time"
 
-	gut "github.com/panyam/goutils/utils"
+	gfn "github.com/panyam/goutils/fn"
 )
+
+type StringMap = map[string]any
 
 const (
 	ErrCodeInvalidRequest     = 400
@@ -79,7 +81,7 @@ func (t *TSClient) MakeUrl(endpoint string, args string) (url string) {
 	return url
 }
 
-func (t *TSClient) MakeJsonRequest(method string, endpoint string, body gut.StringMap) (req *http.Request, err error) {
+func (t *TSClient) MakeJsonRequest(method string, endpoint string, body StringMap) (req *http.Request, err error) {
 	var bodyBytes []byte
 	if body != nil {
 		bodyBytes, err = json.Marshal(body)
@@ -113,12 +115,12 @@ func (t *TSClient) MakeRequest(method string, endpoint string, bodyReader io.Rea
 	return
 }
 
-func (t *TSClient) JsonCall(req *http.Request) (response gut.StringMap, err error) {
+func (t *TSClient) JsonCall(req *http.Request) (response StringMap, err error) {
 	out, err := t.Call(req)
 	if err != nil {
 		return nil, err
 	}
-	return out.(gut.StringMap), err
+	return out.(StringMap), err
 }
 
 func (t *TSClient) Call(req *http.Request) (response interface{}, err error) {
@@ -165,7 +167,7 @@ func (t *TSClient) Call(req *http.Request) (response interface{}, err error) {
 /**
  * Gets a collection schema.
  */
-func (t *TSClient) GetCollection(doctype string) (gut.StringMap, error) {
+func (t *TSClient) GetCollection(doctype string) (StringMap, error) {
 	endpoint := fmt.Sprintf("collections/%s", doctype)
 	req, err := t.MakeRequest("GET", endpoint, nil)
 	if err != nil {
@@ -174,9 +176,9 @@ func (t *TSClient) GetCollection(doctype string) (gut.StringMap, error) {
 	return t.JsonCall(req)
 }
 
-func (t *TSClient) UpdateCollection(doctype string, fields []gut.StringMap) (gut.StringMap, error) {
+func (t *TSClient) UpdateCollection(doctype string, fields []StringMap) (StringMap, error) {
 	endpoint := fmt.Sprintf("collections/%s", doctype)
-	req, err := t.MakeJsonRequest("PATCH", endpoint, gut.StringMap{
+	req, err := t.MakeJsonRequest("PATCH", endpoint, StringMap{
 		"fields": fields,
 	})
 	if err != nil {
@@ -188,7 +190,7 @@ func (t *TSClient) UpdateCollection(doctype string, fields []gut.StringMap) (gut
 /**
  * Create a collection with the given field info.
  */
-func (t *TSClient) CreateCollection(schema gut.StringMap) (gut.StringMap, error) {
+func (t *TSClient) CreateCollection(schema StringMap) (StringMap, error) {
 	endpoint := "/collections"
 	req, err := t.MakeJsonRequest("POST", endpoint, schema)
 	if err != nil {
@@ -200,7 +202,7 @@ func (t *TSClient) CreateCollection(schema gut.StringMap) (gut.StringMap, error)
 /**
  * Delete a collection.
  */
-func (t *TSClient) DeleteCollection(doctype string) (gut.StringMap, error) {
+func (t *TSClient) DeleteCollection(doctype string) (StringMap, error) {
 	endpoint := fmt.Sprintf("collections/%s", doctype)
 	req, err := t.MakeRequest("DELETE", endpoint, nil)
 	if err != nil {
@@ -212,7 +214,7 @@ func (t *TSClient) DeleteCollection(doctype string) (gut.StringMap, error) {
 /**
  * Gets a document by its ID in a given collection.
  */
-func (t *TSClient) Get(doctype string, docid string) (out gut.StringMap, err error) {
+func (t *TSClient) Get(doctype string, docid string) (out StringMap, err error) {
 	endpoint := fmt.Sprintf("collections/%s/documents/%s", doctype, docid)
 	req, err := t.MakeRequest("GET", endpoint, nil)
 	if err != nil {
@@ -224,7 +226,7 @@ func (t *TSClient) Get(doctype string, docid string) (out gut.StringMap, err err
 /**
  * Gets a document by its ID in a given collection.
  */
-func (t *TSClient) Delete(doctype string, docid string) (out gut.StringMap, err error) {
+func (t *TSClient) Delete(doctype string, docid string) (out StringMap, err error) {
 	endpoint := fmt.Sprintf("collections/%s/documents/%s", doctype, docid)
 	req, err := t.MakeRequest("DELETE", endpoint, nil)
 	if err != nil {
@@ -236,7 +238,7 @@ func (t *TSClient) Delete(doctype string, docid string) (out gut.StringMap, err 
 /**
  * Upserts a document given its ID into a collection.
  */
-func (t *TSClient) Upsert(doctype string, docid string, doc gut.StringMap) (out gut.StringMap, err error) {
+func (t *TSClient) Upsert(doctype string, docid string, doc StringMap) (out StringMap, err error) {
 	if len(strings.TrimSpace(docid)) > 0 {
 		doc["id"] = strings.TrimSpace(docid)
 	}
@@ -248,7 +250,7 @@ func (t *TSClient) Upsert(doctype string, docid string, doc gut.StringMap) (out 
 	return t.JsonCall(req)
 }
 
-func (t *TSClient) BatchUpsert(doctype string, docs []gut.StringMap) (interface{}, error) {
+func (t *TSClient) BatchUpsert(doctype string, docs []StringMap) (interface{}, error) {
 	var jsonlines []byte
 	for i, d := range docs {
 		marshalled, _ := json.Marshal(d)
@@ -268,9 +270,9 @@ func (t *TSClient) BatchUpsert(doctype string, docs []gut.StringMap) (interface{
 	} else {
 		payload := string(out.([]byte))
 		jsonlines := strings.Split(payload, "\n")
-		return gut.Map(jsonlines, func(input string) gut.StringMap {
-			var out gut.StringMap
-			json.Unmarshal([]byte(input), &out)
+		return gfn.Map(jsonlines, func(input string) StringMap {
+			var out StringMap
+			err = json.Unmarshal([]byte(input), &out)
 			return out
 		}), nil
 	}
@@ -298,7 +300,7 @@ func (t *TSClient) BatchDelete(doctype string, docids []string) (interface{}, er
 	return t.JsonCall(req)
 }
 
-func fieldDifferent(oldField gut.StringMap, newField gut.StringMap) bool {
+func fieldDifferent(oldField StringMap, newField StringMap) bool {
 	if oldField == nil {
 		return true
 	}
@@ -319,14 +321,14 @@ func fieldDifferent(oldField gut.StringMap, newField gut.StringMap) bool {
 	return false
 }
 
-func (t *TSClient) EnsureSchema(doctype string, newFields []gut.StringMap) {
+func (t *TSClient) EnsureSchema(doctype string, newFields []StringMap) {
 	// fields, fieldMap := PGTableInfoToSchema(tableInfo)
 	existing, err := t.GetCollection(doctype)
 	if err != nil {
 		log.Println("Schema Fetch Error: ", err)
 	}
 	if existing == nil {
-		schema := gut.StringMap{
+		schema := StringMap{
 			"name":                 doctype,
 			"enable_nested_fields": true,
 			"fields":               newFields,
@@ -338,20 +340,20 @@ func (t *TSClient) EnsureSchema(doctype string, newFields []gut.StringMap) {
 		}
 	} else {
 		oldFields := existing["fields"].([]interface{})
-		oldFieldMap := make(map[string]gut.StringMap)
+		oldFieldMap := make(map[string]StringMap)
 		for _, f := range oldFields {
-			field := f.(gut.StringMap)
+			field := f.(StringMap)
 			name := field["name"].(string)
 			oldFieldMap[name] = field
 		}
-		newFieldMap := make(map[string]gut.StringMap)
+		newFieldMap := make(map[string]StringMap)
 		for _, field := range newFields {
 			name := field["name"].(string)
 			newFieldMap[name] = field
 		}
 		// Go through *new* fields and see which either dont exist
 		// or have changed and add those
-		var patchinfo []gut.StringMap
+		var patchinfo []StringMap
 		for _, newField := range newFields {
 			newFieldName := newField["name"].(string)
 			// Does it not exist in prev?
@@ -366,7 +368,7 @@ func (t *TSClient) EnsureSchema(doctype string, newFields []gut.StringMap) {
 			} else {
 				if fieldDifferent(newField, oldField) {
 					// drop and reload it
-					patchinfo = append(patchinfo, gut.StringMap{
+					patchinfo = append(patchinfo, StringMap{
 						"drop": true,
 						"name": newFieldName,
 					})
@@ -379,7 +381,7 @@ func (t *TSClient) EnsureSchema(doctype string, newFields []gut.StringMap) {
 
 		// Now go through fields that have been "droped"
 		for _, f := range oldFields {
-			oldField := f.(gut.StringMap)
+			oldField := f.(StringMap)
 			oldFieldName := oldField["name"].(string)
 			// Does it not exist in prev?
 			if oldFieldName == "id" {
@@ -390,7 +392,7 @@ func (t *TSClient) EnsureSchema(doctype string, newFields []gut.StringMap) {
 			if !ok || newField == nil {
 				// Does not exist in new so drop it
 				// It does not exist in the old set so just add it
-				patchinfo = append(patchinfo, gut.StringMap{
+				patchinfo = append(patchinfo, StringMap{
 					"drop": true,
 					"name": oldFieldName,
 				})
