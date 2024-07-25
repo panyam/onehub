@@ -16,8 +16,71 @@ import (
 
 type StringMap = map[string]any
 
+type OurMessageHandler struct {
+	dbsync.DefaultMessageHandler
+	ds *dbsync.Syncer
+}
+
+func (m *OurMessageHandler) HandleRelationMessage(idx int, msg *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
+	// Make sure we ahve an equivalent TS schema (or we could do this proactively at the start)
+	// Typically we wouldnt be doing this when handling log events but rather
+	// on startup time
+	// doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
+	// _, fieldMap := PGTableInfoToSchema(tableInfo)
+	// log.Println(fmt.Sprintf("Relation Message (%s): ", doctype), m.LastBegin, msg, "Fields: ", fieldMap)
+	return nil
+}
+
+func (m *OurMessageHandler) HandleInsertMessage(idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
+	// log.Println("Insert Message: ", m.LastBegin, msg, reln)
+	// Now write this to our typesense index
+
+	pkey, outmap, errors := m.ds.MessageToMap(msg.Tuple, reln)
+	if errors != nil {
+		log.Println("Error converting to map: ", pkey, errors)
+	}
+	// log.Println("Converted: ", pkey, out)
+
+	if _, ok := outmap["created_at"]; ok {
+		outmap["created_at"] = outmap["created_at"].(time.Time).Unix()
+	}
+	if _, ok := outmap["updated_at"]; ok {
+		outmap["updated_at"] = outmap["updated_at"].(time.Time).Unix()
+	}
+	doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
+	// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
+	// docid := outmap["id"].(string)
+	docid := tableInfo.GetRecordID(msg.Tuple, reln)
+
+	m.ds.MarkUpdated(doctype, docid, outmap)
+
+	/* - Uncomment to do single gets instead of batch
+	result, err := tsclient.Upsert(doctype, docid, outmap)
+	if err != nil && clients.TSErrorCode(err) != clients.ErrCodeEntityNotFound {
+		schema, err2 := tsclient.GetCollection(doctype)
+		log.Println("Error Upserting: ", result, err)
+		log.Println("Old Schema: ", schema, err2)
+		panic(err)
+	}
+	*/
+
+	return nil
+}
+
+func (m *OurMessageHandler) HandleDeleteMessage(idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
+	// Instead of individual deletes we will batch them by collections
+	doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
+	docid := tableInfo.GetRecordID(msg.OldTuple, reln)
+	m.ds.MarkDeleted(doctype, docid)
+	return nil
+}
+func (m *OurMessageHandler) HandleUpdateMessage(idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
+	// log.Println("Update Message: ", m.LastBegin, msg, reln)
+	return nil
+}
+
 func main() {
-	d, err := dbsync.NewDBSync(
+	d, err := dbsync.NewSyncer(
 		dbsync.ForTables("users", "services", "topics"),
 	)
 	if err != nil {
@@ -25,65 +88,7 @@ func main() {
 	}
 	tsclient := tsClient()
 	d.Batcher = tsclient
-	d.MessageHandler = &dbsync.DefaultMessageHandler{
-		HandleRelationMessage: func(m *dbsync.DefaultMessageHandler, idx int, msg *pglogrepl.RelationMessage, tableInfo *dbsync.PGTableInfo) error {
-			// Make sure we ahve an equivalent TS schema (or we could do this proactively at the start)
-			// Typically we wouldnt be doing this when handling log events but rather
-			// on startup time
-			// doctype := fmt.Sprintf("%s.%s", msg.Namespace, msg.RelationName)
-			// _, fieldMap := PGTableInfoToSchema(tableInfo)
-			// log.Println(fmt.Sprintf("Relation Message (%s): ", doctype), m.LastBegin, msg, "Fields: ", fieldMap)
-			return nil
-		},
-		HandleInsertMessage: func(m *dbsync.DefaultMessageHandler, idx int, msg *pglogrepl.InsertMessage, reln *pglogrepl.RelationMessage) error {
-			// log.Println("Insert Message: ", m.LastBegin, msg, reln)
-			// Now write this to our typesense index
-
-			pkey, outmap, errors := dbsync.MessageToMap(d, msg.Tuple, reln)
-			if errors != nil {
-				log.Println("Error converting to map: ", pkey, errors)
-			}
-			// log.Println("Converted: ", pkey, out)
-
-			if _, ok := outmap["created_at"]; ok {
-				outmap["created_at"] = outmap["created_at"].(time.Time).Unix()
-			}
-			if _, ok := outmap["updated_at"]; ok {
-				outmap["updated_at"] = outmap["updated_at"].(time.Time).Unix()
-			}
-			tableinfo := d.GetTableInfo(reln.RelationID)
-			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
-			// result, err := tsclient.Collection(doctype).Documents().Upsert(out)
-			// docid := outmap["id"].(string)
-			docid := tableinfo.GetRecordID(msg.Tuple, reln)
-
-			d.MarkUpdated(doctype, docid, outmap)
-
-			/* - Uncomment to do single gets instead of batch
-			result, err := tsclient.Upsert(doctype, docid, outmap)
-			if err != nil && clients.TSErrorCode(err) != clients.ErrCodeEntityNotFound {
-				schema, err2 := tsclient.GetCollection(doctype)
-				log.Println("Error Upserting: ", result, err)
-				log.Println("Old Schema: ", schema, err2)
-				panic(err)
-			}
-			*/
-
-			return nil
-		},
-		HandleDeleteMessage: func(m *dbsync.DefaultMessageHandler, idx int, msg *pglogrepl.DeleteMessage, reln *pglogrepl.RelationMessage) error {
-			// Instead of individual deletes we will batch them by collections
-			tableinfo := d.GetTableInfo(reln.RelationID)
-			doctype := fmt.Sprintf("%s.%s", reln.Namespace, reln.RelationName)
-			docid := tableinfo.GetRecordID(msg.OldTuple, reln)
-			d.MarkDeleted(doctype, docid)
-			return nil
-		},
-		HandleUpdateMessage: func(m *dbsync.DefaultMessageHandler, idx int, msg *pglogrepl.UpdateMessage, reln *pglogrepl.RelationMessage) error {
-			// log.Println("Update Message: ", m.LastBegin, msg, reln)
-			return nil
-		},
-	}
+	d.MessageHandler = &OurMessageHandler{ds: d}
 
 	// Start a simple http server that listens to commands to control the replicator
 	// and to "introduce" selective dumps
