@@ -14,6 +14,7 @@ import (
 	"runtime/debug"
 	"strings"
 
+	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 
@@ -40,8 +41,9 @@ var (
 )
 
 func startGRPCServer(addr string, db *ds.OneHubDB, srvErr chan error, stopChan chan bool) {
-	// create new gRPC server
+	// create new gRPC server with otel enabled
 	server := grpc.NewServer(
+		grpc.StatsHandler(otelgrpc.NewServerHandler()),
 		grpc.ChainUnaryInterceptor(
 			ErrorLogger(),
 			EnsureAuthIsValid,
@@ -91,15 +93,23 @@ func startGatewayServer(ctx context.Context, gw_addr, grpc_addr string, srvErr c
 			return md
 		}))
 
-	opts := []grpc.DialOption{grpc.WithInsecure()}
-	err := v1.RegisterTopicServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts)
+	// Use the OpenTelemetry gRPC client interceptor for tracing
+	conn, err := grpc.DialContext(ctx,
+		grpc_addr,
+		grpc.WithInsecure(),
+		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()))
 	if err != nil {
 		srvErr <- err
 	}
-	if err := v1.RegisterMessageServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts); err != nil {
+
+	err = v1.RegisterTopicServiceHandler(ctx, mux, conn)
+	if err != nil {
 		srvErr <- err
 	}
-	if err := v1.RegisterUserServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts); err != nil {
+	if err = v1.RegisterMessageServiceHandler(ctx, mux, conn); err != nil {
+		srvErr <- err
+	}
+	if err := v1.RegisterUserServiceHandler(ctx, mux, conn); err != nil {
 		srvErr <- err
 	}
 

@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"fmt"
-	"log"
 
 	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
@@ -74,7 +73,6 @@ func (s *TopicService) ListTopics(ctx context.Context, req *protos.ListTopicsReq
 	if err != nil {
 		return nil, err
 	}
-	log.Println("Found Topics: ", results)
 	resp = &protos.ListTopicsResponse{Topics: gfn.Map(results, TopicToProto)}
 	return
 }

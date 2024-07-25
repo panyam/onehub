@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	sl "log"
 	"time"
 
 	"go.opentelemetry.io/otel"
@@ -13,7 +14,9 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/sdk/log"
 	"go.opentelemetry.io/otel/sdk/metric"
+	"go.opentelemetry.io/otel/sdk/resource"
 	"go.opentelemetry.io/otel/sdk/trace"
+	semconv "go.opentelemetry.io/otel/semconv/v1.26.0"
 )
 
 // setupOTelSDK bootstraps the OpenTelemetry pipeline.
@@ -45,6 +48,7 @@ func setupOTelSDK(ctx context.Context) (shutdown func(context.Context) error, er
 	// Set up trace provider.
 	tracerProvider, err := newTraceProvider()
 	if err != nil {
+		sl.Println("TraceProvider Error: ", err)
 		handleErr(err)
 		return
 	}
@@ -86,10 +90,23 @@ func newTraceProvider() (*trace.TracerProvider, error) {
 		return nil, err
 	}
 
+	// Ensure default SDK resources and the required service name are set.
+	traceRes, err := resource.Merge(
+		resource.Default(),
+		resource.NewWithAttributes(
+			semconv.SchemaURL,
+			semconv.ServiceNameKey.String("onehub")),
+	)
+	if err != nil {
+		sl.Println("err: ", err)
+		return nil, err
+	}
+
 	traceProvider := trace.NewTracerProvider(
 		trace.WithBatcher(traceExporter,
 			// Default is 5s. Set to 1s for demonstrative purposes.
 			trace.WithBatchTimeout(time.Second)),
+		trace.WithResource(traceRes),
 	)
 	return traceProvider, nil
 }
