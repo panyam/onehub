@@ -2,14 +2,19 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"log"
+	"log/slog"
 	"net"
 	"net/http"
+	"os"
+	"os/signal"
 	"runtime/debug"
 	"strings"
 
+	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
 	"google.golang.org/grpc"
 
 	"github.com/grpc-ecosystem/grpc-gateway/v2/runtime"
@@ -34,7 +39,7 @@ var (
 	db_endpoint = flag.String("db_endpoint", "", fmt.Sprintf("Endpoint of DB where all topics/messages state are persisted.  Default value: ONEHUB_DB_ENDPOINT environment variable or %s", DEFAULT_DB_ENDPOINT))
 )
 
-func startGRPCServer(addr string, db *ds.OneHubDB) {
+func startGRPCServer(addr string, db *ds.OneHubDB, srvErr chan error, stopChan chan bool) {
 	// create new gRPC server
 	server := grpc.NewServer(
 		grpc.ChainUnaryInterceptor(
@@ -46,19 +51,25 @@ func startGRPCServer(addr string, db *ds.OneHubDB) {
 	v1.RegisterUserServiceServer(server, svc.NewUserService(db))
 	v1.RegisterMessageServiceServer(server, svc.NewMessageService(db))
 	if l, err := net.Listen("tcp", addr); err != nil {
-		log.Fatalf("error in listening on port %s: %v", addr, err)
+		slog.Error("error in listening on port: ", "addr", addr, "err", err)
+		srvErr <- err
 	} else {
 		// the gRPC server
 		log.Printf("Starting grpc endpoint on %s:", addr)
 		reflection.Register(server)
+
+		go func() {
+			<-stopChan
+			server.GracefulStop()
+		}()
 		if err := server.Serve(l); err != nil {
-			log.Fatal("unable to start server", err)
+			slog.Error("unable to start grpc server", "err", err)
+			srvErr <- err
 		}
 	}
 }
 
-func startGatewayServer(gw_addr, grpc_addr string) {
-	ctx := context.Background()
+func startGatewayServer(ctx context.Context, gw_addr, grpc_addr string, srvErr chan error, stopChan chan bool) {
 	mux := runtime.NewServeMux(
 		runtime.WithMetadata(func(ctx context.Context, request *http.Request) metadata.MD {
 
@@ -83,17 +94,29 @@ func startGatewayServer(gw_addr, grpc_addr string) {
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 	err := v1.RegisterTopicServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts)
 	if err != nil {
-		log.Fatal(err)
+		srvErr <- err
 	}
 	if err := v1.RegisterMessageServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts); err != nil {
-		log.Fatal(err)
+		srvErr <- err
 	}
 	if err := v1.RegisterUserServiceHandlerFromEndpoint(ctx, mux, grpc_addr, opts); err != nil {
-		log.Fatal(err)
+		srvErr <- err
 	}
 
 	log.Println("Starting grpc gateway server on: ", gw_addr)
-	http.ListenAndServe(gw_addr, mux)
+	server := &http.Server{
+		Addr:        gw_addr,
+		BaseContext: func(_ net.Listener) context.Context { return ctx },
+		Handler:     otelhttp.NewHandler(mux, "/"),
+	}
+
+	go func() {
+		<-stopChan
+		if err := server.Shutdown(context.Background()); err != nil {
+			log.Fatalln(err)
+		}
+	}()
+	srvErr <- server.ListenAndServe()
 }
 
 func EnsureAuthExists(ctx context.Context,
@@ -172,9 +195,44 @@ func ErrorLogger( /* Add configs here */ ) grpc.UnaryServerInterceptor {
 
 func main() {
 	flag.Parse()
+
+	// Handle SIGINT (CTRL+C) gracefully.
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
+	defer stop()
+
+	// Set up OpenTelemetry.
+	otelShutdown, err := setupOTelSDK(ctx)
+	if err != nil {
+		return
+	}
+	// Handle shutdown properly so nothing leaks.
+	defer func() {
+		err = errors.Join(err, otelShutdown(context.Background()))
+	}()
+
 	ohdb := OpenOHDB()
-	go startGRPCServer(*addr, ohdb)
-	startGatewayServer(*gw_addr, *addr)
+
+	srvErr := make(chan error, 2)
+
+	httpSrvChan := make(chan bool)
+	grpcSrvChan := make(chan bool)
+	go startGRPCServer(*addr, ohdb, srvErr, httpSrvChan)
+	go startGatewayServer(ctx, *gw_addr, *addr, srvErr, grpcSrvChan)
+
+	// Wait for interruption.
+	select {
+	case err = <-srvErr:
+		// Error when starting HTTP server or GRPC server
+		return
+	case <-ctx.Done():
+		// Wait for first CTRL+C.
+		// Stop receiving signal notifications as soon as possible.
+		stop()
+	}
+
+	// When Shutdown is called, ListenAndServe immediately returns ErrServerClosed.
+	httpSrvChan <- true
+	grpcSrvChan <- true
 }
 
 func OpenOHDB() *ds.OneHubDB {
