@@ -25,6 +25,8 @@ func NewUserService(db *ds.OneHubDB) *UserService {
 
 // Create a new User
 func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequest) (resp *protos.CreateUserResponse, err error) {
+	otelctx, span := tracer.Start(ctx, "CreateUser")
+	defer span.End()
 	user := req.User
 	if user.Id != "" {
 		// see if it already exists
@@ -36,6 +38,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequ
 		user.Id = s.DB.NewID("User")
 	}
 	if user.Name == "" {
+		logger.InfoContext(otelctx, "User.Name must be specified")
 		return nil, status.Error(codes.InvalidArgument, "Name must be specified")
 	}
 
@@ -45,6 +48,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequ
 		resp = &protos.CreateUserResponse{
 			User: UserToProto(dbUser),
 		}
+		userCnt.Add(otelctx, 1)
 	}
 	return resp, err
 }

@@ -68,7 +68,7 @@ services:
       - ./ohfe:/app
     environment:
       ONEHUB_API_ENDPOINT: http://onehub:9080/api
-      ONEHUB_GRPC_ENDPOINT: onehub:9090
+      ONEHUB_GRPC_ENDPOINT: onehub:9081
     ports:
       - 5080:5000
       - 9091:9091

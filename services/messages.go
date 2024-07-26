@@ -35,7 +35,7 @@ func ensureMessageBase(msg *protos.Message) *protos.Message {
 }
 
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
-	otelctx, span := tracer.Start(ctx, "ListMessages")
+	_, span := tracer.Start(ctx, "ListMessages")
 	defer span.End()
 
 	pageKey := ""
@@ -68,7 +68,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 
 	// Add a new message entity here
 	numNewIDs := 0
-	authedUser := GetAuthedUser(ctx)
+	authedUser := GetAuthedUser(otelctx)
 	for _, message := range req.Messages {
 		// TODO - do this on batch
 		ensureMessageBase(message)
@@ -191,7 +191,7 @@ func (s *MessageService) GetMessage(ctx context.Context, req *protos.GetMessageR
 // Deletes an message from our system.
 func (s *MessageService) DeleteMessage(ctx context.Context, req *protos.DeleteMessageRequest) (resp *protos.DeleteMessageResponse, err error) {
 	resp = &protos.DeleteMessageResponse{}
-	s.DB.DeleteMessage(req.Id)
+	err = s.DB.DeleteMessage(req.Id)
 	return
 }
 

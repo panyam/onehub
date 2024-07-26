@@ -58,3 +58,31 @@ services:
     volumes:
       - ./.data/typesensedata:/data
     command: '--data-dir /data --api-key=my_api_key --enable-cors'
+
+  otel-collector:
+    image: otel/opentelemetry-collector-contrib:0.105.0
+    command: ["--config=/etc/otel-collector.yaml"]
+    volumes:
+      - ./configs/otel-collector.yaml:/etc/otel-collector.yaml
+        # - ./configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
+    ports:
+      - 1888:1888 # pprof extension
+      - 8888:8888 # Prometheus metrics exposed by the Collector
+      - 8889:8889 # Prometheus exporter metrics
+      - 13133:13133 # health_check extension
+      - 4317:4317 # OTLP gRPC receiver
+      - 4318:4318 # OTLP http receiver
+      - 55679:55679 # zpages extension
+
+
+  prometheus:
+    image: prom/prometheus:v2.53.1
+    volumes:
+      - ./configs/prometheus.yaml:/etc/prometheus/prometheus.yml
+    ports:
+      - 9090:9090
+
+  jaeger:
+    image: jaegertracing/all-in-one:1.59
+    ports:
+      - 16686:16686

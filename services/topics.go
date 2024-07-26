@@ -34,7 +34,7 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 	otelctx, span := tracer.Start(ctx, "CreateTopic")
 	defer span.End()
 	ensureTopicBase(req.Topic)
-	req.Topic.Base.CreatorId = GetAuthedUser(ctx)
+	req.Topic.Base.CreatorId = GetAuthedUser(otelctx)
 	if req.Topic.Base.CreatorId == "" {
 		logger.InfoContext(otelctx, "User is not authenticated to create a topic.")
 		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic.")
