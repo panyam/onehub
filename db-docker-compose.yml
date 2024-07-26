@@ -53,6 +53,8 @@ services:
         # image: typesense/typesense:0.25.0
     image: typesense/typesense:26.0-arm64
     restart: on-failure
+    environment:
+      GLOG_minloglevel: 1
     ports:
       - 8108:8108
     volumes:
