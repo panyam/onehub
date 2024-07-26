@@ -31,9 +31,12 @@ func ensureTopicBase(topic *protos.Topic) *protos.Topic {
 
 // Create a new Topic
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
+	otelctx, span := tracer.Start(ctx, "CreateTopic")
+	defer span.End()
 	ensureTopicBase(req.Topic)
 	req.Topic.Base.CreatorId = GetAuthedUser(ctx)
 	if req.Topic.Base.CreatorId == "" {
+		logger.InfoContext(otelctx, "User is not authenticated to create a topic.")
 		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic.")
 	}
 	topic := req.Topic
@@ -41,6 +44,7 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 		// see if it already exists
 		curr, _ := s.DB.GetTopic(topic.Base.Id)
 		if curr != nil {
+			logger.InfoContext(otelctx, "Topic with id already exists", "topicId", topic.Base.Id)
 			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Topic with id '%s' already exists", topic.Base.Id))
 		}
 	} else {
@@ -56,6 +60,8 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 		resp = &protos.CreateTopicResponse{
 			Topic: TopicToProto(dbTopic),
 		}
+		// Increatement our topic
+		topicCnt.Add(otelctx, 1)
 	}
 	return resp, err
 }

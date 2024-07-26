@@ -73,6 +73,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
+      OTEL_RESOURCE_ATTRIBUTES: service.name=onehub.backend,service.version=0.0.1
     ports:
       - 9080:9080
       - 9000:9000

@@ -35,6 +35,9 @@ func ensureMessageBase(msg *protos.Message) *protos.Message {
 }
 
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
+	otelctx, span := tracer.Start(ctx, "ListMessages")
+	defer span.End()
+
 	pageKey := ""
 	pageSize := 100
 	if req.Pagination != nil {
@@ -52,6 +55,9 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 
 // Create a new Message
 func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateMessagesRequest) (resp *protos.CreateMessagesResponse, err error) {
+	otelctx, span := tracer.Start(ctx, "CreateMessages")
+	defer span.End()
+
 	topic, err := s.DB.GetTopic(req.TopicId)
 	if topic == nil {
 		return nil, fmt.Errorf("topic not found: %s", req.TopicId)
@@ -74,6 +80,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 			// see if it already exists
 			curr, _ := s.DB.GetMessage(message.Base.Id)
 			if curr != nil {
+				logger.InfoContext(otelctx, "Message with id already exists", "messageId", message.Base.Id)
 				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
 		} else {
@@ -99,12 +106,14 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 	}
 
 	if err := s.DB.CreateMessages(dbmsgs); err != nil {
+		logger.ErrorContext(otelctx, err.Error())
 		return nil, err
 	}
 
 	resp = &protos.CreateMessagesResponse{
 		Messages: gfn.Map(dbmsgs, MessageToProto),
 	}
+	messageCnt.Add(otelctx, int64(len(dbmsgs)))
 	return
 }
 
