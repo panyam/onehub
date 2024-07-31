@@ -62,6 +62,8 @@ services:
     command: '--data-dir /data --api-key=my_api_key --enable-cors'
 
   otel-collector:
+    networks:
+      - onehubnetwork
     image: otel/opentelemetry-collector-contrib:0.105.0
     command: ["--config=/etc/otel-collector.yaml"]
     volumes:
@@ -78,13 +80,23 @@ services:
 
 
   prometheus:
+    networks:
+      - onehubnetwork
     image: prom/prometheus:v2.53.1
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--web.external-url=/prometheus/'
+      - '--web.route-prefix=/prometheus/'
     volumes:
       - ./configs/prometheus.yaml:/etc/prometheus/prometheus.yml
     ports:
       - 9090:9090
 
   jaeger:
+    networks:
+      - onehubnetwork
     image: jaegertracing/all-in-one:1.59
+    environment:
+      QUERY_BASE_PATH: '/jaeger'
     ports:
       - 16686:16686
