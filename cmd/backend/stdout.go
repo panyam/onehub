@@ -13,7 +13,16 @@ import (
 	"go.opentelemetry.io/otel/trace"
 )
 
-func newStdoutMeterProvider() (otelmetric.MeterProvider, ShutdownFunc, error) {
+func NewOTELSetupWithStdout() (out *OTELSetup[any]) {
+	out = &OTELSetup[any]{
+		SetupTracerProvider: newStdoutTraceProvider[any],
+		SetupMeterProvider:  newStdoutMeterProvider,
+		SetupLoggerProvider: newStdoutLoggerProvider[any],
+	}
+	return
+}
+
+func newStdoutMeterProvider(o *OTELSetup[any]) (otelmetric.MeterProvider, ShutdownFunc, error) {
 	metricExporter, err := stdoutmetric.New()
 	if err != nil {
 		return nil, nil, err

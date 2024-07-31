@@ -2,7 +2,6 @@ package main
 
 import (
 	"context"
-	"errors"
 	"flag"
 	"fmt"
 	"log"
@@ -26,6 +25,7 @@ import (
 
 	// This is needed to enable the use of the grpc_cli tool
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/reflection"
 	"google.golang.org/grpc/status"
@@ -210,14 +210,23 @@ func main() {
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
 	defer stop()
 
-	// Set up OpenTelemetry.
-	otelShutdown, err := setupOTelSDK(ctx)
+	collectorAddr := cmdutils.GetEnvOrDefault("OTEL_COLLECTOR_ADDR", "otel-collector:4317")
+	conn, err := grpc.NewClient(collectorAddr,
+		// Note the use of insecure transport here. TLS is recommended in production.
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
 	if err != nil {
+		log.Println("failed to create gRPC connection to collector: %w", err)
 		return
 	}
-	// Handle shutdown properly so nothing leaks.
+	setup := NewOTELSetupWithCollector(conn)
+	err = setup.Setup(ctx)
+	if err != nil {
+		log.Println("error setting up otel: ", err)
+	}
+
 	defer func() {
-		err = errors.Join(err, otelShutdown(context.Background()))
+		err = setup.Shutdown(context.Background())
 	}()
 
 	ohdb := OpenOHDB()
@@ -232,6 +241,7 @@ func main() {
 	// Wait for interruption.
 	select {
 	case err = <-srvErr:
+		log.Println("Server error: ", err)
 		// Error when starting HTTP server or GRPC server
 		return
 	case <-ctx.Done():
