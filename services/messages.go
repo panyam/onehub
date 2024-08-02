@@ -9,6 +9,7 @@ import (
 	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
+	"github.com/panyam/onehub/obs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -35,7 +36,7 @@ func ensureMessageBase(msg *protos.Message) *protos.Message {
 }
 
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
-	ctx, span := tracer.Start(ctx, "ListMessages")
+	ctx, span := obs.Tracer.Start(ctx, "ListMessages")
 	defer span.End()
 
 	pageKey := ""
@@ -44,7 +45,7 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 		pageKey = req.Pagination.PageKey
 		pageSize = int(req.Pagination.PageSize)
 	}
-	results, err := s.DB.GetMessages(req.TopicId, "", pageKey, pageSize)
+	results, err := s.DB.GetMessages(ctx, req.TopicId, "", pageKey, pageSize)
 	if err != nil {
 		return nil, err
 	}
@@ -55,10 +56,10 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 
 // Create a new Message
 func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateMessagesRequest) (resp *protos.CreateMessagesResponse, err error) {
-	ctx, span := tracer.Start(ctx, "CreateMessages")
+	ctx, span := obs.Tracer.Start(ctx, "CreateMessages")
 	defer span.End()
 
-	topic, err := s.DB.GetTopic(req.TopicId)
+	topic, err := s.DB.GetTopic(ctx, req.TopicId)
 	if topic == nil {
 		return nil, fmt.Errorf("topic not found: %s", req.TopicId)
 	}
@@ -78,9 +79,9 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 		message.TopicId = req.TopicId
 		if message.Base.Id != "" {
 			// see if it already exists
-			curr, _ := s.DB.GetMessage(message.Base.Id)
+			curr, _ := s.DB.GetMessage(ctx, message.Base.Id)
 			if curr != nil {
-				logger.InfoContext(ctx, "Message with id already exists", "messageId", message.Base.Id)
+				obs.Logger.InfoContext(ctx, "Message with id already exists", "messageId", message.Base.Id)
 				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
 		} else {
@@ -105,8 +106,8 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 		msg.UpdatedAt = time.Now()
 	}
 
-	if err := s.DB.CreateMessages(dbmsgs); err != nil {
-		logger.ErrorContext(ctx, err.Error())
+	if err := s.DB.CreateMessages(ctx, dbmsgs); err != nil {
+		obs.Logger.ErrorContext(ctx, err.Error())
 		return nil, err
 	}
 
@@ -119,7 +120,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 
 // Create a new Message
 func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportMessagesRequest) (resp *protos.ImportMessagesResponse, err error) {
-	ctx, span := tracer.Start(ctx, "ImportMessages")
+	ctx, span := obs.Tracer.Start(ctx, "ImportMessages")
 	defer span.End()
 	// Add a new message entity here
 	numNewIDs := 0
@@ -133,7 +134,7 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 		}
 		if message.Base.Id != "" {
 			// see if it already exists
-			curr, _ := s.DB.GetMessage(message.Base.Id)
+			curr, _ := s.DB.GetMessage(ctx, message.Base.Id)
 			if curr != nil {
 				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
@@ -153,7 +154,7 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 		dbmsgs = append(dbmsgs, dbmsg)
 	}
 
-	if err := s.DB.CreateMessages(dbmsgs); err != nil {
+	if err := s.DB.CreateMessages(ctx, dbmsgs); err != nil {
 		return nil, err
 	}
 
@@ -166,12 +167,12 @@ func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportM
 
 func (s *MessageService) UpdateMessage(ctx context.Context, req *protos.UpdateMessageRequest) (resp *protos.UpdateMessageResponse, err error) {
 	ensureMessageBase(req.Message)
-	msg, err := s.DB.GetMessage(req.Message.Base.Id)
+	msg, err := s.DB.GetMessage(ctx, req.Message.Base.Id)
 	if msg == nil {
 		return nil, fmt.Errorf("message not found: %s", req.Message.Base.Id)
 	}
 	dbmsg := MessageFromProto(req.Message)
-	if err := s.DB.SaveMessage(dbmsg); err != nil {
+	if err := s.DB.SaveMessage(ctx, dbmsg); err != nil {
 		return nil, err
 	}
 	resp = &protos.UpdateMessageResponse{
@@ -181,7 +182,7 @@ func (s *MessageService) UpdateMessage(ctx context.Context, req *protos.UpdateMe
 }
 
 func (s *MessageService) GetMessage(ctx context.Context, req *protos.GetMessageRequest) (resp *protos.GetMessageResponse, err error) {
-	curr, _ := s.DB.GetMessage(req.Id)
+	curr, _ := s.DB.GetMessage(ctx, req.Id)
 	if curr == nil {
 		err = status.Error(codes.NotFound, fmt.Sprintf("Message with id '%s' not found", req.Id))
 	} else {
@@ -193,7 +194,7 @@ func (s *MessageService) GetMessage(ctx context.Context, req *protos.GetMessageR
 // Deletes an message from our system.
 func (s *MessageService) DeleteMessage(ctx context.Context, req *protos.DeleteMessageRequest) (resp *protos.DeleteMessageResponse, err error) {
 	resp = &protos.DeleteMessageResponse{}
-	err = s.DB.DeleteMessage(req.Id)
+	err = s.DB.DeleteMessage(ctx, req.Id)
 	return
 }
 

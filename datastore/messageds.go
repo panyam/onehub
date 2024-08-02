@@ -1,14 +1,18 @@
 package datastore
 
 import (
+	"context"
 	"errors"
 	"strings"
 	"time"
 
+	"github.com/panyam/onehub/obs"
 	"gorm.io/gorm"
 )
 
-func (tdb *OneHubDB) GetMessages(topic_id string, creator_id string, pageKey string, pageSize int) (out []*Message, err error) {
+func (tdb *OneHubDB) GetMessages(ctx context.Context, topic_id string, creator_id string, pageKey string, pageSize int) (out []*Message, err error) {
+	_, span := obs.Tracer.Start(ctx, "db.GetMessages")
+	defer span.End()
 	creator_id = strings.Trim(creator_id, " ")
 	topic_id = strings.Trim(topic_id, " ")
 	if creator_id == "" && topic_id == "" {
@@ -35,12 +39,16 @@ func (tdb *OneHubDB) GetMessages(topic_id string, creator_id string, pageKey str
 }
 
 // Get messages in a topic paginated and ordered by creation time stamp
-func (tdb *OneHubDB) ListMessagesInTopic(topic_id string, pageKey string, pageSize int) (out []*Topic, err error) {
+func (tdb *OneHubDB) ListMessagesInTopic(ctx context.Context, topic_id string, pageKey string, pageSize int) (out []*Topic, err error) {
+	_, span := obs.Tracer.Start(ctx, "db.ListMessages")
+	defer span.End()
 	err = tdb.storage.Where("topic_id= ?", topic_id).Find(&out).Error
 	return
 }
 
-func (tdb *OneHubDB) GetMessage(msgid string) (*Message, error) {
+func (tdb *OneHubDB) GetMessage(ctx context.Context, msgid string) (*Message, error) {
+	_, span := obs.Tracer.Start(ctx, "db.GetMessage")
+	defer span.End()
 	var out Message
 	err := tdb.storage.First(&out, "id = ?", msgid).Error
 	if err != nil {
@@ -53,7 +61,9 @@ func (tdb *OneHubDB) GetMessage(msgid string) (*Message, error) {
 	return &out, err
 }
 
-func (tdb *OneHubDB) ListMessages(topic_id string, pageKey string, pageSize int) (out []*Message, err error) {
+func (tdb *OneHubDB) ListMessages(ctx context.Context, topic_id string, pageKey string, pageSize int) (out []*Message, err error) {
+	_, span := obs.Tracer.Start(ctx, "db.GetMessage")
+	defer span.End()
 	query := tdb.storage.Where("topic_id = ?").Order("created_at asc")
 	if pageKey != "" {
 		count := 0
@@ -67,13 +77,17 @@ func (tdb *OneHubDB) ListMessages(topic_id string, pageKey string, pageSize int)
 	return out, err
 }
 
-func (tdb *OneHubDB) CreateMessages(msgs []*Message) (err error) {
+func (tdb *OneHubDB) CreateMessages(ctx context.Context, msgs []*Message) (err error) {
+	_, span := obs.Tracer.Start(ctx, "db.CreateMessages")
+	defer span.End()
 	result := tdb.storage.Model(&Message{}).Create(msgs)
 	err = result.Error
 	return
 }
 
-func (tdb *OneHubDB) CreateMessage(msg *Message) (err error) {
+func (tdb *OneHubDB) CreateMessage(ctx context.Context, msg *Message) (err error) {
+	_, span := obs.Tracer.Start(ctx, "db.CreateMessage")
+	defer span.End()
 	msg.CreatedAt = time.Now()
 	msg.UpdatedAt = time.Now()
 	result := tdb.storage.Model(&Message{}).Create(msg)
@@ -81,12 +95,16 @@ func (tdb *OneHubDB) CreateMessage(msg *Message) (err error) {
 	return
 }
 
-func (tdb *OneHubDB) DeleteMessage(msgId string) (err error) {
+func (tdb *OneHubDB) DeleteMessage(ctx context.Context, msgId string) (err error) {
+	_, span := obs.Tracer.Start(ctx, "db.DeleteMessage")
+	defer span.End()
 	err = tdb.storage.Where("id = ?", msgId).Delete(&Message{}).Error
 	return
 }
 
-func (tdb *OneHubDB) SaveMessage(msg *Message) (err error) {
+func (tdb *OneHubDB) SaveMessage(ctx context.Context, msg *Message) (err error) {
+	_, span := obs.Tracer.Start(ctx, "db.SaveMessage")
+	defer span.End()
 	db := tdb.storage
 	q := db.Model(msg).Where("id = ? and version = ?", msg.Id, msg.Version)
 	msg.UpdatedAt = time.Now()

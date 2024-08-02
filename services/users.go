@@ -8,6 +8,7 @@ import (
 	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
+	"github.com/panyam/onehub/obs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -25,7 +26,7 @@ func NewUserService(db *ds.OneHubDB) *UserService {
 
 // Create a new User
 func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequest) (resp *protos.CreateUserResponse, err error) {
-	otelctx, span := tracer.Start(ctx, "CreateUser")
+	otelctx, span := obs.Tracer.Start(ctx, "CreateUser")
 	defer span.End()
 	user := req.User
 	if user.Id != "" {
@@ -38,7 +39,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequ
 		user.Id = s.DB.NewID("User")
 	}
 	if user.Name == "" {
-		logger.InfoContext(otelctx, "User.Name must be specified")
+		obs.Logger.InfoContext(otelctx, "User.Name must be specified")
 		return nil, status.Error(codes.InvalidArgument, "Name must be specified")
 	}
 

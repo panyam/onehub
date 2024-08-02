@@ -62,6 +62,7 @@ services:
       # - ./go.sum:/app/go.sum:ro
       - ./cmd/backend:/app/cmd/backend
       - ./clients:/app/clients
+      - ./obs:/app/obs
       - ./datastore:/app/datastore
       - ./protos:/app/protos
       - ./services:/app/services
