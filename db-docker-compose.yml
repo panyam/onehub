@@ -40,12 +40,14 @@ services:
   # git clone https://github.com/bfritscher/typesense-dashboard.git
   # cd typesense-dashboard
   # docker build -t typesense-dashboard .
+  # or
+  # docker build --build-arg=PUBLIC_PATH=/typesense -t typesense-dashboard .
   typesense-dashboard:
+    networks:
+      - onehubnetwork
     image: typesense-dashboard
     volumes:
       - ./configs/tsdash.config:/srv/config.json
-    ports:
-      - 8180:80
 
   typesense:
     networks:
@@ -69,15 +71,14 @@ services:
     volumes:
       - ./configs/otel-collector.yaml:/etc/otel-collector.yaml
         # - ./configs/otel-collector-config.yaml:/etc/otelcol-contrib/config.yaml
-    ports:
-      - 1888:1888 # pprof extension
-      - 8888:8888 # Prometheus metrics exposed by the Collector
-      - 8889:8889 # Prometheus exporter metrics
-      - 13133:13133 # health_check extension
-      - 4317:4317 # OTLP gRPC receiver
-      - 4318:4318 # OTLP http receiver
-      - 55679:55679 # zpages extension
-
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+#    ports:
+#      - 13133:13133 # health_check extension
+#      - 4317:4317 # OTLP gRPC receiver
+#      - 4318:4318 # OTLP http receiver
 
   prometheus:
     networks:
@@ -96,7 +97,21 @@ services:
     networks:
       - onehubnetwork
     image: jaegertracing/all-in-one:1.59
+    container_name: jaeger
     environment:
       QUERY_BASE_PATH: '/jaeger'
-    ports:
-      - 16686:16686
+      COLLECTOR_OTLP_GRPC_HOST_PORT: '0.0.0.0:4317'
+      COLLECTOR_OTLP_HTTP_HOST_PORT: '0.0.0.0:4318'
+      COLLECTOR_ZIPKIN_HOST_PORT: ':9411'
+      COLLECTOR_OTLP_ENABLED: true
+#    ports: # Some ports are optional or deprecated, but we still let them be here as it's a general snippet
+#      - "4317:4317" # OTLP collector grpc
+#      - "4318:4318" # OTLP collector http
+#      - "5775:5775/udp" # agent accept zipkin.thrift over compact thrift protocol (deprecated, used by legacy clients only)
+#      - "6831:6831/udp" # agent accept jaeger.thrift over compact thrift protocol
+#      - "6832:6832/udp" # agent accept jaeger.thrift over binary thrift protocol
+#      - "5778:5778" # agent serve configs
+#      - "16686:16686" # query serve frontend (Jaeger UI)
+#      - "14268:14268" # collector accept jaeger.thrift directly from clients
+#      - "14250:14250" # collector accept model.proto
+#      - "9411:9411" # collector Zipkin compatible endpoint (optional)

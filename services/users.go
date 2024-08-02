@@ -82,7 +82,7 @@ func (s *UserService) GetUser(ctx context.Context, req *protos.GetUserRequest) (
 }
 
 func (s *UserService) GetUsers(ctx context.Context, req *protos.GetUsersRequest) (resp *protos.GetUsersResponse, err error) {
-	log.Println("Batch Getting Users: ", req.Ids, len(req.Ids))
+	// log.Println("Batch Getting Users: ", req.Ids, len(req.Ids))
 	users, err := s.DB.GetUsers(req.Ids)
 	/*
 		users := gfn.BatchGet(req.Ids, func(id string) (out *protos.User, err error) {

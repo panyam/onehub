@@ -30,6 +30,7 @@ services:
     image: nginx:latest
     volumes:
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./webroot:/www/webroot:ro
       - ./configs/server.key:/root/ssl/server.key
       - ./configs/server.crt:/root/ssl/server.crt
     ports:

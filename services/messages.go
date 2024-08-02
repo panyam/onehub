@@ -35,7 +35,7 @@ func ensureMessageBase(msg *protos.Message) *protos.Message {
 }
 
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
-	_, span := tracer.Start(ctx, "ListMessages")
+	ctx, span := tracer.Start(ctx, "ListMessages")
 	defer span.End()
 
 	pageKey := ""
@@ -55,7 +55,7 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 
 // Create a new Message
 func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateMessagesRequest) (resp *protos.CreateMessagesResponse, err error) {
-	otelctx, span := tracer.Start(ctx, "CreateMessages")
+	ctx, span := tracer.Start(ctx, "CreateMessages")
 	defer span.End()
 
 	topic, err := s.DB.GetTopic(req.TopicId)
@@ -68,7 +68,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 
 	// Add a new message entity here
 	numNewIDs := 0
-	authedUser := GetAuthedUser(otelctx)
+	authedUser := GetAuthedUser(ctx)
 	for _, message := range req.Messages {
 		// TODO - do this on batch
 		ensureMessageBase(message)
@@ -80,7 +80,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 			// see if it already exists
 			curr, _ := s.DB.GetMessage(message.Base.Id)
 			if curr != nil {
-				logger.InfoContext(otelctx, "Message with id already exists", "messageId", message.Base.Id)
+				logger.InfoContext(ctx, "Message with id already exists", "messageId", message.Base.Id)
 				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
 		} else {
@@ -106,19 +106,21 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 	}
 
 	if err := s.DB.CreateMessages(dbmsgs); err != nil {
-		logger.ErrorContext(otelctx, err.Error())
+		logger.ErrorContext(ctx, err.Error())
 		return nil, err
 	}
 
 	resp = &protos.CreateMessagesResponse{
 		Messages: gfn.Map(dbmsgs, MessageToProto),
 	}
-	messageCnt.Add(otelctx, int64(len(dbmsgs)))
+	messageCnt.Add(ctx, int64(len(dbmsgs)))
 	return
 }
 
 // Create a new Message
 func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportMessagesRequest) (resp *protos.ImportMessagesResponse, err error) {
+	ctx, span := tracer.Start(ctx, "ImportMessages")
+	defer span.End()
 	// Add a new message entity here
 	numNewIDs := 0
 	for idx, message := range req.Messages {

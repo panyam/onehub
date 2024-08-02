@@ -4,19 +4,32 @@
 receivers:
   otlp:
     protocols:
+      http:
+        endpoint: 0.0.0.0:4318
       grpc:
         endpoint: 0.0.0.0:4317
+  postgresql:
+    endpoint: postgres:5432
+    transport: tcp
+    username: ${POSTGRES_USER}
+    password: ${POSTGRES_PASSWORD}
+    databases:
+      - ${POSTGRES_DB}
+    collection_interval: 10s
+    tls:
+      insecure: true
+
 processors:
 extensions:
   health_check: {}
 exporters:
-  otlp:
+  otlp/jaeger:
     endpoint: jaeger:4317
     tls:
       insecure: true
   prometheus:
     endpoint: 0.0.0.0:9090
-    namespace: testapp
+    namespace: onehub
   debug:
 
 service:
@@ -25,7 +38,7 @@ service:
     traces:
       receivers: [otlp]
       processors: []
-      exporters: [otlp, debug]
+      exporters: [otlp/jaeger, debug]
 
     metrics:
       receivers: [otlp]

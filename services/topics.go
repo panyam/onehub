@@ -31,12 +31,12 @@ func ensureTopicBase(topic *protos.Topic) *protos.Topic {
 
 // Create a new Topic
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
-	otelctx, span := tracer.Start(ctx, "CreateTopic")
+	ctx, span := tracer.Start(ctx, "CreateTopic")
 	defer span.End()
 	ensureTopicBase(req.Topic)
-	req.Topic.Base.CreatorId = GetAuthedUser(otelctx)
+	req.Topic.Base.CreatorId = GetAuthedUser(ctx)
 	if req.Topic.Base.CreatorId == "" {
-		logger.InfoContext(otelctx, "User is not authenticated to create a topic.")
+		logger.InfoContext(ctx, "User is not authenticated to create a topic.")
 		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic.")
 	}
 	topic := req.Topic
@@ -44,7 +44,7 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 		// see if it already exists
 		curr, _ := s.DB.GetTopic(topic.Base.Id)
 		if curr != nil {
-			logger.InfoContext(otelctx, "Topic with id already exists", "topicId", topic.Base.Id)
+			logger.InfoContext(ctx, "Topic with id already exists", "topicId", topic.Base.Id)
 			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Topic with id '%s' already exists", topic.Base.Id))
 		}
 	} else {
@@ -61,13 +61,15 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 			Topic: TopicToProto(dbTopic),
 		}
 		// Increatement our topic
-		topicCnt.Add(otelctx, 1)
+		topicCnt.Add(ctx, 1)
 	}
 	return resp, err
 }
 
 // Deletes an topic from our system.
 func (s *TopicService) DeleteTopic(ctx context.Context, req *protos.DeleteTopicRequest) (resp *protos.DeleteTopicResponse, err error) {
+	ctx, span := tracer.Start(ctx, "DeleteTopic")
+	defer span.End()
 	resp = &protos.DeleteTopicResponse{}
 	s.DB.DeleteTopic(req.Id)
 	return
@@ -75,6 +77,8 @@ func (s *TopicService) DeleteTopic(ctx context.Context, req *protos.DeleteTopicR
 
 // Finds and retrieves topics matching the particular criteria.
 func (s *TopicService) ListTopics(ctx context.Context, req *protos.ListTopicsRequest) (resp *protos.ListTopicsResponse, err error) {
+	ctx, span := tracer.Start(ctx, "ListTopics")
+	defer span.End()
 	results, err := s.DB.ListTopics("", 100)
 	if err != nil {
 		return nil, err
@@ -84,6 +88,8 @@ func (s *TopicService) ListTopics(ctx context.Context, req *protos.ListTopicsReq
 }
 
 func (s *TopicService) GetTopic(ctx context.Context, req *protos.GetTopicRequest) (resp *protos.GetTopicResponse, err error) {
+	ctx, span := tracer.Start(ctx, "GetTopic")
+	defer span.End()
 	curr, _ := s.DB.GetTopic(req.Id)
 	if curr == nil {
 		err = status.Error(codes.NotFound, fmt.Sprintf("Topic with id '%s' not found", req.Id))
@@ -94,6 +100,8 @@ func (s *TopicService) GetTopic(ctx context.Context, req *protos.GetTopicRequest
 }
 
 func (s *TopicService) GetTopics(ctx context.Context, req *protos.GetTopicsRequest) (resp *protos.GetTopicsResponse, err error) {
+	ctx, span := tracer.Start(ctx, "GetTopics")
+	defer span.End()
 	topics := gfn.BatchGet(req.Ids, func(id string) (out *protos.Topic, err error) {
 		resp, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: id})
 		if err != nil {
@@ -109,6 +117,8 @@ func (s *TopicService) GetTopics(ctx context.Context, req *protos.GetTopicsReque
 
 // Update a new Topic
 func (s *TopicService) UpdateTopic(ctx context.Context, req *protos.UpdateTopicRequest) (resp *protos.UpdateTopicResponse, err error) {
+	ctx, span := tracer.Start(ctx, "UpdateTopic")
+	defer span.End()
 	currtopic, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: req.Topic.Base.Id})
 	if err != nil {
 		return nil, err
