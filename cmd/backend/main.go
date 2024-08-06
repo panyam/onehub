@@ -24,6 +24,7 @@ import (
 	svc "github.com/panyam/onehub/services"
 
 	// This is needed to enable the use of the grpc_cli tool
+	_ "github.com/panyam/onehub/obs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
@@ -94,10 +95,10 @@ func startGatewayServer(ctx context.Context, gw_addr, grpc_addr string, srvErr c
 		}))
 
 	// Use the OpenTelemetry gRPC client interceptor for tracing
-	conn, err := grpc.DialContext(ctx,
-		grpc_addr,
-		grpc.WithInsecure(),
-		grpc.WithUnaryInterceptor(otelgrpc.UnaryClientInterceptor()))
+	trclient := grpc.WithStatsHandler(otelgrpc.NewClientHandler())
+	conn, err := grpc.NewClient(grpc_addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		trclient)
 	if err != nil {
 		srvErr <- err
 	}
@@ -117,7 +118,9 @@ func startGatewayServer(ctx context.Context, gw_addr, grpc_addr string, srvErr c
 	server := &http.Server{
 		Addr:        gw_addr,
 		BaseContext: func(_ net.Listener) context.Context { return ctx },
-		Handler:     otelhttp.NewHandler(mux, "/"),
+		Handler: otelhttp.NewHandler(mux, "gateway", otelhttp.WithSpanNameFormatter(func(operation string, r *http.Request) string {
+			return fmt.Sprintf("%s %s %s", operation, r.Method, r.URL.Path)
+		})),
 	}
 
 	go func() {
