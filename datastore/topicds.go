@@ -1,17 +1,21 @@
 package datastore
 
 import (
+	"context"
 	"errors"
 	"log"
 	"strings"
 	"time"
 
+	"github.com/panyam/onehub/obs"
 	"gorm.io/gorm"
 )
 
 /////////////////////// Topic DB
 
-func (tdb *OneHubDB) SaveTopic(topic *Topic) (err error) {
+func (tdb *OneHubDB) SaveTopic(ctx context.Context, topic *Topic) (err error) {
+	_, span := obs.Tracer.Start(ctx, "db.SaveTopic")
+	defer span.End()
 	db := tdb.storage
 	topic.UpdatedAt = time.Now()
 	if strings.Trim(topic.Id, " ") == "" {
@@ -28,7 +32,9 @@ func (tdb *OneHubDB) SaveTopic(topic *Topic) (err error) {
 	return
 }
 
-func (tdb *OneHubDB) DeleteTopic(topicId string) (err error) {
+func (tdb *OneHubDB) DeleteTopic(ctx context.Context, topicId string) (err error) {
+	_, span := obs.Tracer.Start(ctx, "db.DeleteTopic")
+	defer span.End()
 	err = tdb.storage.Where("topic_id = ?", topicId).Delete(&Message{}).Error
 	if err == nil {
 		err = tdb.storage.Where("id = ?", topicId).Delete(&Topic{}).Error
@@ -36,7 +42,9 @@ func (tdb *OneHubDB) DeleteTopic(topicId string) (err error) {
 	return
 }
 
-func (tdb *OneHubDB) GetTopic(id string) (*Topic, error) {
+func (tdb *OneHubDB) GetTopic(ctx context.Context, id string) (*Topic, error) {
+	_, span := obs.Tracer.Start(ctx, "db.GetTopic")
+	defer span.End()
 	var out Topic
 	err := tdb.storage.First(&out, "id = ?", id).Error
 	if err != nil {
@@ -51,7 +59,9 @@ func (tdb *OneHubDB) GetTopic(id string) (*Topic, error) {
 	return &out, err
 }
 
-func (tdb *OneHubDB) ListTopics(pageKey string, pageSize int) (out []*Topic, err error) {
+func (tdb *OneHubDB) ListTopics(ctx context.Context, pageKey string, pageSize int) (out []*Topic, err error) {
+	_, span := obs.Tracer.Start(ctx, "db.ListTopics")
+	defer span.End()
 	query := tdb.storage.Model(&Topic{}).Order("name asc")
 	if pageKey != "" {
 		count := 0

@@ -8,6 +8,7 @@ services:
       - onehubnetwork
     image: arm64v8/nginx:latest
     volumes:
+      - ./webroot:/www/webroot:ro
       - ./configs/nginx.conf:/etc/nginx/nginx.conf:ro
       - ./configs/server.key:/root/ssl/server.key
       - ./configs/server.crt:/root/ssl/server.crt
@@ -61,6 +62,7 @@ services:
       # - ./go.sum:/app/go.sum:ro
       - ./cmd/backend:/app/cmd/backend
       - ./clients:/app/clients
+      - ./obs:/app/obs
       - ./datastore:/app/datastore
       - ./protos:/app/protos
       - ./services:/app/services
@@ -73,6 +75,7 @@ services:
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       ONEHUB_DB_ENDPOINT: ${ONEHUB_DB_ENDOINT}
+      OTEL_RESOURCE_ATTRIBUTES: service.name=onehub.backend,service.version=0.0.1
     ports:
       - 9080:9080
       - 9000:9000

@@ -8,6 +8,7 @@ import (
 	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
+	"github.com/panyam/onehub/obs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -25,6 +26,8 @@ func NewUserService(db *ds.OneHubDB) *UserService {
 
 // Create a new User
 func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequest) (resp *protos.CreateUserResponse, err error) {
+	otelctx, span := obs.Tracer.Start(ctx, "CreateUser")
+	defer span.End()
 	user := req.User
 	if user.Id != "" {
 		// see if it already exists
@@ -36,6 +39,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequ
 		user.Id = s.DB.NewID("User")
 	}
 	if user.Name == "" {
+		obs.Logger.InfoContext(otelctx, "User.Name must be specified")
 		return nil, status.Error(codes.InvalidArgument, "Name must be specified")
 	}
 
@@ -45,6 +49,7 @@ func (s *UserService) CreateUser(ctx context.Context, req *protos.CreateUserRequ
 		resp = &protos.CreateUserResponse{
 			User: UserToProto(dbUser),
 		}
+		userCnt.Add(otelctx, 1)
 	}
 	return resp, err
 }
@@ -78,7 +83,7 @@ func (s *UserService) GetUser(ctx context.Context, req *protos.GetUserRequest) (
 }
 
 func (s *UserService) GetUsers(ctx context.Context, req *protos.GetUsersRequest) (resp *protos.GetUsersResponse, err error) {
-	log.Println("Batch Getting Users: ", req.Ids, len(req.Ids))
+	// log.Println("Batch Getting Users: ", req.Ids, len(req.Ids))
 	users, err := s.DB.GetUsers(req.Ids)
 	/*
 		users := gfn.BatchGet(req.Ids, func(id string) (out *protos.User, err error) {
