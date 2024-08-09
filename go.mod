@@ -14,7 +14,7 @@ require (
 require (
 	github.com/go-logr/logr v1.4.2
 	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
-	github.com/panyam/dbsync v0.0.1
+	github.com/panyam/dbsync v0.0.2
 	github.com/panyam/goutils v0.1.1
 	github.com/stretchr/testify v1.9.0
 	go.opentelemetry.io/contrib/bridges/otelslog v0.3.0
@@ -37,8 +37,7 @@ require (
 	gorm.io/gorm v1.25.2
 )
 
-replace github.com/panyam/dbsync v0.0.1 => ./locallinks/dbsync
-
+// replace github.com/panyam/dbsync v0.0.1 => ./locallinks/dbsync
 // replace github.com/panyam/goutils v0.1.1 => ../goutils/
 // replace github.com/panyam/slicer v0.0.1 => ../slicer/
 

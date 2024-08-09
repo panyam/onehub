@@ -45,7 +45,7 @@ services:
   typesense-dashboard:
     networks:
       - onehubnetwork
-    image: typesense-dashboard
+    image: panyam/typesense-dashboard:latest
     volumes:
       - ./configs/tsdash.config:/srv/config.json
 
