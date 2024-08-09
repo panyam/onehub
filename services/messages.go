@@ -9,7 +9,6 @@ import (
 	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
-	"github.com/panyam/onehub/obs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -36,7 +35,7 @@ func ensureMessageBase(msg *protos.Message) *protos.Message {
 }
 
 func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessagesRequest) (resp *protos.ListMessagesResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "ListMessages")
+	ctx, span := Tracer.Start(ctx, "ListMessages")
 	defer span.End()
 
 	pageKey := ""
@@ -56,7 +55,7 @@ func (s *MessageService) ListMessages(ctx context.Context, req *protos.ListMessa
 
 // Create a new Message
 func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateMessagesRequest) (resp *protos.CreateMessagesResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "CreateMessages")
+	ctx, span := Tracer.Start(ctx, "CreateMessages")
 	defer span.End()
 
 	topic, err := s.DB.GetTopic(ctx, req.TopicId)
@@ -81,7 +80,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 			// see if it already exists
 			curr, _ := s.DB.GetMessage(ctx, message.Base.Id)
 			if curr != nil {
-				obs.Logger.InfoContext(ctx, "Message with id already exists", "messageId", message.Base.Id)
+				Logger.InfoContext(ctx, "Message with id already exists", "messageId", message.Base.Id)
 				return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Message with id '%s' already exists", message.Base.Id))
 			}
 		} else {
@@ -107,7 +106,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 	}
 
 	if err := s.DB.CreateMessages(ctx, dbmsgs); err != nil {
-		obs.Logger.ErrorContext(ctx, err.Error())
+		Logger.ErrorContext(ctx, err.Error())
 		return nil, err
 	}
 
@@ -120,7 +119,7 @@ func (s *MessageService) CreateMessages(ctx context.Context, req *protos.CreateM
 
 // Create a new Message
 func (s *MessageService) ImportMessages(ctx context.Context, req *protos.ImportMessagesRequest) (resp *protos.ImportMessagesResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "ImportMessages")
+	ctx, span := Tracer.Start(ctx, "ImportMessages")
 	defer span.End()
 	// Add a new message entity here
 	numNewIDs := 0

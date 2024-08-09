@@ -7,7 +7,6 @@ import (
 	gfn "github.com/panyam/goutils/fn"
 	ds "github.com/panyam/onehub/datastore"
 	protos "github.com/panyam/onehub/gen/go/onehub/v1"
-	"github.com/panyam/onehub/obs"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -32,12 +31,12 @@ func ensureTopicBase(topic *protos.Topic) *protos.Topic {
 
 // Create a new Topic
 func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicRequest) (resp *protos.CreateTopicResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "CreateTopic")
+	ctx, span := Tracer.Start(ctx, "CreateTopic")
 	defer span.End()
 	ensureTopicBase(req.Topic)
 	req.Topic.Base.CreatorId = GetAuthedUser(ctx)
 	if req.Topic.Base.CreatorId == "" {
-		obs.Logger.InfoContext(ctx, "User is not authenticated to create a topic.")
+		Logger.InfoContext(ctx, "User is not authenticated to create a topic.")
 		return nil, status.Error(codes.PermissionDenied, "User is not authenticated to create a topic.")
 	}
 	topic := req.Topic
@@ -45,7 +44,7 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 		// see if it already exists
 		curr, _ := s.DB.GetTopic(ctx, topic.Base.Id)
 		if curr != nil {
-			obs.Logger.InfoContext(ctx, "Topic with id already exists", "topicId", topic.Base.Id)
+			Logger.InfoContext(ctx, "Topic with id already exists", "topicId", topic.Base.Id)
 			return nil, status.Error(codes.AlreadyExists, fmt.Sprintf("Topic with id '%s' already exists", topic.Base.Id))
 		}
 	} else {
@@ -69,7 +68,7 @@ func (s *TopicService) CreateTopic(ctx context.Context, req *protos.CreateTopicR
 
 // Deletes an topic from our system.
 func (s *TopicService) DeleteTopic(ctx context.Context, req *protos.DeleteTopicRequest) (resp *protos.DeleteTopicResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "DeleteTopic")
+	ctx, span := Tracer.Start(ctx, "DeleteTopic")
 	defer span.End()
 	resp = &protos.DeleteTopicResponse{}
 	s.DB.DeleteTopic(ctx, req.Id)
@@ -78,7 +77,7 @@ func (s *TopicService) DeleteTopic(ctx context.Context, req *protos.DeleteTopicR
 
 // Finds and retrieves topics matching the particular criteria.
 func (s *TopicService) ListTopics(ctx context.Context, req *protos.ListTopicsRequest) (resp *protos.ListTopicsResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "ListTopics")
+	ctx, span := Tracer.Start(ctx, "ListTopics")
 	defer span.End()
 	results, err := s.DB.ListTopics(ctx, "", 100)
 	if err != nil {
@@ -89,7 +88,7 @@ func (s *TopicService) ListTopics(ctx context.Context, req *protos.ListTopicsReq
 }
 
 func (s *TopicService) GetTopic(ctx context.Context, req *protos.GetTopicRequest) (resp *protos.GetTopicResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "GetTopic")
+	ctx, span := Tracer.Start(ctx, "GetTopic")
 	defer span.End()
 	curr, _ := s.DB.GetTopic(ctx, req.Id)
 	if curr == nil {
@@ -101,7 +100,7 @@ func (s *TopicService) GetTopic(ctx context.Context, req *protos.GetTopicRequest
 }
 
 func (s *TopicService) GetTopics(ctx context.Context, req *protos.GetTopicsRequest) (resp *protos.GetTopicsResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "GetTopics")
+	ctx, span := Tracer.Start(ctx, "GetTopics")
 	defer span.End()
 	topics := gfn.BatchGet(req.Ids, func(id string) (out *protos.Topic, err error) {
 		resp, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: id})
@@ -118,7 +117,7 @@ func (s *TopicService) GetTopics(ctx context.Context, req *protos.GetTopicsReque
 
 // Update a new Topic
 func (s *TopicService) UpdateTopic(ctx context.Context, req *protos.UpdateTopicRequest) (resp *protos.UpdateTopicResponse, err error) {
-	ctx, span := obs.Tracer.Start(ctx, "UpdateTopic")
+	ctx, span := Tracer.Start(ctx, "UpdateTopic")
 	defer span.End()
 	currtopic, err := s.GetTopic(ctx, &protos.GetTopicRequest{Id: req.Topic.Base.Id})
 	if err != nil {
