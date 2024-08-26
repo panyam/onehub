@@ -26,7 +26,7 @@ func TestCreateTopicAndFetch(t *testing.T) {
 				},
 			})
 			assert.Equal(t, err, nil, "Error should be nil")
-			assert.Equal(t, resp.Topic.Id, "1")
+			assert.Equal(t, resp.Topic.Base.Id, "1")
 			assert.Equal(t, resp.Topic.Name, "First Topic")
 			assert.Equal(t, resp.Topic.Users, map[string]bool{"1": true, "2": true, "3": true})
 
@@ -38,7 +38,7 @@ func TestCreateTopicAndFetch(t *testing.T) {
 				},
 			})
 			assert.Equal(t, err, nil, "Error should be nil")
-			assert.Equal(t, resp.Topic.Id, "2")
+			assert.Equal(t, resp.Topic.Base.Id, "2")
 			assert.Equal(t, resp.Topic.Name, "An awesome second song")
 			assert.Equal(t, resp.Topic.Users, []string{"4", "2", "5"})
 

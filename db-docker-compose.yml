@@ -40,12 +40,14 @@ services:
   # git clone https://github.com/bfritscher/typesense-dashboard.git
   # cd typesense-dashboard
   # docker build -t typesense-dashboard .
+  # or
+  # docker build --build-arg=PUBLIC_PATH=/typesense -t typesense-dashboard .
   typesense-dashboard:
-    image: typesense-dashboard
+    networks:
+      - onehubnetwork
+    image: panyam/typesense-dashboard:latest
     volumes:
       - ./configs/tsdash.config:/srv/config.json
-    ports:
-      - 8180:80
 
   typesense:
     networks:
@@ -53,6 +55,8 @@ services:
         # image: typesense/typesense:0.25.0
     image: typesense/typesense:26.0-arm64
     restart: on-failure
+    environment:
+      GLOG_minloglevel: 1
     ports:
       - 8108:8108
     volumes:

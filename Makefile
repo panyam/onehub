@@ -1,14 +1,14 @@
 
 all: build
 
-buildimage: down copylinks build resymlink
+build: down copylinks dockerbuild resymlink
 
 copylinks:
 	rm -Rf locallinks/*
 	cp -r ../dbsync locallinks/
 	cp -r ../goutils locallinks/
 
-build:
+dockerbuild:
 	BUILDKIT_PROGRESS=plain docker compose build --no-cache
 
 resymlink:

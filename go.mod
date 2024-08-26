@@ -7,16 +7,16 @@ toolchain go1.22.4
 require (
 	github.com/jackc/pglogrepl v0.0.0-20240307033717-828fbfe908e9
 	github.com/lib/pq v1.10.9
-	google.golang.org/grpc v1.59.0
-	google.golang.org/protobuf v1.33.0
+	google.golang.org/grpc v1.65.0
+	google.golang.org/protobuf v1.34.2
 )
 
 require (
-	github.com/grpc-ecosystem/grpc-gateway/v2 v2.16.1
+	github.com/grpc-ecosystem/grpc-gateway/v2 v2.20.0
 	github.com/panyam/dbsync v0.0.1
 	github.com/panyam/goutils v0.1.1
-	github.com/stretchr/testify v1.8.4
-	google.golang.org/genproto/googleapis/api v0.0.0-20230822172742-b8732ec3820d
+	github.com/stretchr/testify v1.9.0
+	google.golang.org/genproto/googleapis/api v0.0.0-20240701130421-f6361c86f094
 	gorm.io/driver/postgres v1.5.2
 	gorm.io/gorm v1.25.2
 )
