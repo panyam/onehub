@@ -81,7 +81,7 @@ func (m *OurMessageHandler) HandleUpdateMessage(idx int, msg *pglogrepl.UpdateMe
 
 func main() {
 	d, err := dbsync.NewSyncer(
-		dbsync.ForTables("users", "services", "topics"),
+		dbsync.ForTables("users", "messages", "topics"),
 	)
 	if err != nil {
 		panic(err)
