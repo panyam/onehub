@@ -7,8 +7,6 @@ import (
 	"log"
 	"net"
 	"net/http"
-	"os"
-	"os/signal"
 
 	"go.opentelemetry.io/contrib/instrumentation/google.golang.org/grpc/otelgrpc"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
@@ -55,33 +53,17 @@ func StartGatewayServer(ctx context.Context, mux *runtime.ServeMux, gw_addr stri
 func main() {
 	flag.Parse()
 
-	// Handle SIGINT (CTRL+C) gracefully.
-	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt)
-	defer stop()
-
-	collectorAddr := cmdutils.GetEnvOrDefault("OTEL_COLLECTOR_ADDR", "otel-collector:4317")
-	conn, err := grpc.NewClient(collectorAddr,
-		// Note the use of insecure transport here. TLS is recommended in production.
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		log.Println("failed to create gRPC connection to collector: %w", err)
-		return
-	}
-	setup := NewOTELSetupWithCollector(conn)
-	err = setup.Setup(ctx)
-	if err != nil {
-		log.Println("error setting up otel: ", err)
-	}
-
+	ctx, setup, stop, err := SetupOtel("", "")
 	defer func() {
+		if stop != nil {
+			stop()
+		}
 		err = setup.Shutdown(context.Background())
 	}()
 
 	ohdb := OpenOHDB()
 
 	srvErr := make(chan error, 2)
-
 	httpSrvChan := make(chan bool)
 	grpcSrvChan := make(chan bool)
 	trclient := grpc.WithStatsHandler(otelgrpc.NewClientHandler())
