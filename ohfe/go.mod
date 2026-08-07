@@ -1,8 +1,6 @@
 module github.com/panyam/onehub/ohfe
 
-go 1.22
-
-toolchain go1.22.4
+go 1.25.0
 
 // replace github.com/panyam/s3gen v0.0.11 => ../../s3gen/
 
@@ -17,8 +15,8 @@ require (
 	github.com/panyam/goutils v0.1.2
 	github.com/panyam/onehub v0.0.0-20240625081306-c666a276c24b
 	github.com/panyam/s3gen v0.0.11
-	golang.org/x/text v0.14.0
-	google.golang.org/grpc v1.64.0
+	golang.org/x/text v0.36.0
+	google.golang.org/grpc v1.82.1
 )
 
 require (
@@ -37,11 +35,11 @@ require (
 	github.com/yuin/goldmark v1.7.1 // indirect
 	github.com/yuin/goldmark-highlighting/v2 v2.0.0-20230729083705-37449abec8cc // indirect
 	go.abhg.dev/goldmark/anchor v0.1.1 // indirect
-	golang.org/x/net v0.24.0 // indirect
-	golang.org/x/sys v0.19.0 // indirect
-	google.golang.org/genproto/googleapis/api v0.0.0-20240318140521-94a12d6c2237 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20240318140521-94a12d6c2237 // indirect
-	google.golang.org/protobuf v1.33.0 // indirect
+	golang.org/x/net v0.53.0 // indirect
+	golang.org/x/sys v0.43.0 // indirect
+	google.golang.org/genproto/googleapis/api v0.0.0-20260414002931-afd174a4e478 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20260414002931-afd174a4e478 // indirect
+	google.golang.org/protobuf v1.36.11 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gorm.io/gorm v1.25.2 // indirect
 )
